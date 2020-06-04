@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "fabrictailor",
+  "version": "${version}",
+
+  "name": "Fabric Tailor",
+  "description": "For those needing to quickly change their skin!",
+  "authors": [
+    "samo_lego"
+  ],
+  "contact": {
+    "homepage": "https://samolego.github.io",
+    "sources": "https://github.com/samolego/FabricTailor"
+  },
+
+  "license": "MIT",
+  "icon": "assets/fabrictailor/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "server": [
+      "org.samo_lego.fabrictailor.FabricTailor"
+    ]
+  },
+  "mixins": [
+    "fabrictailor.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
