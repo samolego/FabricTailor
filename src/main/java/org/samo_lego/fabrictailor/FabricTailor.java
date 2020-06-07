@@ -3,16 +3,12 @@ package org.samo_lego.fabrictailor;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import nerdhub.cardinal.components.api.ComponentRegistry;
-import nerdhub.cardinal.components.api.ComponentType;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mineskin.MineskinClient;
-import org.samo_lego.fabrictailor.Command.SkinCommand;
+import org.samo_lego.fabrictailor.Command.SetskinCommand;
 import org.samo_lego.fabrictailor.event.PlayerJoinServerCallback;
 import org.samo_lego.fabrictailor.event.TailorEventHandler;
 
@@ -20,10 +16,8 @@ public class FabricTailor implements DedicatedServerModInitializer {
 	private static final Logger LOGGER = LogManager.getLogger();
 	public static final String MODID = "[FabricTailor]";
 
-	public static MineskinClient skinClient;
 
-	public static final ComponentType<SkinSaver> skinData =
-			ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("fabrictailor:skindata"), SkinSaver.class);
+	//public static final ComponentType<SkinSaver> skinData = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("fabrictailor:skindata"), SkinSaver.class);
 
 	@Override
 	public void onInitializeServer() {
@@ -31,7 +25,7 @@ public class FabricTailor implements DedicatedServerModInitializer {
 		log("Starting FabricTailor mod by samo_lego.");
 
 		// Registering /skin command
-		CommandRegistrationCallback.EVENT.register(SkinCommand::register);
+		CommandRegistrationCallback.EVENT.register(SetskinCommand::register);
 
 		// registering player join event
 		PlayerJoinServerCallback.EVENT.register(TailorEventHandler::onPlayerJoin);
@@ -52,8 +46,6 @@ public class FabricTailor implements DedicatedServerModInitializer {
 
 	// Main method for setting player skin
 	public static boolean setPlayerSkin(ServerPlayerEntity player, String value, String signature) {
-		System.out.println("Setting skin for : " + player.getName().asString());
-
 		GameProfile gameProfile = player.getGameProfile();
 		PropertyMap map = gameProfile.getProperties();
 

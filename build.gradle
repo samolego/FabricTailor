@@ -4,10 +4,6 @@ plugins {
 }
 
 repositories {
-	// inventive-repo (mineskin)
-	maven {
-		url 'https://repo.inventivetalent.org/content/groups/public'
-	}
 	maven {
 		name = "Jitpack"
 		url = "https://jitpack.io"
@@ -30,12 +26,12 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// Mineskin API
-	implementation 'org.mineskin:java-client:1.0.4-SNAPSHOT'
+	implementation 'org.jsoup:jsoup:1.13.1'
+	include 'org.jsoup:jsoup:1.13.1'
 
 	// Cardinal Components
 	//modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_module}:${project.cca_version}"
-	modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_version}"
+	//modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_version}"
 	// Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
 	//include "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_module}:${project.cca_version}"
 }
