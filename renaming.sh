@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd ./build/libs
 
 # Deleting the development and sources files
