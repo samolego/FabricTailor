@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Script uploads the latest build and deletes old ones, if there are more than 10
 
 cd ./build/libs
 
