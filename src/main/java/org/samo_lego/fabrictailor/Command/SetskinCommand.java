@@ -3,7 +3,6 @@ package org.samo_lego.fabrictailor.Command;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -24,7 +23,7 @@ public class SetskinCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean b) {
         dispatcher.register(CommandManager.literal("setskin")
             .then(CommandManager.argument("URL", message())
-                    .executes(ctx -> skin(ctx.getSource(), getMessage(ctx, "URL").getString(), false))
+                    .executes(ctx -> fetchSkin((ServerPlayerEntity) ctx.getSource().getEntityOrThrow(), getMessage(ctx, "URL").getString()))
                     //.then(CommandManager.argument("slim", string())
                             //.executes(ctx -> skin(ctx.getSource(), StringArgumentType.getString(ctx, "URL"), true)))
             )
@@ -41,9 +40,7 @@ public class SetskinCommand {
         );
     }
 
-    private static int skin(ServerCommandSource source, String skinUrl, boolean slim) throws CommandSyntaxException {
-        ServerPlayerEntity player = (ServerPlayerEntity) source.getEntityOrThrow();
-
+    public static int fetchSkin(ServerPlayerEntity player, String skinUrl) {
         new Thread(() -> {
             try {
                 URL url = new URL(skinUrl);
@@ -52,13 +49,14 @@ public class SetskinCommand {
                 // Getting gson for parsing
                 final Gson gson = new Gson();
                 String body = connection.execute().body();
+                System.out.println(body);
 
                 // Parsing response
                 JsonObject json = gson.fromJson(body, JsonObject.class);
                 if (json.has("error")) {
                     player.sendSystemMessage(
                             new LiteralText(
-                                    "§cAn error occured."
+                                    "§cAn error occurred when trying to fetch skin."
                             ),
                             player.getUuid()
                     );
@@ -78,19 +76,6 @@ public class SetskinCommand {
                             ),
                             player.getUuid()
                     );
-                    // Updating player's gameprofile
-                    /*player.setInvisible(true);
-                    player.setInvisible(false);
-                    player.inventory.updateItems();
-                    player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(
-                            DimensionType.OVERWORLD_REGISTRY_KEY,
-                            player.getEntityWorld().getRegistryKey(),
-                            0,
-                            player.interactionManager.getGameMode(),
-                            player.getEntityWorld().isDebugWorld(),
-                            false,
-                            true
-                    ));*/
                 }
 
             } catch (IOException e) {

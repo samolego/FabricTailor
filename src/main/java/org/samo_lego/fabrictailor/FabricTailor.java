@@ -5,7 +5,10 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.samo_lego.fabrictailor.Command.SetskinCommand;
@@ -56,6 +59,35 @@ public class FabricTailor implements DedicatedServerModInitializer {
 			// Player has no skin data
 		}
 		map.put("textures", new Property("textures", value, signature));
+		reloadSelfSkin(player);
 		return true;
+	}
+
+	// Ugly reloading of player's gameprofile
+	private static void reloadSelfSkin(ServerPlayerEntity player) {
+		player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
+		player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
+
+		player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(
+				DimensionType.THE_NETHER_REGISTRY_KEY,
+				player.getEntityWorld().getRegistryKey(),
+				0,
+				player.interactionManager.getGameMode(),
+				player.getEntityWorld().isDebugWorld(),
+				false,
+				true
+		));
+		player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(
+				DimensionType.OVERWORLD_REGISTRY_KEY,
+				player.getEntityWorld().getRegistryKey(),
+				0,
+				player.interactionManager.getGameMode(),
+				player.getEntityWorld().isDebugWorld(),
+				false,
+				true
+		));
+		player.teleport(player.getX(), player.getY(), player.getZ(), false);
+		// update inventory
+		player.inventory.updateItems(); //doesnt work
 	}
 }
