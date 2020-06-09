@@ -1,16 +1,24 @@
 package org.samo_lego.fabrictailor;
 
-/*interface SkinSaveData extends Component {
+import nerdhub.cardinal.components.api.component.Component;
+import net.minecraft.nbt.CompoundTag;
+
+interface SkinSaveData extends Component {
     String getValue();
     void setValue(String value);
+
     String getSignature();
     void setSignature(String signature);
-}*/
+}
 
-public class SkinSaver /*implements SkinSaveData*/ {
-    /*private String value = "";
-    private String signature = "";
+public class SkinSaver implements SkinSaveData {
+    private String value;
+    private String signature;
 
+    public SkinSaver(String value, String signature) {
+        this.value = value;
+        this.signature = signature;
+    }
     @Override
     public String getValue() {
         return this.value;
@@ -29,13 +37,17 @@ public class SkinSaver /*implements SkinSaveData*/ {
     }
 
     @Override public void fromTag(CompoundTag tag) {
-        this.value = tag.getString("value");
-        this.signature = tag.getString("signature");
+        CompoundTag skinDataTag = tag.getCompound("skin_data");
+        this.value = skinDataTag.getString("value");
+        this.signature = skinDataTag.getString("signature");
     }
 
     @Override public CompoundTag toTag(CompoundTag tag) {
-        tag.putString("value", this.value);
-        tag.putString("signature", this.signature);
+        CompoundTag skinDataTag = new CompoundTag();
+        skinDataTag.putString("value", this.value);
+        skinDataTag.putString("signature", this.signature);
+
+        tag.put("skin_data", skinDataTag);
         return tag;
-    }*/
+    }
 }

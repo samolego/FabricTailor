@@ -28,7 +28,7 @@ dependencies {
 
 	// Cardinal Components
 	//modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_module}:${project.cca_version}"
-	//modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_version}"
+	modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_version}"
 	// Includes Cardinal Components API as a Jar-in-Jar dependency (optional)
 	//include "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_module}:${project.cca_version}"
 }

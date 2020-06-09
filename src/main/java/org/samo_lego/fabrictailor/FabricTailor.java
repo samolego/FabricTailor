@@ -3,11 +3,18 @@ package org.samo_lego.fabrictailor;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import nerdhub.cardinal.components.api.ComponentRegistry;
+import nerdhub.cardinal.components.api.ComponentType;
+import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.util.EntityComponents;
+import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,11 +23,10 @@ import org.samo_lego.fabrictailor.event.PlayerJoinServerCallback;
 import org.samo_lego.fabrictailor.event.TailorEventHandler;
 
 public class FabricTailor implements DedicatedServerModInitializer {
+	public static final String MODID = "fabrictailor";
 	private static final Logger LOGGER = LogManager.getLogger();
-	public static final String MODID = "[FabricTailor]";
 
-
-	//public static final ComponentType<SkinSaver> skinData = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier("fabrictailor:skindata"), SkinSaver.class);
+	public static final ComponentType<SkinSaver> SKIN_DATA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(MODID,"skin_data"), SkinSaver.class);
 
 	@Override
 	public void onInitializeServer() {
@@ -33,17 +39,16 @@ public class FabricTailor implements DedicatedServerModInitializer {
 		// registering player join event
 		PlayerJoinServerCallback.EVENT.register(TailorEventHandler::onPlayerJoin);
 
+
 		// Add the component to every instance of PlayerEntity
-		//EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(skinData, new SkinSaver()));
+		EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(SKIN_DATA, new SkinSaver("", "")));
+		EntityComponents.setRespawnCopyStrategy(SKIN_DATA, RespawnCopyStrategy.ALWAYS_COPY);
 
 	}
 
-	// Logging methods
+	// Logging method
 	public static void log(String msg) {
-		LOGGER.info(MODID + " " + msg);
-	}
-	public static void errorLog(String msg) {
-		LOGGER.error(MODID + " Error occured: "+ msg);
+		LOGGER.info("[FabricTailor] " + msg);
 	}
 
 
@@ -58,8 +63,12 @@ public class FabricTailor implements DedicatedServerModInitializer {
 		} catch (Exception ignored) {
 			// Player has no skin data
 		}
+
 		map.put("textures", new Property("textures", value, signature));
 		reloadSelfSkin(player);
+		// We need to save data as well
+		// Cardinal Components
+
 		return true;
 	}
 
