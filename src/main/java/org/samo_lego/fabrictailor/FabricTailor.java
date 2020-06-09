@@ -89,5 +89,7 @@ public class FabricTailor implements DedicatedServerModInitializer {
 		player.teleport(player.getX(), player.getY(), player.getZ(), false);
 		// update inventory
 		player.inventory.updateItems(); //doesnt work
+		player.playerScreenHandler.sendContentUpdates();
+		player.currentScreenHandler.sendContentUpdates();
 	}
 }

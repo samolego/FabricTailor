@@ -26,9 +26,6 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	implementation 'org.jsoup:jsoup:1.13.1'
-	include 'org.jsoup:jsoup:1.13.1'
-
 	// Cardinal Components
 	//modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_module}:${project.cca_version}"
 	//modImplementation "io.github.OnyxStudios:Cardinal-Components-API:${project.cca_version}"

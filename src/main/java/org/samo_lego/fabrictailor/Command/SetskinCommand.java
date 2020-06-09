@@ -11,7 +11,7 @@ import net.minecraft.text.LiteralText;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -45,70 +45,20 @@ public class SetskinCommand {
 
     public static int fetchSkin(ServerPlayerEntity player, String skinUrl) {
         new Thread(() -> {
-            /*try {
-                URL url = new URL(skinUrl);
-                Connection connection = Jsoup.connect("https://api.mineskin.org/generate/url?url=" + url).method(Connection.Method.POST).ignoreContentType(true).ignoreHttpErrors(true).timeout(40000);
-
-                // Getting gson for parsing
-                final Gson gson = new Gson();
-                String body = connection.execute().body();
-                System.out.println(body);
-
-                // Parsing response
-                JsonObject json = gson.fromJson(body, JsonObject.class);
-                if (json.has("error")) {
-                    player.sendSystemMessage(
-                            new LiteralText(
-                                    "§cAn error occurred when trying to fetch skin."
-                            ),
-                            player.getUuid()
-                    );
-                    return;
-                }
-
-                JsonObject textureObject = json.get("data").getAsJsonObject().get("texture").getAsJsonObject();
-
-                // Getting skin data that we need
-                String value = textureObject.get("value").getAsString();
-                String signature = textureObject.get("signature").getAsString();
-
-                if(setPlayerSkin(player, value, signature)) {
-                    player.sendSystemMessage(
-                            new LiteralText(
-                                    "§aSkin data set."
-                            ),
-                            player.getUuid()
-                    );
-                }
-
-            } catch (IOException e) {
-                player.sendSystemMessage(
-                    new LiteralText(
-                            "§cMalformed url!"
-                    ),
-                    player.getUuid()
-                );
-            }*/
             try {
                 URL url = new URL("https://api.mineskin.org/generate/url?url=" + skinUrl);
-                /*URLConnection con = url.openConnection();
-                HttpURLConnection http = (HttpURLConnection)con;
-                http.setRequestMethod("POST");
-                http.setDoOutput(true);
-                http.connect();
-                System.out.println(http.getRequestMethod());*/
 
-                HttpClient client = new DefaultHttpClient();
+                HttpClient httpclient = HttpClientBuilder.create().build();
                 HttpPost post = new HttpPost(url.toString());
-                HttpEntity httpEntity = client.execute(post).getEntity();
+                HttpEntity httpEntity = httpclient.execute(post).getEntity();
 
                 if(httpEntity == null) {
                     return;
                 }
+                System.out.println();
                 // Getting gson for parsing
                 final Gson gson = new Gson();
                 String body = EntityUtils.toString(httpEntity);
-                System.out.println(body);
 
                 // Parsing response
                 JsonObject json = gson.fromJson(body, JsonObject.class);
