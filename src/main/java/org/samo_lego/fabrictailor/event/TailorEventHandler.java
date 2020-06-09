@@ -17,13 +17,11 @@ public class TailorEventHandler {
     // Pretty self explanatory
     public static void onPlayerJoin(ServerPlayerEntity player) {
         // todo get skin data from player nbt with ccapi
-
-        // Getting skin data from ely.by api, since it can be used with usernames
-        // it also includes mojang skins
         // Puts the saved skindata to player's profile
         //setPlayerSkin(player, value, signature);
 
-        // Checks ely.by api for mojang or ely.by skins
+        // Getting skin data from ely.by api, since it can be used with usernames
+        // it also includes mojang skins
         new Thread(() -> {
             try {
                 URL url = new URL("http://skinsystem.ely.by/skins/" + player.getName().getString() + ".png");
