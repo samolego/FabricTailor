@@ -18,7 +18,7 @@
 
   "environment": "*",
   "entrypoints": {
-    "server": [
+    "main": [
       "org.samo_lego.fabrictailor.FabricTailor"
     ]
   },

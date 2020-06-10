@@ -34,7 +34,7 @@ public class SetskinCommand {
                 Entity player = ctx.getSource().getEntityOrThrow();
                 player.sendSystemMessage(
                     new LiteralText(
-                            "You have to provide URL of the skin."
+                            "§6You have to provide URL of the skin."
                     ),
                     player.getUuid()
                 );
@@ -44,6 +44,12 @@ public class SetskinCommand {
     }
 
     public static int fetchSkin(ServerPlayerEntity player, String skinUrl) {
+        player.sendSystemMessage(
+                new LiteralText(
+                        "§eTrying to set your skin ... Please wait."
+                ),
+                player.getUuid()
+        );
         new Thread(() -> {
             try {
                 URL url = new URL("https://api.mineskin.org/generate/url?url=" + skinUrl);
@@ -81,7 +87,7 @@ public class SetskinCommand {
                 if(setPlayerSkin(player, value, signature)) {
                     player.sendSystemMessage(
                             new LiteralText(
-                                    "§aSkin data set."
+                                    "§aYour skin was set successfully."
                             ),
                             player.getUuid()
                     );

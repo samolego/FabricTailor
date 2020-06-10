@@ -3,10 +3,10 @@
   "minVersion": "0.8",
   "package": "org.samo_lego.fabrictailor.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
-  "server": [
+  "mixins": [
     "MixinPlayerManager"
   ],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   }

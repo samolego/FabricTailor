@@ -8,9 +8,10 @@ import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
-import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,16 +23,16 @@ import org.samo_lego.fabrictailor.Command.SetskinCommand;
 import org.samo_lego.fabrictailor.event.PlayerJoinServerCallback;
 import org.samo_lego.fabrictailor.event.TailorEventHandler;
 
-public class FabricTailor implements DedicatedServerModInitializer {
+public class FabricTailor implements ModInitializer {
 	public static final String MODID = "fabrictailor";
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	public static final ComponentType<SkinSaver> SKIN_DATA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(MODID,"skin_data"), SkinSaver.class);
+	public static final ComponentType<SkinSaveData> SKIN_DATA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(MODID,"skin_data"), SkinSaveData.class);
 
 	@Override
-	public void onInitializeServer() {
+	public void onInitialize() {
 		// Info that mod is loading
-		log("Starting FabricTailor mod by samo_lego.");
+		infoLog("Starting FabricTailor mod by samo_lego.");
 
 		// Registering /skin command
 		CommandRegistrationCallback.EVENT.register(SetskinCommand::register);
@@ -43,14 +44,15 @@ public class FabricTailor implements DedicatedServerModInitializer {
 		// Add the component to every instance of PlayerEntity
 		EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(SKIN_DATA, new SkinSaver("", "")));
 		EntityComponents.setRespawnCopyStrategy(SKIN_DATA, RespawnCopyStrategy.ALWAYS_COPY);
-
 	}
 
-	// Logging method
-	public static void log(String msg) {
-		LOGGER.info("[FabricTailor] " + msg);
+	// Logging methods
+	public static void infoLog(String info) {
+		LOGGER.info("[FabricTailor] " + info);
 	}
-
+	public static void errorLog(String error) {
+		LOGGER.error("[FabricTailor] " + error);
+	}
 
 	// Main method for setting player skin
 	public static boolean setPlayerSkin(ServerPlayerEntity player, String value, String signature) {
@@ -66,8 +68,19 @@ public class FabricTailor implements DedicatedServerModInitializer {
 
 		map.put("textures", new Property("textures", value, signature));
 		reloadSelfSkin(player);
+
 		// We need to save data as well
 		// Cardinal Components
+		// Thanks Pyro and UPcraft for helping me out :)
+		CompoundTag playerTag = new CompoundTag();
+		player.toTag(playerTag);
+
+		CompoundTag skinDataTag = playerTag.getCompound("skin_data");
+		skinDataTag.putString("value", value);
+		skinDataTag.putString("signature", signature);
+
+		playerTag.put("skin_data", skinDataTag);
+		player.fromTag(playerTag);
 
 		return true;
 	}
