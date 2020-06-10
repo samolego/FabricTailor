@@ -11,7 +11,6 @@ import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -21,13 +20,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.samo_lego.fabrictailor.Command.SetskinCommand;
 import org.samo_lego.fabrictailor.event.PlayerJoinServerCallback;
-import org.samo_lego.fabrictailor.event.TailorEventHandler;
+
+import static org.samo_lego.fabrictailor.event.TailorEventHandler.onPlayerJoin;
 
 public class FabricTailor implements ModInitializer {
 	public static final String MODID = "fabrictailor";
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	public static final ComponentType<SkinSaveData> SKIN_DATA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(MODID,"skin_data"), SkinSaveData.class);
+	private static final ComponentType<SkinSaveData> SKIN_DATA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(MODID,"skin_data"), SkinSaveData.class);
 
 	@Override
 	public void onInitialize() {
@@ -38,7 +38,7 @@ public class FabricTailor implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(SetskinCommand::register);
 
 		// registering player join event
-		PlayerJoinServerCallback.EVENT.register(TailorEventHandler::onPlayerJoin);
+		PlayerJoinServerCallback.EVENT.register(player -> onPlayerJoin(player, SKIN_DATA.get(player).getValue(), SKIN_DATA.get(player).getSignature()));
 
 
 		// Add the component to every instance of PlayerEntity
@@ -72,15 +72,8 @@ public class FabricTailor implements ModInitializer {
 		// We need to save data as well
 		// Cardinal Components
 		// Thanks Pyro and UPcraft for helping me out :)
-		CompoundTag playerTag = new CompoundTag();
-		player.toTag(playerTag);
-
-		CompoundTag skinDataTag = playerTag.getCompound("skin_data");
-		skinDataTag.putString("value", value);
-		skinDataTag.putString("signature", signature);
-
-		playerTag.put("skin_data", skinDataTag);
-		player.fromTag(playerTag);
+		SKIN_DATA.get(player).setValue(value);
+		SKIN_DATA.get(player).setSignature(signature);
 
 		return true;
 	}
@@ -109,9 +102,12 @@ public class FabricTailor implements ModInitializer {
 				true
 		));
 		player.teleport(player.getX(), player.getY(), player.getZ(), false);
+
 		// update inventory
-		player.inventory.updateItems(); //doesnt work
-		player.playerScreenHandler.sendContentUpdates(); //doesnt work
-		player.currentScreenHandler.sendContentUpdates(); //doesnt work
+		//player.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-1, -1, player.inventory.getMainHandStack()));
+		//player.inventory.insertStack(ItemStack.EMPTY);
+		//player.inventory.updateItems(); //doesnt work
+		//player.playerScreenHandler.sendContentUpdates(); //doesnt work
+		//player.currentScreenHandler.sendContentUpdates(); //doesnt work
 	}
 }
