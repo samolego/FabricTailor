@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.dimension.DimensionType;
@@ -37,7 +38,8 @@ public class FabricTailor implements ModInitializer {
 		// Registering /skin command
 		CommandRegistrationCallback.EVENT.register(SetskinCommand::register);
 
-		// registering player join event
+		// Registering player join event
+		// It passes the skin data to method as well, in order to apply skin at join
 		PlayerJoinServerCallback.EVENT.register(player -> onPlayerJoin(player, SKIN_DATA.get(player).getValue(), SKIN_DATA.get(player).getSignature()));
 
 
@@ -53,6 +55,7 @@ public class FabricTailor implements ModInitializer {
 	public static void errorLog(String error) {
 		LOGGER.error("[FabricTailor] " + error);
 	}
+
 
 	// Main method for setting player skin
 	public static boolean setPlayerSkin(ServerPlayerEntity player, String value, String signature) {
@@ -79,6 +82,7 @@ public class FabricTailor implements ModInitializer {
 	}
 
 	// Ugly reloading of player's gameprofile
+	//todo update player inv & hide&show player for others to see
 	private static void reloadSelfSkin(ServerPlayerEntity player) {
 		player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
 		player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
@@ -104,7 +108,7 @@ public class FabricTailor implements ModInitializer {
 		player.teleport(player.getX(), player.getY(), player.getZ(), false);
 
 		// update inventory
-		//player.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-1, -1, player.inventory.getMainHandStack()));
+		player.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-2, -1, player.inventory.getMainHandStack()));
 		//player.inventory.insertStack(ItemStack.EMPTY);
 		//player.inventory.updateItems(); //doesnt work
 		//player.playerScreenHandler.sendContentUpdates(); //doesnt work

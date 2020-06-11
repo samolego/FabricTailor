@@ -8,8 +8,6 @@
 
 A server-side or singleplayer skin changing mod.
 
-This mod exists thanks to the https://mineskin.org project.
-
 ## Setup
 
 1. Clone the repository. Then run `./gradlew genSources`
@@ -20,7 +18,11 @@ This mod exists thanks to the https://mineskin.org project.
 ./gradlew build
 ```
 
-
+## Thanks
+This mod exists thanks to:
+* [Cardinal Components API](https://github.com/OnyxStudios/Cardinal-Components-API) (Saving skin data)
+* [MineSkin API](https://mineskin.org) (Skin uploading & signing)
+* [ely.by API](https://ely.by) (Skin values & signatures)
 
 ## License
 

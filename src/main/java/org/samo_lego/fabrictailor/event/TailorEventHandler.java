@@ -1,17 +1,16 @@
 package org.samo_lego.fabrictailor.event;
 
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.HttpClientBuilder;
+import net.minecraft.text.LiteralText;
+import sun.net.www.protocol.http.HttpURLConnection;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Objects;
 
-import static org.samo_lego.fabrictailor.Command.SetskinCommand.fetchSkin;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 import static org.samo_lego.fabrictailor.FabricTailor.setPlayerSkin;
 
@@ -27,19 +26,25 @@ public class TailorEventHandler {
                 // Getting skin data from ely.by api, since it can be used with usernames
                 // it also includes mojang skins
                 try {
-                    URL url = new URL("http://skinsystem.ely.by/skins/" + player.getName().getString() + ".png");
+                    HttpURLConnection connection = (HttpURLConnection) new URL("http://skinsystem.ely.by/textures/signed/" + player.getName().getString() + ".png?proxy=true").openConnection();
+                    if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+                        String reply = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
+                        if (reply.contains("error")) {
+                            player.sendSystemMessage(
+                                    new LiteralText(
+                                            "§cAn error occurred when trying to fetch skin."
+                                    ),
+                                    player.getUuid()
+                            );
+                            return;
+                        }
 
-                    // Since api does a redirect, we need to get the new URL
-                    HttpClient httpclient = HttpClientBuilder.create().build();
-                    HttpGet get = new HttpGet(url.toString());
-                    HttpClientContext context = HttpClientContext.create();
-                    HttpResponse response = httpclient.execute(get, context);
+                        String replyValue = reply.split("\"value\":\"")[1].split("\"")[0];
+                        String replySignature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
-                    if(response == null) {
-                        return;
+                        setPlayerSkin(player, replyValue, replySignature);
+
                     }
-                    // Executing method from `/setskin` command
-                    fetchSkin(player, context.getRedirectLocations().iterator().next().toString());
                 } catch (IOException e) {
                     errorLog(e.getMessage());
                 }
