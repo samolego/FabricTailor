@@ -70,7 +70,9 @@ public class FabricTailor implements ModInitializer {
 		}
 
 		map.put("textures", new Property("textures", value, signature));
-		reloadSelfSkin(player);
+
+		if(!player.getServerWorld().isClient())
+			reloadSelfSkin(player);
 
 		// We need to save data as well
 		// Cardinal Components
@@ -106,6 +108,9 @@ public class FabricTailor implements ModInitializer {
 				true
 		));
 		player.teleport(player.getX(), player.getY(), player.getZ(), false);
+
+		//player.setInvisible(true); doesn't work sadly
+		//player.setInvisible(false);
 
 		// update inventory
 		player.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-2, -1, player.inventory.getMainHandStack()));
