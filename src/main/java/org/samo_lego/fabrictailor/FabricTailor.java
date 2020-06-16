@@ -54,7 +54,7 @@ public class FabricTailor implements ModInitializer {
 		LOGGER.info("[FabricTailor] " + info);
 	}
 	public static void errorLog(String error) {
-		LOGGER.info("[FabricTailor] " + error);
+		LOGGER.error("[FabricTailor] An error occurred: " + error);
 	}
 
 	// Main method for setting player skin
@@ -113,7 +113,6 @@ public class FabricTailor implements ModInitializer {
 			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, other));
 
 			if(player == other) {
-				System.out.println("Player " + other.getName().getString() + " has changed skin.");
 				// We found the player whose skin was changed, we need to change his dimension
 				// in order for him to be able to see new skin
 				ServerWorld world = player.getServerWorld();
@@ -124,7 +123,6 @@ public class FabricTailor implements ModInitializer {
 
 				while(worlds.hasNext()) {
 					newWorld = worlds.next();
-					System.out.println(newWorld);
 					if(newWorld != world)
 						break;
 				}
