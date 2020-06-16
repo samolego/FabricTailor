@@ -1,9 +1,8 @@
 # Fabric Tailor
-![License](https://img.shields.io/github/license/samolego/simpleauth.svg)
+[![GitHub license](https://img.shields.io/github/license/samolego/FabricTailor)](https://github.com/samolego/FabricTailor/blob/master/LICENSE)
 ![Gradle Build](https://github.com/samolego/FabricTailor/workflows/Gradle%20Build/badge.svg)
 ![Serverside](https://img.shields.io/badge/Working-server--side%20only-blue)
 ![Singleplayer](https://img.shields.io/badge/Working-singleplayer-darkblue)
-
 
 
 A server-side or singleplayer skin changing mod.
