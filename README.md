@@ -26,4 +26,4 @@ This mod exists thanks to:
 
 ## License
 
-This mod is licensed under `MIT` license.
+This mod is licensed under `LGPLv3` license.

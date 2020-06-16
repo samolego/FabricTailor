@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Fabric Tailor",
-  "description": "For those needing to quickly change their skin!",
+  "description": "For those needing to quickly change their skin! Works in singleplayer as well as server-side!",
   "authors": [
     "samo_lego"
   ],

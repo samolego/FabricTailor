@@ -14,6 +14,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static com.mojang.brigadier.arguments.StringArgumentType.getString;
+import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.command.arguments.MessageArgumentType.getMessage;
 import static net.minecraft.command.arguments.MessageArgumentType.message;
 import static org.samo_lego.fabrictailor.FabricTailor.setPlayerSkin;
@@ -22,17 +24,35 @@ public class SetskinCommand {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean b) {
         dispatcher.register(CommandManager.literal("setskin")
-                .then(CommandManager.argument("URL / playername", message())
+                .then(CommandManager.literal("URL")
+                        .then(CommandManager.argument("skin URL", message())
+                                .executes(ctx -> fetchSkinByUrl((ServerPlayerEntity) ctx.getSource().getEntityOrThrow(), getMessage(ctx, "skin URL").getString()))
+                        )
                         .executes(ctx -> {
-                            String parameter = getMessage(ctx, "URL / playername").getString();
-                            if(parameter.contains("//"))
-                                // URL parameter
-                                return fetchSkinByUrl((ServerPlayerEntity) ctx.getSource().getEntityOrThrow(), parameter);
-                            return fetchSkinByName((ServerPlayerEntity) ctx.getSource().getEntityOrThrow(), parameter, true);
-
+                            Entity player = ctx.getSource().getEntityOrThrow();
+                            player.sendSystemMessage(
+                                    new LiteralText(
+                                            "§6You have to provide URL of the skin you want."
+                                    ),
+                                    player.getUuid()
+                            );
+                            return 1;
                         })
-                        //.then(CommandManager.argument("slim", string())
-                                //.executes(ctx -> skin(ctx.getSource(), StringArgumentType.getString(ctx, "URL"), true)))
+                )
+                .then(CommandManager.literal("player")
+                        .then(CommandManager.argument("playername", greedyString())
+                            .executes(ctx -> fetchSkinByName((ServerPlayerEntity) ctx.getSource().getEntityOrThrow(), getString(ctx, "playername"), true))
+                        )
+                        .executes(ctx -> {
+                            Entity player = ctx.getSource().getEntityOrThrow();
+                            player.sendSystemMessage(
+                                    new LiteralText(
+                                            "§6You have to provide player's name."
+                                    ),
+                                    player.getUuid()
+                            );
+                            return 1;
+                        })
                 )
                 .executes(ctx -> {
                     Entity player = ctx.getSource().getEntityOrThrow();
@@ -78,6 +98,14 @@ public class SetskinCommand {
                         player.sendSystemMessage(
                                 new LiteralText(
                                         "§aYour skin was set successfully."
+                                ),
+                                player.getUuid()
+                        );
+                    }
+                    else {
+                        player.sendSystemMessage(
+                                new LiteralText(
+                                        "§aA problem occurred when trying to set the skin."
                                 ),
                                 player.getUuid()
                         );
