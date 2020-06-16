@@ -12,15 +12,16 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.dimension.DimensionType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.samo_lego.fabrictailor.Command.SetskinCommand;
 import org.samo_lego.fabrictailor.event.PlayerJoinServerCallback;
+
+import java.util.Iterator;
+import java.util.Objects;
 
 import static org.samo_lego.fabrictailor.event.TailorEventHandler.onPlayerJoin;
 
@@ -53,12 +54,20 @@ public class FabricTailor implements ModInitializer {
 		LOGGER.info("[FabricTailor] " + info);
 	}
 	public static void errorLog(String error) {
-		LOGGER.error("[FabricTailor] " + error);
+		LOGGER.info("[FabricTailor] " + error);
 	}
 
-
 	// Main method for setting player skin
+
+	/**
+	 * Sets the skin to the specified player and reloads it with {@link org.samo_lego.fabrictailor.FabricTailor#reloadSkin(ServerPlayerEntity)}
+	 * @param player player whose skin needs to be changed
+	 * @param value skin texture value
+	 * @param signature skin texture signature
+	 * @return true if
+	 */
 	public static boolean setPlayerSkin(ServerPlayerEntity player, String value, String signature) {
+		boolean result;
 		GameProfile gameProfile = player.getGameProfile();
 		PropertyMap map = gameProfile.getProperties();
 
@@ -66,57 +75,71 @@ public class FabricTailor implements ModInitializer {
 			Property property = map.get("textures").iterator().next();
 			map.remove("textures", property);
 		} catch (Exception ignored) {
-			// Player has no skin data
+			// Player has no skin data, no worries
 		}
 
-		map.put("textures", new Property("textures", value, signature));
+		try {
+			map.put("textures", new Property("textures", value, signature));
 
-		if(!player.getServerWorld().isClient())
-			reloadSelfSkin(player);
+			// Reloading is needed in order to see the new skin
+			reloadSkin(player);
 
-		// We need to save data as well
-		// Cardinal Components
-		// Thanks Pyro and UPcraft for helping me out :)
-		SKIN_DATA.get(player).setValue(value);
-		SKIN_DATA.get(player).setSignature(signature);
+			// We need to save data as well
+			// Cardinal Components
+			// Thanks Pyro and UPcraft for helping me out :)
+			SKIN_DATA.get(player).setValue(value);
+			SKIN_DATA.get(player).setSignature(signature);
 
-		return true;
+			result = true;
+		} catch (Error e) {
+			// Something went wrong when trying to set the skin
+			errorLog(e.getMessage());
+			result = false;
+		}
+
+		return result;
 	}
 
-	// Ugly reloading of player's gameprofile
-	//todo update player inv & hide&show player for others to see
-	private static void reloadSelfSkin(ServerPlayerEntity player) {
-		player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
-		player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
+	/**
+	 * Reloads player's skin for all the players (including the one that has changed the skin)
+	 * If
+	 * @param player player that wants to have the skin reloaded
+	 */
+	private static void reloadSkin(ServerPlayerEntity player) {
 
-		player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(
-				DimensionType.THE_NETHER_REGISTRY_KEY,
-				player.getEntityWorld().getRegistryKey(),
-				0,
-				player.interactionManager.getGameMode(),
-				player.getEntityWorld().isDebugWorld(),
-				false,
-				true
-		));
-		player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(
-				DimensionType.OVERWORLD_REGISTRY_KEY,
-				player.getEntityWorld().getRegistryKey(),
-				0,
-				player.interactionManager.getGameMode(),
-				player.getEntityWorld().isDebugWorld(),
-				false,
-				true
-		));
-		player.teleport(player.getX(), player.getY(), player.getZ(), false);
+		for(ServerPlayerEntity other : Objects.requireNonNull(player.getServer()).getPlayerManager().getPlayerList()) {
+			// Refreshing tablist for each player
+			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, other));
+			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, other));
 
-		//player.setInvisible(true); doesn't work sadly
-		//player.setInvisible(false);
+			if(player == other) {
+				System.out.println("Player " + other.getName().getString() + " has changed skin.");
+				// We found the player whose skin was changed, we need to change his dimension
+				// in order for him to be able to see new skin
+				ServerWorld world = player.getServerWorld();
 
-		// update inventory
-		player.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(-2, -1, player.inventory.getMainHandStack()));
-		//player.inventory.insertStack(ItemStack.EMPTY);
-		//player.inventory.updateItems(); //doesnt work
-		//player.playerScreenHandler.sendContentUpdates(); //doesnt work
-		//player.currentScreenHandler.sendContentUpdates(); //doesnt work
+				// Getting world which is different from player's world
+				Iterator<ServerWorld> worlds = Objects.requireNonNull(player.getServer()).getWorlds().iterator();
+				ServerWorld newWorld = null;
+
+				while(worlds.hasNext()) {
+					newWorld = worlds.next();
+					System.out.println(newWorld);
+					if(newWorld != world)
+						break;
+				}
+
+				// Changing dimension
+				player.teleport(newWorld, player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
+				player.teleport(world, player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
+				continue;
+			}
+
+			// This might seem redundant but it's actually needed
+			// Refreshing tablist in order to update player's skin data
+			// Needed just for all players but the one that has changed the skin
+			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
+			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
+		}
 	}
 }

@@ -6,7 +6,6 @@
   "mixins": [
     "MixinPlayerManager"
   ],
-  "server": [],
   "injectors": {
     "defaultRequire": 1
   }
