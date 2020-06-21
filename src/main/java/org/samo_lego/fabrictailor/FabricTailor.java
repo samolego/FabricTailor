@@ -33,9 +33,6 @@ public class FabricTailor implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// Info that mod is loading
-		infoLog("Starting FabricTailor mod by samo_lego.");
-
 		// Registering /skin command
 		CommandRegistrationCallback.EVENT.register(SetskinCommand::register);
 
@@ -64,7 +61,7 @@ public class FabricTailor implements ModInitializer {
 	 * @param player player whose skin needs to be changed
 	 * @param value skin texture value
 	 * @param signature skin texture signature
-	 * @return true if
+	 * @return true if it was successful, otherwise false
 	 */
 	public static boolean setPlayerSkin(ServerPlayerEntity player, String value, String signature) {
 		boolean result;
@@ -102,7 +99,6 @@ public class FabricTailor implements ModInitializer {
 
 	/**
 	 * Reloads player's skin for all the players (including the one that has changed the skin)
-	 * If
 	 * @param player player that wants to have the skin reloaded
 	 */
 	private static void reloadSkin(ServerPlayerEntity player) {
