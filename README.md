@@ -5,7 +5,9 @@
 ![Singleplayer](https://img.shields.io/badge/Working-singleplayer-darkblue)
 
 
-A server-side or singleplayer skin changing mod.
+A server-side or singleplayer skin changing / restoring mod.
+Download it on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabrictailor)
+or get the [unstable build](https://samolego.github.io/projects/ci?project=FabricTailor&build=latest)
 
 ## Setup
 
