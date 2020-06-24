@@ -13,7 +13,7 @@
     "sources": "https://github.com/samolego/FabricTailor"
   },
 
-  "license": "MIT",
+  "license": "LGPLv3",
   "icon": "assets/fabrictailor/icon.png",
 
   "environment": "*",
@@ -27,7 +27,7 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.7.4",
+    "fabricloader": ">=0.8.8",
     "fabric": "*"
   },
   "suggests": {

@@ -54,6 +54,9 @@ public class SetskinCommand {
                             return 1;
                         })
                 )
+                .then(CommandManager.argument("clear", greedyString())
+                        .executes(ctx -> setPlayerSkin((ServerPlayerEntity) ctx.getSource().getEntityOrThrow(), "", "") ? 1 : 0)
+                )
                 .executes(ctx -> {
                     Entity player = ctx.getSource().getEntityOrThrow();
                     player.sendSystemMessage(

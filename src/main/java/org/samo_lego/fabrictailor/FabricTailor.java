@@ -79,7 +79,8 @@ public class FabricTailor implements ModInitializer {
 		}
 
 		try {
-			map.put("textures", new Property("textures", value, signature));
+			if(!value.equals("") && !signature.equals(""))
+				map.put("textures", new Property("textures", value, signature));
 
 			// Reloading is needed in order to see the new skin
 			reloadSkin(player);
