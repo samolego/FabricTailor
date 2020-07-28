@@ -4,7 +4,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.Objects;
 
-import static org.samo_lego.fabrictailor.Command.SetskinCommand.fetchSkinByName;
+import static org.samo_lego.fabrictailor.Command.SkinCommand.fetchSkinByName;
 import static org.samo_lego.fabrictailor.FabricTailor.setPlayerSkin;
 
 public class TailorEventHandler {

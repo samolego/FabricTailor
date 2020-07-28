@@ -10,24 +10,36 @@ import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.chunk.ChunkManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.samo_lego.fabrictailor.Command.SetskinCommand;
+import org.samo_lego.fabrictailor.Command.SkinCommand;
 import org.samo_lego.fabrictailor.event.PlayerJoinServerCallback;
+import org.samo_lego.fabrictailor.mixin.EntityTrackerAccessor;
+import org.samo_lego.fabrictailor.mixin.ThreadedAnvilChunkStorageAccessor;
 
-import java.util.Iterator;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.samo_lego.fabrictailor.event.TailorEventHandler.onPlayerJoin;
 
 public class FabricTailor implements ModInitializer {
 	public static final String MODID = "fabrictailor";
+
 	private static final Logger LOGGER = LogManager.getLogger();
+
+	public static final ExecutorService THREADPOOL = Executors.newCachedThreadPool();
 
 	private static final ComponentType<SkinSaveData> SKIN_DATA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(MODID,"skin_data"), SkinSaveData.class);
 
@@ -35,6 +47,7 @@ public class FabricTailor implements ModInitializer {
 	public void onInitialize() {
 		// Registering /skin command
 		CommandRegistrationCallback.EVENT.register(SetskinCommand::register);
+		CommandRegistrationCallback.EVENT.register(SkinCommand::register);
 
 		// Registering player join event
 		// It passes the skin data to method as well, in order to apply skin at join
@@ -99,42 +112,43 @@ public class FabricTailor implements ModInitializer {
 	}
 
 	/**
+	 * <p>
+	 * This method has been adapted from the Impersonate mod's <a href="https://github.com/Ladysnake/Impersonate/blob/1.16/src/main/java/io/github/ladysnake/impersonate/impl/ServerPlayerSkins.java">source code</a>
+	 * under GNU Lesser General Public License.
+	 *
 	 * Reloads player's skin for all the players (including the one that has changed the skin)
 	 * @param player player that wants to have the skin reloaded
+	 *
+	 * @author Pyrofab
 	 */
 	private static void reloadSkin(ServerPlayerEntity player) {
-
 		for(ServerPlayerEntity other : Objects.requireNonNull(player.getServer()).getPlayerManager().getPlayerList()) {
 			// Refreshing tablist for each player
-			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, other));
-			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, other));
-
-			if(player == other) {
-				// We found the player whose skin was changed, we need to change his dimension
-				// in order for him to be able to see new skin
-				ServerWorld world = player.getServerWorld();
-
-				// Getting world which is different from player's world
-				Iterator<ServerWorld> worlds = Objects.requireNonNull(player.getServer()).getWorlds().iterator();
-				ServerWorld newWorld = null;
-
-				while(worlds.hasNext()) {
-					newWorld = worlds.next();
-					if(newWorld != world)
-						break;
-				}
-
-				// Changing dimension
-				player.teleport(newWorld, player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
-				player.teleport(world, player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
-				continue;
-			}
-
-			// This might seem redundant but it's actually needed
-			// Refreshing tablist in order to update player's skin data
-			// Needed just for all players but the one that has changed the skin
 			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
 			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
 		}
+
+		ChunkManager manager = player.world.getChunkManager();
+		assert manager instanceof ServerChunkManager;
+		ThreadedAnvilChunkStorage storage = ((ServerChunkManager)manager).threadedAnvilChunkStorage;
+		EntityTrackerAccessor trackerEntry = ((ThreadedAnvilChunkStorageAccessor) storage).getEntityTrackers().get(player.getEntityId());
+
+		for (ServerPlayerEntity tracking : trackerEntry.getPlayersTracking()) {
+			trackerEntry.getEntry().startTracking(tracking);
+		}
+
+		// need to change the player entity on the client
+		ServerWorld targetWorld = (ServerWorld) player.world;
+		player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimensionRegistryKey(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.method_30119(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
+		player.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
+		player.server.getPlayerManager().sendCommandTree(player);
+		player.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
+		player.networkHandler.sendPacket(new HealthUpdateS2CPacket(player.getHealth(), player.getHungerManager().getFoodLevel(), player.getHungerManager().getSaturationLevel()));
+		for (StatusEffectInstance statusEffect : player.getStatusEffects()) {
+			player.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(player.getEntityId(), statusEffect));
+		}
+		player.sendAbilitiesUpdate();
+		player.server.getPlayerManager().sendWorldInfo(player, targetWorld);
+		player.server.getPlayerManager().sendPlayerStatus(player);
 	}
 }
