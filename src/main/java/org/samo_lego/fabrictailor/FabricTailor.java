@@ -10,6 +10,7 @@ import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.impl.networking.server.EntityTrackerStreamAccessor;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.*;
@@ -133,9 +134,7 @@ public class FabricTailor implements ModInitializer {
 		ThreadedAnvilChunkStorage storage = ((ServerChunkManager)manager).threadedAnvilChunkStorage;
 		EntityTrackerAccessor trackerEntry = ((ThreadedAnvilChunkStorageAccessor) storage).getEntityTrackers().get(player.getEntityId());
 
-		for (ServerPlayerEntity tracking : trackerEntry.getPlayersTracking()) {
-			trackerEntry.getEntry().startTracking(tracking);
-		}
+		((EntityTrackerStreamAccessor) trackerEntry).fabric_getTrackingPlayers().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking));
 
 		// need to change the player entity on the client
 		ServerWorld targetWorld = (ServerWorld) player.world;
