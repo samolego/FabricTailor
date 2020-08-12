@@ -27,5 +27,5 @@ cd ./build/libs
 
 echo "Build is going to be renamed: $projectId-$version-devbuild_$GITHUB_RUN_NUMBER-MC_$mcVersion.jar"
 # Renaming the dev build
-mv "$projectId-$version.jar" "$projectId-$version-devbuild_$GITHUB_RUN_NUMBER-MC_$mcVersion.jar"
+mv "$projectId-$version-$mcVersion.jar" "$projectId-$version-devbuild_$GITHUB_RUN_NUMBER-MC_$mcVersion.jar"
 
