@@ -16,8 +16,8 @@ import java.net.URL;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-import static net.minecraft.command.arguments.MessageArgumentType.getMessage;
-import static net.minecraft.command.arguments.MessageArgumentType.message;
+import static net.minecraft.command.argument.MessageArgumentType.getMessage;
+import static net.minecraft.command.argument.MessageArgumentType.message;
 import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 import static org.samo_lego.fabrictailor.FabricTailor.setPlayerSkin;
 

@@ -14,6 +14,7 @@ import net.fabricmc.fabric.impl.networking.server.EntityTrackerStreamAccessor;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
@@ -123,11 +124,10 @@ public class FabricTailor implements ModInitializer {
 	 * @author Pyrofab
 	 */
 	private static void reloadSkin(ServerPlayerEntity player) {
-		for(ServerPlayerEntity other : Objects.requireNonNull(player.getServer()).getPlayerManager().getPlayerList()) {
-			// Refreshing tablist for each player
-			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
-			other.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
-		}
+		// Refreshing tablist for each player
+		PlayerManager playerManager = Objects.requireNonNull(player.getServer()).getPlayerManager();
+		playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
+		playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
 
 		ChunkManager manager = player.world.getChunkManager();
 		assert manager instanceof ServerChunkManager;
@@ -138,7 +138,7 @@ public class FabricTailor implements ModInitializer {
 
 		// need to change the player entity on the client
 		ServerWorld targetWorld = (ServerWorld) player.world;
-		player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimensionRegistryKey(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.method_30119(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
+		player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimension(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.method_30119(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
 		player.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
 		player.server.getPlayerManager().sendCommandTree(player);
 		player.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
