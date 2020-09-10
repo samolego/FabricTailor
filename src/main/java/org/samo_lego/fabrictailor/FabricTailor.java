@@ -10,10 +10,12 @@ import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.impl.networking.server.EntityTrackerStreamAccessor;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
@@ -24,8 +26,7 @@ import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.ChunkManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.samo_lego.fabrictailor.Command.SetskinCommand;
-import org.samo_lego.fabrictailor.Command.SkinCommand;
+import org.samo_lego.fabrictailor.command.SkinCommand;
 import org.samo_lego.fabrictailor.event.PlayerJoinServerCallback;
 import org.samo_lego.fabrictailor.mixin.EntityTrackerAccessor;
 import org.samo_lego.fabrictailor.mixin.ThreadedAnvilChunkStorageAccessor;
@@ -33,6 +34,7 @@ import org.samo_lego.fabrictailor.mixin.ThreadedAnvilChunkStorageAccessor;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.samo_lego.fabrictailor.event.TailorEventHandler.onPlayerJoin;
 
@@ -41,24 +43,27 @@ public class FabricTailor implements ModInitializer {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	public static final ExecutorService THREADPOOL = Executors.newCachedThreadPool();
+	public static ExecutorService THREADPOOL;
 
 	private static final ComponentType<SkinSaveData> SKIN_DATA = ComponentRegistry.INSTANCE.registerIfAbsent(new Identifier(MODID,"skin_data"), SkinSaveData.class);
+
 
 	@Override
 	public void onInitialize() {
 		// Registering /skin command
-		CommandRegistrationCallback.EVENT.register(SetskinCommand::register);
 		CommandRegistrationCallback.EVENT.register(SkinCommand::register);
 
 		// Registering player join event
 		// It passes the skin data to method as well, in order to apply skin at join
 		PlayerJoinServerCallback.EVENT.register(player -> onPlayerJoin(player, SKIN_DATA.get(player).getValue(), SKIN_DATA.get(player).getSignature()));
 
-
 		// Add the component to every instance of PlayerEntity
 		EntityComponentCallback.event(PlayerEntity.class).register((player, components) -> components.put(SKIN_DATA, new SkinSaver("", "")));
 		EntityComponents.setRespawnCopyStrategy(SKIN_DATA, RespawnCopyStrategy.ALWAYS_COPY);
+
+		// Stop server event
+		ServerLifecycleEvents.SERVER_STOPPED.register(this::onStopServer);
+		ServerLifecycleEvents.SERVER_STARTING.register(this::onStartServer);
 	}
 
 	// Logging methods
@@ -69,8 +74,28 @@ public class FabricTailor implements ModInitializer {
 		LOGGER.error("[FabricTailor] An error occurred: " + error);
 	}
 
-	// Main method for setting player skin
-
+	/**
+	 * Called on server start
+	 */
+	private void onStartServer(MinecraftServer server) {
+		// Initialising executor service
+		THREADPOOL = Executors.newCachedThreadPool();
+	}
+    /**
+     * Called on server stop.
+     * @param server server that is stopping
+     */
+    private void onStopServer(MinecraftServer server) {
+        try {
+            THREADPOOL.shutdownNow();
+            if (!THREADPOOL.awaitTermination(100, TimeUnit.MICROSECONDS)) {
+                Thread.currentThread().interrupt();
+            }
+        } catch (InterruptedException e) {
+            errorLog(e.getMessage());
+            THREADPOOL.shutdownNow();
+        }
+    }
 	/**
 	 * Sets the skin to the specified player and reloads it with {@link org.samo_lego.fabrictailor.FabricTailor#reloadSkin(ServerPlayerEntity)}
 	 * @param player player whose skin needs to be changed
