@@ -5,6 +5,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import org.samo_lego.fabrictailor.TailoredPlayer;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -21,7 +22,6 @@ import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.command.argument.MessageArgumentType.getMessage;
 import static net.minecraft.command.argument.MessageArgumentType.message;
 import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
-import static org.samo_lego.fabrictailor.FabricTailor.setPlayerSkin;
 
 public class SkinCommand {
 
@@ -97,7 +97,7 @@ public class SkinCommand {
             .then(CommandManager.literal("clear")
                 .executes(ctx -> {
                         ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
-                        if(setPlayerSkin(player, "", "")) {
+                        if(((TailoredPlayer) player).setSkin(null, null)) {
                             player.sendMessage(new LiteralText(
                                         "§aYour skin was cleared successfully."
                                 ),
@@ -254,7 +254,7 @@ public class SkinCommand {
         String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
         // Setting skin
-        if(setPlayerSkin(player, value, signature) && giveFeedback) {
+        if(((TailoredPlayer) player).setSkin(value, signature) && giveFeedback) {
             player.sendMessage(
                     new LiteralText(
                             "§aYour skin was set successfully."
