@@ -49,7 +49,7 @@ jobs:
         # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
         tag_name: ${{ env.VERSION }}
         # The name of the release. For example, `Release v1.0.1`
-        release_name: SimpleAuth ${{ env.VERSION }}
+        release_name: FabricTailor ${{ env.VERSION }}
         # Text describing the contents of the tag.
         body: This release was created automatically, since version was bumped. Should be stable unless I messed up something.
     - name: Upload a Release Asset
