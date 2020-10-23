@@ -5,7 +5,6 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.fabricmc.fabric.impl.networking.server.EntityTrackerStreamAccessor;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.server.PlayerManager;
@@ -16,9 +15,7 @@ import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.world.biome.source.BiomeAccess;
 import net.minecraft.world.chunk.ChunkManager;
 import org.samo_lego.fabrictailor.TailoredPlayer;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -27,12 +24,12 @@ import java.util.Objects;
 
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
-@Mixin(PlayerEntity.class)
-public class MixinPlayerEntity implements TailoredPlayer  {
-
-    @Shadow @Final private GameProfile gameProfile;
+@Mixin(ServerPlayerEntity.class)
+public class MixinServerPlayerEntity implements TailoredPlayer  {
 
     private final ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+    private final GameProfile gameProfile = player.getGameProfile();
+
     private String skinValue;
     private String skinSignature;
 
@@ -77,7 +74,7 @@ public class MixinPlayerEntity implements TailoredPlayer  {
     }
 
     /**
-     * Sets the skin to the specified player and reloads it with {@link MixinPlayerEntity#reloadSkin()} reloadSkin().
+     * Sets the skin to the specified player and reloads it with {@link MixinServerPlayerEntity#reloadSkin()} reloadSkin().
      *
      * @param value skin texture value
      * @param signature skin texture signature

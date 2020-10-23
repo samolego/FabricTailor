@@ -5,8 +5,8 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "EntityTrackerAccessor",
-    "MixinPlayerEntity",
     "MixinPlayerManager",
+    "MixinServerPlayerEntity",
     "ThreadedAnvilChunkStorageAccessor"
   ],
   "injectors": {
