@@ -22,7 +22,6 @@ or get the [unstable build](https://samolego.github.io/projects/ci?project=Fabri
 
 ## Thanks
 This mod exists thanks to:
-* [Cardinal Components API](https://github.com/OnyxStudios/Cardinal-Components-API) (Saving skin data)
 * [MineSkin API](https://mineskin.org) (Skin uploading & signing)
 * [ely.by API](https://ely.by) (Skin values & signatures)
 
