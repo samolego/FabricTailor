@@ -33,6 +33,8 @@ public class MixinServerPlayerEntity implements TailoredPlayer  {
     private String skinValue;
     private String skinSignature;
 
+    private final PropertyMap map = this.gameProfile.getProperties();
+
 
 
     /**
@@ -60,7 +62,7 @@ public class MixinServerPlayerEntity implements TailoredPlayer  {
 
         // need to change the player entity on the client
         ServerWorld targetWorld = (ServerWorld) player.world;
-        player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimension(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.method_30119(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
+        player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimension(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
         player.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
         player.server.getPlayerManager().sendCommandTree(player);
         player.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
@@ -83,49 +85,61 @@ public class MixinServerPlayerEntity implements TailoredPlayer  {
     public boolean setSkin(String value, String signature) {
         boolean result = false;
 
-        PropertyMap map = this.gameProfile.getProperties();
+        try {
+            Property property = this.map.get("textures").iterator().next();
+            this.map.remove("textures", property);
+        } catch (Exception ignored) {
+            // Player has no skin data, no worries
+        }
 
-        if(value != null && signature != null) {
-            try {
-                Property property = map.get("textures").iterator().next();
-                map.remove("textures", property);
-            } catch (Exception ignored) {
-                // Player has no skin data, no worries
-            }
+        try {
+            map.put("textures", new Property("textures", value, signature));
 
-            try {
-                map.put("textures", new Property("textures", value, signature));
+            // Saving skin data
+            this.skinValue = value;
+            this.skinSignature = signature;
 
-                // Saving skin data
-                this.skinValue = value;
-                this.skinSignature = signature;
+            // Reloading skin
+            this.reloadSkin();
 
-                // Reloading skin
-                this.reloadSkin();
-
-                result = true;
-            } catch (Error e) {
-                // Something went wrong when trying to set the skin
-                errorLog(e.getMessage());
-            }
+            result = true;
+        } catch (Error e) {
+            // Something went wrong when trying to set the skin
+            errorLog(e.getMessage());
         }
         return result;
     }
 
     @Override
     public String getSkinValue() {
+        if(this.skinValue == null) {
+            try {
+                Property property = map.get("textures").iterator().next();
+                this.skinValue = property.getValue();
+            } catch (Exception ignored) {
+                // Player has no skin data, no worries
+            }
+        }
         return this.skinValue;
     }
 
     @Override
     public String getSkinSignature() {
+        if(this.skinSignature == null) {
+            try {
+                Property property = map.get("textures").iterator().next();
+                this.skinSignature = property.getSignature()    ;
+            } catch (Exception ignored) {
+                // Player has no skin data, no worries
+            }
+        }
         return this.skinSignature;
     }
 
 
     @Inject(method = "writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
     private void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
-        if(this.skinValue != null && this.skinSignature != null) {
+        if(this.getSkinValue() != null && this.getSkinSignature() != null) {
             CompoundTag skinDataTag = new CompoundTag();
             skinDataTag.putString("value", this.skinValue);
             skinDataTag.putString("signature", this.skinSignature);
