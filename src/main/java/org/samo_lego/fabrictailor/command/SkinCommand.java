@@ -29,11 +29,25 @@ public class SkinCommand {
         dispatcher.register(CommandManager.literal("skin")
             .then(CommandManager.literal("set")
                 .then(CommandManager.literal("URL")
-                        .then(CommandManager.argument("skin URL", message())
-                                .executes(ctx ->
-                                        fetchSkinByUrl(
-                                                (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
-                                                getMessage(ctx, "skin URL").getString()
+                        .then(CommandManager.literal("classic")
+                            .then(CommandManager.argument("skin URL", message())
+                                    .executes(ctx ->
+                                            fetchSkinByUrl(
+                                                    (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
+                                                    getMessage(ctx, "skin URL").getString(),
+                                                    false
+                                            )
+                                    )
+                            )
+                        )
+                        .then(CommandManager.literal("slim")
+                                .then(CommandManager.argument("skin URL", message())
+                                        .executes(ctx ->
+                                                fetchSkinByUrl(
+                                                        (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
+                                                        getMessage(ctx, "skin URL").getString(),
+                                                        true
+                                                )
                                         )
                                 )
                         )
@@ -41,7 +55,7 @@ public class SkinCommand {
                             ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
                             player.sendMessage(
                                     new LiteralText(
-                                            "§6You have to provide URL of the skin you want."
+                                            "§6You have to provide URL and variant of the skin you want."
                                     ),
                                     false
                             );
@@ -49,19 +63,31 @@ public class SkinCommand {
                         })
                 )
                 .then(CommandManager.literal("upload")
-                        .then(CommandManager.argument("skin file path", message())
-                                .executes(ctx -> setSkinFromFile(
-                                        (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
-                                        getMessage(ctx, "skin file path").getString()
+                        .then(CommandManager.literal("classic")
+                            .then(CommandManager.argument("skin file path", message())
+                                    .executes(ctx -> setSkinFromFile(
+                                            (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
+                                            getMessage(ctx, "skin file path").getString(),
+                                            false
+                                            )
+                                    )
+                            )
+                        )
+                        .then(CommandManager.literal("slim")
+                                .then(CommandManager.argument("skin file path", message())
+                                        .executes(ctx -> setSkinFromFile(
+                                                (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
+                                                getMessage(ctx, "skin file path").getString(),
+                                                true
+                                                )
                                         )
                                 )
-
                         )
                         .executes(ctx -> {
                             ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
                             player.sendMessage(
                                     new LiteralText(
-                                            "§6You have to provide file path of the skin you want."
+                                            "§6You have to provide file path and variant of the skin you want."
                                     ),
                                     false
                             );
@@ -87,7 +113,7 @@ public class SkinCommand {
                     ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
                     player.sendMessage(
                             new LiteralText(
-                                    "§6You have to provide URL or player's name of the skin you want."
+                                    "§6You have to provide URL, player's name or file of the skin you want."
                             ),
                             false
                     );
@@ -97,7 +123,7 @@ public class SkinCommand {
             .then(CommandManager.literal("clear")
                 .executes(ctx -> {
                         ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
-                        if(((TailoredPlayer) player).setSkin(null, null)) {
+                        if(((TailoredPlayer) player).setSkin("", "")) {
                             player.sendMessage(new LiteralText(
                                         "§aYour skin was cleared successfully."
                                 ),
@@ -122,9 +148,10 @@ public class SkinCommand {
      *
      * @param player player that will have skin changed.
      * @param skinFilePath file path
+     * @param useSlim whether slim format should be used
      * @return 1 if image is valid, otherwise 0
      */
-    private static int setSkinFromFile(ServerPlayerEntity player, String skinFilePath) {
+    private static int setSkinFromFile(ServerPlayerEntity player, String skinFilePath, boolean useSlim) {
         if(Objects.requireNonNull(player.getServer()).isDedicated()) {
             player.sendMessage(new LiteralText(
                     "§6FabricTailor mod is running in server environment.\n" +
@@ -144,7 +171,7 @@ public class SkinCommand {
                 );
                 THREADPOOL.submit(() -> {
                     try {
-                        String reply = urlRequest(new URL("https://api.mineskin.org/generate/upload"), skinFile);
+                        String reply = urlRequest(new URL("https://api.mineskin.org/generate/upload?model=" + (useSlim ? "slim" : "steve")), skinFile);
                         setSkinFromReply(reply, player, true);
                     } catch (IOException e) {
                         player.sendMessage(
@@ -171,7 +198,7 @@ public class SkinCommand {
      * @param skinUrl string url of the skin
      * @return 1
      */
-    public static int fetchSkinByUrl(ServerPlayerEntity player, String skinUrl) {
+    public static int fetchSkinByUrl(ServerPlayerEntity player, String skinUrl, boolean useSlim) {
         player.sendMessage(
                 new LiteralText(
                         "§eTrying to set your skin ... Please wait."
@@ -180,9 +207,11 @@ public class SkinCommand {
         );
         THREADPOOL.submit(() -> {
             try {
-                String reply = urlRequest(new URL(String.format("https://api.mineskin.org/generate/url?url=%s", skinUrl)), null);
+                URL url = new URL(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", skinUrl, useSlim ? "slim" : "steve"));
+                String reply = urlRequest(url, null);
                 setSkinFromReply(reply, player, true);
             } catch (IOException e) {
+                e.printStackTrace();
                 player.sendMessage(
                         new LiteralText(
                                 "§cMalformed url!"
@@ -277,62 +306,72 @@ public class SkinCommand {
         URLConnection connection = url.openConnection();
 
         String reply = null;
-        if(image != null) {
+
+        if(connection instanceof HttpsURLConnection) {
             HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
             httpsConnection.setUseCaches(false);
             httpsConnection.setDoOutput(true);
             httpsConnection.setDoInput(true);
+            httpsConnection.setRequestMethod("POST");
+            if(image != null) {
+                String boundary = UUID.randomUUID().toString();
+                httpsConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+                httpsConnection.setRequestProperty("User-Agent", "User-Agent");
 
-            String boundary = UUID.randomUUID().toString();
-            httpsConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-            httpsConnection.setRequestProperty("User-Agent", "User-Agent");
+                OutputStream outputStream = httpsConnection.getOutputStream();
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
 
-            OutputStream outputStream = httpsConnection.getOutputStream();
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
+                final String LINE = "\r\n";
+                writer.append("--").append(boundary).append(LINE);
+                writer.append("Content-Disposition: form-data; name=\"file\"").append(LINE);
+                writer.append("Content-Type: text/plain; charset=UTF-8").append(LINE);
+                writer.append(LINE);
+                writer.append(image.getName()).append(LINE);
+                writer.flush();
 
-            final String LINE = "\r\n";
-            writer.append("--").append(boundary).append(LINE);
-            writer.append("Content-Disposition: form-data; name=\"file\"").append(LINE);
-            writer.append("Content-Type: text/plain; charset=UTF-8").append(LINE);
-            writer.append(LINE);
-            writer.append(image.getName()).append(LINE);
-            writer.flush();
+                writer.append("--").append(boundary).append(LINE);
+                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(image.getName()).append("\"").append(LINE);
+                writer.append("Content-Type: image/png").append(LINE);
+                writer.append("Content-Transfer-Encoding: binary").append(LINE);
+                writer.append(LINE);
+                writer.flush();
 
-            writer.append("--").append(boundary).append(LINE);
-            writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(image.getName()).append("\"").append(LINE);
-            writer.append("Content-Type: image/png").append(LINE);
-            writer.append("Content-Transfer-Encoding: binary").append(LINE);
-            writer.append(LINE);
-            writer.flush();
+                byte[] fileBytes =  Files.readAllBytes(image.toPath());
+                outputStream.write(fileBytes,  0, fileBytes.length);
 
-            byte[] fileBytes =  Files.readAllBytes(image.toPath());
-            outputStream.write(fileBytes,  0, fileBytes.length);
+                outputStream.flush();
+                writer.append(LINE);
+                writer.flush();
 
-            outputStream.flush();
-            writer.append(LINE);
-            writer.flush();
-
-            writer.append("--").append(boundary).append("--").append(LINE);
-            writer.close();
-
-            if (httpsConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                reply = new BufferedReader(new InputStreamReader(httpsConnection.getInputStream())).readLine();
-                httpsConnection.disconnect();
+                writer.append("--").append(boundary).append("--").append(LINE);
+                writer.close();
             }
+
+            if(httpsConnection.getResponseCode() == HttpURLConnection.HTTP_OK)
+                reply = getContent(connection);
             httpsConnection.disconnect();
         }
         else {
-            if(connection instanceof HttpsURLConnection) {
-                HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
-                httpsConnection.setRequestMethod("POST");
-                if (httpsConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    reply = new BufferedReader(new InputStreamReader(httpsConnection.getInputStream())).readLine();
-                }
-                httpsConnection.disconnect();
-            }
-            else
-                reply = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
+            reply = getContent(connection);
         }
         return reply;
+    }
+
+    /**
+     * Reads repsonse from API.
+     * Used just to avoid duplicate code.
+     *
+     * @param connection connection where to take output stream from
+     * @return API reply as String
+     * @throws IOException exception when something went wrong
+     */
+    private static String getContent(URLConnection connection) throws IOException {
+        try (
+                InputStream is = connection.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+        ) {
+            return br.readLine();
+        }
     }
 }
