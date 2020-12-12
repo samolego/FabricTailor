@@ -3,7 +3,6 @@ package org.samo_lego.fabrictailor.mixin;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import net.fabricmc.fabric.impl.networking.server.EntityTrackerStreamAccessor;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.*;
@@ -58,7 +57,7 @@ public class MixinServerPlayerEntity implements TailoredPlayer  {
         ThreadedAnvilChunkStorage storage = ((ServerChunkManager)manager).threadedAnvilChunkStorage;
         EntityTrackerAccessor trackerEntry = ((ThreadedAnvilChunkStorageAccessor) storage).getEntityTrackers().get(player.getEntityId());
 
-        ((EntityTrackerStreamAccessor) trackerEntry).fabric_getTrackingPlayers().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking));
+        trackerEntry.getTrackingPlayers().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking));
 
         // need to change the player entity on the client
         ServerWorld targetWorld = (ServerWorld) player.world;
