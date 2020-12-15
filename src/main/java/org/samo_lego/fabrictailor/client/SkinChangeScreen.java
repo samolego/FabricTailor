@@ -4,46 +4,43 @@ import carpet.script.language.Sys;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.AdvancementDisplay;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SkullBlock;
-import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
+import org.samo_lego.fabrictailor.client.SkinTab.TailorStyle;
 
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
 
-    public static final int BUTTONHEIGHT = 20;
+    public static final int BUTTON_HEIGHT = 20;
+    public static final int BUTTON_WIDTH = 100;
     private static final Identifier TABS_TEXTURE = new Identifier("textures/gui/advancements/tabs.png");
-    private static final Identifier SELECTED_TABS_TEXTURE = new Identifier("textures/gui/advancements/tabs.png");
     private static final Identifier BACKGROUND_TEXTURE = new Identifier("textures/gui/advancements/window.png");
+
     private static final SkinTab[] TABS = new SkinTab[]{
-            new SkinTab("tab.fabrictailor.title_player", new ItemStack(Items.PLAYER_HEAD), 27, 28),
-            new SkinTab("tab.fabrictailor.title_url", new ItemStack(Items.GLOBE_BANNER_PATTERN), 27, 28),
-            new SkinTab("tab.fabrictailor.title_local", new ItemStack(Items.JIGSAW), 27, 28)
+            new SkinTab(TailorStyle.PLAYER, 27, 28),
+            new SkinTab(TailorStyle.URL, 27, 28),
+            new SkinTab(TailorStyle.LOCAL, 27, 28)
     };
 
     private TextFieldWidget skinInput;
     private int startX;
     private int startY;
-    private MatrixStack matrixStack;
     private SkinTab selectedTab;
 
     protected SkinChangeScreen() {
@@ -54,11 +51,9 @@ public class SkinChangeScreen extends Screen {
     protected void init() {
         super.init();
         this.client.keyboard.setRepeatEvents(true);
-        int buttonWidth = 100;
-        int horizontalSpacing = 4;
         int verticalSpacing = 8;
 
-        skinInput = new TextFieldWidget(this.textRenderer, width / 2, height / 3, width / 4, 14, new TranslatableText("itemGroup.search"));
+        skinInput = new TextFieldWidget(this.textRenderer, width / 2, height / 2, BUTTON_WIDTH, 14, new TranslatableText("itemGroup.search"));
         skinInput.setMaxLength(256);
         skinInput.setVisible(true);
         skinInput.setHasBorder(true);
@@ -70,11 +65,26 @@ public class SkinChangeScreen extends Screen {
 
         addButton(
                 new ButtonWidget(
-                        width / 2 + horizontalSpacing / 2, height - BUTTONHEIGHT - verticalSpacing,
-                        buttonWidth,
-                        BUTTONHEIGHT,
+                        width / 2,
+                        height / 2 + 28,
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
                         new TranslatableText("button.fabrictailor.set_skin"),
                         onClick -> {
+                            String skin = skinInput.getText();
+
+                            if(this.client.getServer() != null) {
+                                // Integrated server - singleplayer
+                                System.out.println("Skin: " + skin);
+                                System.out.println("Client!");
+
+                                // Works, but ugly
+                                client.player.networkHandler.sendPacket(new ChatMessageC2SPacket(this.selectedTab.getSkinCommand() + skin));
+                            }
+                            else {
+                                // Multiplayer - send command or client-side skin
+                                client.player.networkHandler.sendPacket(new ChatMessageC2SPacket(this.selectedTab.getSkinCommand() + skin));
+                            }
                             this.onClose();
                         }
                 )
@@ -82,15 +92,27 @@ public class SkinChangeScreen extends Screen {
 
         addButton(
                 new ButtonWidget(
-                        width / 2 - buttonWidth - horizontalSpacing / 2, height - BUTTONHEIGHT - verticalSpacing,
-                        buttonWidth,
-                        BUTTONHEIGHT,
+                        width / 2 - BUTTON_WIDTH - 2, height - BUTTON_HEIGHT - verticalSpacing,
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
+                        new TranslatableText("button.fabrictailor.clear_skin"),
+                        onClick -> {
+                            this.onClose();
+                        }
+                )
+        );
+        addButton(
+                new ButtonWidget(
+                        width / 2 + 2, height - BUTTON_HEIGHT - verticalSpacing,
+                        BUTTON_WIDTH,
+                        BUTTON_HEIGHT,
                         ScreenTexts.CANCEL,
                         onClick -> {
                             this.onClose();
                         }
                 )
         );
+
 
         addButton(
                 new ButtonWidget(
@@ -113,7 +135,6 @@ public class SkinChangeScreen extends Screen {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
         //renderBackgroundTexture(0); // renders dirt background
         this.renderBackground(matrixStack, 0);
-        this.matrixStack = matrixStack;
 
         super.render(matrixStack, mouseX, mouseY, delta);
         drawCenteredText(matrixStack, textRenderer, title, width / 2, 15, 0xffffff);
@@ -125,11 +146,17 @@ public class SkinChangeScreen extends Screen {
         this.client.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         this.drawTexture(matrixStack, startX, startY, 0, 0, 252, 140);
 
-        // Render skin input
+        // Drawing Player
+        // Luckily vanilla code is available
+        InventoryScreen.drawEntity(startX + 50, startY + 120, 50, (float)width / 2 - 75 - mouseX, (float)height / 2 - mouseY, client.player);
+
+        // Render input field
         skinInput.render(matrixStack, startX, startY, delta);
 
+
+        // Other renders
         this.drawTabs(matrixStack, startX, startY, mouseX, mouseY);
-        this.drawSkullIcons(matrixStack, startX, startY, mouseX, mouseY);
+        this.drawIcons(matrixStack, startX, startY, mouseX, mouseY);
         this.drawWidgetTooltip(matrixStack, startX, startY, mouseX, mouseY);
     }
 
@@ -151,12 +178,16 @@ public class SkinChangeScreen extends Screen {
                 this.drawTexture(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
             }
         }
+        this.textRenderer.drawWithShadow(matrixStack, this.selectedTab.getTitle(), startX + 10, startY + 5, 16777215);
+        this.textRenderer.drawWithShadow(matrixStack, this.selectedTab.getDescription(), (float) width / 2, (float) height / 2 - 10, 16777215);
+
+
         RenderSystem.defaultBlendFunc();
     }
 
 
-    private void drawSkullIcons(MatrixStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
-        // Skull icons
+    private void drawIcons(MatrixStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
+        // Icons
         for(int i = 0; i < TABS.length; ++i) {
             SkinTab tab = TABS[i];
             itemRenderer.renderInGui(tab.getIcon(), startX + 231 - i * 27, startY - 18);
@@ -191,7 +222,6 @@ public class SkinChangeScreen extends Screen {
             for(int i = 0; i < TABS.length; ++i) {
                 SkinTab tab = TABS[i];
                 if(tab.isSelected(startX + 225 - i * 27, startY - 28, (int) mouseX, (int) mouseY)) {
-                    System.out.println("Selecting: " + tab.getTitle().getKey());
                     this.selectedTab = tab;
                     break;
                 }

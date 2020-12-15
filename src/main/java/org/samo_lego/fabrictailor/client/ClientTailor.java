@@ -20,6 +20,8 @@ public class ClientTailor implements ClientModInitializer {
 
     public static KeyBinding keyBinding;
 
+    private static final SkinChangeScreen SKIN_CHANGE_SCREEN = new SkinChangeScreen();
+
     @Override
     public void onInitializeClient() {
         keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
