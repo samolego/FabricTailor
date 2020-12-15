@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "org.samo_lego.fabrictailor.FabricTailor"
+    ],
+    "client": [
+      "org.samo_lego.fabrictailor.client.ClientTailor"
     ]
   },
   "mixins": [

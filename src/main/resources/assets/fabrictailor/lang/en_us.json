@@ -1,0 +1,13 @@
+{
+  "gui.fabrictailor.change_skin": "Change skin",
+
+  "key.fabrictailor.toggle_skin_gui": "Open skin GUI",
+
+  "button.fabrictailor.choose_skin": "Choose skin",
+  "button.fabrictailor.set_skin": "Set skin",
+  "category.fabrictailor.skin_category": "FabricTailor",
+
+  "tab.fabrictailor.title_local": "Local skin upload",
+  "tab.fabrictailor.title_player": "Fetch from player",
+  "tab.fabrictailor.title_url": "Fetch from URL"
+}
