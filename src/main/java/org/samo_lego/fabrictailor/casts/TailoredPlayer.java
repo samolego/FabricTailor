@@ -1,5 +1,8 @@
 package org.samo_lego.fabrictailor.casts;
 
+/**
+ * Includes additional methods for skin changes.
+ */
 public interface TailoredPlayer {
     /**
      * Reloads player's skin.

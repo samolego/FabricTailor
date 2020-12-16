@@ -299,7 +299,7 @@ public class SkinChangeScreen extends Screen {
     }
 
     /**
-     * Used for skin drag & drop.
+     * Used for skin drag and drop.
      *
      * @param paths paths of the files; only first is used
      */
