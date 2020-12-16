@@ -3,7 +3,7 @@ package org.samo_lego.fabrictailor.mixin;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.samo_lego.fabrictailor.TailoredPlayer;
+import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

@@ -1,4 +1,4 @@
-package org.samo_lego.fabrictailor;
+package org.samo_lego.fabrictailor.casts;
 
 public interface TailoredPlayer {
     /**

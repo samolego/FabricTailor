@@ -7,33 +7,19 @@ import net.minecraft.text.TranslatableText;
 
 public class SkinTab extends DrawableHelper {
 
-    public enum TailorStyle {
-        LOCAL("tab.fabrictailor.title_local"),
-        URL("tab.fabrictailor.title_url"),
-        PLAYER("tab.fabrictailor.title_player");
-
-        private final String TITLE;
-
-        TailorStyle(String title) {
-            this.TITLE = title;
-        }
-
-        public String getTitle() {
-            return this.TITLE;
-        }
-    }
-
+    private final TailorStyle type;
     private final TranslatableText TITLE;
     private final TranslatableText DESCRIPTION;
     private final ItemStack ICON;
-    private final int WIDTH;
-    private final int HEIGHT;
+    private final int width;
+    private final int height;
     private String skinCommand = "/skin set ";
 
     public SkinTab(TailorStyle type, int width, int height) {
         this.TITLE = new TranslatableText(type.getTitle());
-        this.WIDTH = width;
-        this.HEIGHT = height;
+        this.width = width;
+        this.height = height;
+        this.type = type;
 
         switch(type) {
             case PLAYER:
@@ -44,12 +30,12 @@ public class SkinTab extends DrawableHelper {
             case LOCAL:
                 this.ICON = new ItemStack(Items.MAGENTA_GLAZED_TERRACOTTA);
                 this.DESCRIPTION = new TranslatableText("description.fabrictailor.title_local");
-                this.skinCommand += "upload classic ";
+                this.skinCommand += "upload ";
                 break;
             default:
                 this.ICON = new ItemStack(Items.GLOBE_BANNER_PATTERN);
                 this.DESCRIPTION = new TranslatableText("description.fabrictailor.title_url");
-                this.skinCommand += "url classic ";
+                this.skinCommand += "URL ";
                 break;
         }
     }
@@ -66,10 +52,34 @@ public class SkinTab extends DrawableHelper {
     }
 
     public boolean isSelected(int startX, int startY, int mouseX, int mouseY) {
-        return mouseX > startX && mouseX < startX + this.WIDTH && mouseY > startY && mouseY < startY + this.HEIGHT;
+        return mouseX > startX && mouseX < startX + this.width && mouseY > startY && mouseY < startY + this.height;
     }
 
     public String getSkinCommand() {
         return this.skinCommand;
+    }
+    public boolean hasModels() {
+        return this.type != TailorStyle.PLAYER;
+    }
+
+    public TailorStyle getType() {
+        return this.type;
+    }
+
+
+    public enum TailorStyle {
+        LOCAL("tab.fabrictailor.title_local"),
+        URL("tab.fabrictailor.title_url"),
+        PLAYER("tab.fabrictailor.title_player");
+
+        private final String TITLE;
+
+        TailorStyle(String title) {
+            this.TITLE = title;
+        }
+
+        public String getTitle() {
+            return this.TITLE;
+        }
     }
 }

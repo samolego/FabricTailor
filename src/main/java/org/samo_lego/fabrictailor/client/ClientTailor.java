@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.LiteralText;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -33,7 +32,7 @@ public class ClientTailor implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if(keyBinding.wasPressed()) {
-                client.openScreen(new SkinChangeScreen());
+                client.openScreen(SKIN_CHANGE_SCREEN);
             }
         });
     }

@@ -3,10 +3,12 @@
   "minVersion": "0.8",
   "package": "org.samo_lego.fabrictailor.mixin",
   "compatibilityLevel": "JAVA_8",
+  "client": [
+  ],
   "mixins": [
     "EntityTrackerAccessor",
     "MixinPlayerManager",
-    "MixinServerPlayerEntity",
+    "ServerPlayerEntityMixin_TailoredPlayer",
     "ThreadedAnvilChunkStorageAccessor"
   ],
   "injectors": {

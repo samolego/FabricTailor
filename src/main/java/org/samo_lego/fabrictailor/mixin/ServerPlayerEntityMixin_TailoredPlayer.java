@@ -12,8 +12,7 @@ import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.chunk.ChunkManager;
-import org.samo_lego.fabrictailor.TailoredPlayer;
+import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,16 +23,14 @@ import java.util.Objects;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
 @Mixin(ServerPlayerEntity.class)
-public class MixinServerPlayerEntity implements TailoredPlayer  {
+public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
 
     private final ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
     private final GameProfile gameProfile = player.getGameProfile();
 
     private String skinValue;
     private String skinSignature;
-
     private final PropertyMap map = this.gameProfile.getProperties();
-
 
 
     /**
@@ -52,9 +49,8 @@ public class MixinServerPlayerEntity implements TailoredPlayer  {
         playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
         playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
 
-        ChunkManager manager = player.world.getChunkManager();
-        assert manager instanceof ServerChunkManager;
-        ThreadedAnvilChunkStorage storage = ((ServerChunkManager)manager).threadedAnvilChunkStorage;
+        ServerChunkManager manager = player.getServerWorld().getChunkManager();
+        ThreadedAnvilChunkStorage storage = manager.threadedAnvilChunkStorage;
         EntityTrackerAccessor trackerEntry = ((ThreadedAnvilChunkStorageAccessor) storage).getEntityTrackers().get(player.getEntityId());
 
         trackerEntry.getTrackingPlayers().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking));
@@ -75,7 +71,7 @@ public class MixinServerPlayerEntity implements TailoredPlayer  {
     }
 
     /**
-     * Sets the skin to the specified player and reloads it with {@link MixinServerPlayerEntity#reloadSkin()} reloadSkin().
+     * Sets the skin to the specified player and reloads it with {@link ServerPlayerEntityMixin_TailoredPlayer#reloadSkin()} reloadSkin().
      *
      * @param value skin texture value
      * @param signature skin texture signature
