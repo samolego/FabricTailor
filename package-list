@@ -1,3 +1,5 @@
 org.samo_lego.fabrictailor
+org.samo_lego.fabrictailor.casts
+org.samo_lego.fabrictailor.client
 org.samo_lego.fabrictailor.command
 org.samo_lego.fabrictailor.mixin
