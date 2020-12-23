@@ -45,7 +45,7 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     @Override
     public void reloadSkin() {
         // Refreshing tablist for each player
-        PlayerManager playerManager = Objects.requireNonNull(player.getServer()).getPlayerManager();
+        PlayerManager playerManager = player.server.getPlayerManager();
         playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
         playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
 
