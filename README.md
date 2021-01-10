@@ -4,6 +4,7 @@
 ![Serverside](https://img.shields.io/badge/Working-server--side%20only-blue)
 ![Singleplayer](https://img.shields.io/badge/Working-singleplayer-darkblue)
 [![Curseforge downloads](http://cf.way2muchnoise.eu/full_fabrictailor_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/fabrictailor)
+[![Discord](https://img.shields.io/discord/797713290545332235)](https://discord.gg/PNPjqA4Aw6)
 
 
 A server-side or singleplayer skin changing / restoring mod.
