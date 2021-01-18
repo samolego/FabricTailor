@@ -34,7 +34,6 @@ dependencies {
 
 	//modImplementation "carpet:fabric-carpet:1.16-${project.carpet_core_version}"
 	modImplementation "com.github.gnembon:fabric-carpet:${project.carpet_branch}-SNAPSHOT"
-
 }
 
 processResources {
