@@ -24,6 +24,8 @@ version = "${project.mod_version}-${project.minecraft_version}"
 group = project.maven_group
 
 dependencies {
+	implementation 'org.jetbrains:annotations:20.1.0'
+
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -31,6 +33,8 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	modImplementation "com.github.samolego:Taterzens:master-SNAPSHOT"
 
 	//modImplementation "carpet:fabric-carpet:1.16-${project.carpet_core_version}"
 	modImplementation "com.github.gnembon:fabric-carpet:${project.carpet_branch}-SNAPSHOT"

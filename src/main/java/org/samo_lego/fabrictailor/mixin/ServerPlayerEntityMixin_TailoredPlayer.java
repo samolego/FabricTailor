@@ -1,6 +1,7 @@
 package org.samo_lego.fabrictailor.mixin;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -17,8 +18,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Objects;
 
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
@@ -98,7 +97,10 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
             this.reloadSkin();
 
             result = true;
-        } catch (Error e) {
+        } catch (InsecureTextureException ignored) {
+            // No skin data
+        }
+        catch (Error e) {
             // Something went wrong when trying to set the skin
             errorLog(e.getMessage());
         }

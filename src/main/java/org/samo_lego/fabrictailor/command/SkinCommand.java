@@ -1,11 +1,16 @@
 package org.samo_lego.fabrictailor.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Formatting;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
+import org.samo_lego.fabrictailor.compatibility.TaterzensCompatibility;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -14,149 +19,143 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Objects;
 import java.util.UUID;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.command.argument.MessageArgumentType.getMessage;
 import static net.minecraft.command.argument.MessageArgumentType.message;
+import static net.minecraft.server.command.CommandManager.literal;
 import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 
 public class SkinCommand {
+    public static LiteralCommandNode<ServerCommandSource> skinNode;
+    private static final boolean TATERZENS_LOADED;
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
-        dispatcher.register(CommandManager.literal("skin")
-            .then(CommandManager.literal("set")
-                .then(CommandManager.literal("URL")
-                        .then(CommandManager.literal("classic")
-                            .then(CommandManager.argument("skin URL", message())
-                                    .executes(ctx ->
-                                            fetchSkinByUrl(
-                                                    (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
-                                                    getMessage(ctx, "skin URL").getString(),
-                                                    false
-                                            )
-                                    )
-                            )
+        skinNode = dispatcher.register(literal("skin")
+                .then(literal("set")
+                        .then(literal("URL")
+                                .then(literal("classic")
+                                        .then(CommandManager.argument("skin URL", message())
+                                                .executes(ctx ->
+                                                        fetchSkinByUrl(
+                                                                ctx.getSource(),
+                                                                getMessage(ctx, "skin URL").getString(),
+                                                                false
+                                                        )
+                                                )
+                                        )
+                                )
+                                .then(literal("slim")
+                                        .then(CommandManager.argument("skin URL", message())
+                                                .executes(ctx ->
+                                                        fetchSkinByUrl(
+                                                                ctx.getSource(),
+                                                                getMessage(ctx, "skin URL").getString(),
+                                                                true
+                                                        )
+                                                )
+                                        )
+                                )
+                                .executes(ctx -> {
+                                    ctx.getSource().sendError(
+                                            new LiteralText(
+                                                    "You have to provide URL and variant of the skin you want."
+                                            ).formatted(Formatting.RED)
+                                    );
+                                    return 1;
+                                })
                         )
-                        .then(CommandManager.literal("slim")
-                                .then(CommandManager.argument("skin URL", message())
-                                        .executes(ctx ->
-                                                fetchSkinByUrl(
-                                                        (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
-                                                        getMessage(ctx, "skin URL").getString(),
+                        .then(literal("upload")
+                                .then(literal("classic")
+                                        .then(CommandManager.argument("skin file path", message())
+                                                .executes(ctx -> setSkinFromFile(
+                                                        ctx.getSource(),
+                                                        getMessage(ctx, "skin file path").getString(),
+                                                        false
+                                                        )
+                                                )
+                                        )
+                                )
+                                .then(literal("slim")
+                                        .then(CommandManager.argument("skin file path", message())
+                                                .executes(ctx -> setSkinFromFile(
+                                                        ctx.getSource(),
+                                                        getMessage(ctx, "skin file path").getString(),
                                                         true
+                                                        )
                                                 )
                                         )
                                 )
+                                .executes(ctx -> {
+                                    ctx.getSource().sendError(
+                                            new LiteralText(
+                                                    "You have to provide file path and variant of the skin you want."
+                                            ).formatted(Formatting.RED)
+                                    );
+                                    return 1;
+                                })
                         )
-                        .executes(ctx -> {
-                            ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
-                            player.sendMessage(
-                                    new LiteralText(
-                                            "§6You have to provide URL and variant of the skin you want."
-                                    ),
-                                    false
-                            );
-                            return 1;
-                        })
-                )
-                .then(CommandManager.literal("upload")
-                        .then(CommandManager.literal("classic")
-                            .then(CommandManager.argument("skin file path", message())
-                                    .executes(ctx -> setSkinFromFile(
-                                            (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
-                                            getMessage(ctx, "skin file path").getString(),
-                                            false
-                                            )
-                                    )
-                            )
-                        )
-                        .then(CommandManager.literal("slim")
-                                .then(CommandManager.argument("skin file path", message())
-                                        .executes(ctx -> setSkinFromFile(
-                                                (ServerPlayerEntity) ctx.getSource().getEntityOrThrow(),
-                                                getMessage(ctx, "skin file path").getString(),
-                                                true
-                                                )
-                                        )
+                        .then(literal("player")
+                                .then(CommandManager.argument("playername", greedyString())
+                                        .executes(ctx -> fetchSkinByName(ctx.getSource(), getString(ctx, "playername"), true))
                                 )
+                                .executes(ctx -> {
+                                    ctx.getSource().sendError(
+                                            new LiteralText(
+                                                    "You have to provide player's name."
+                                            ).formatted(Formatting.RED)
+                                    );
+                                    return 1;
+                                })
                         )
                         .executes(ctx -> {
-                            ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
-                            player.sendMessage(
+                            ctx.getSource().sendError(
                                     new LiteralText(
-                                            "§6You have to provide file path and variant of the skin you want."
-                                    ),
-                                    false
+                                            "You have to provide URL, player's name or file of the skin you want."
+                                    ).formatted(Formatting.RED)
                             );
                             return 1;
                         })
                 )
-                .then(CommandManager.literal("player")
-                        .then(CommandManager.argument("playername", greedyString())
-                            .executes(ctx -> fetchSkinByName((ServerPlayerEntity) ctx.getSource().getEntityOrThrow(), getString(ctx, "playername"), true))
-                        )
-                        .executes(ctx -> {
-                            ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
-                            player.sendMessage(
-                                    new LiteralText(
-                                            "§6You have to provide player's name."
-                                    ),
-                                    false
-                            );
-                            return 1;
-                        })
-                )
-                .executes(ctx -> {
-                    ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
-                    player.sendMessage(
-                            new LiteralText(
-                                    "§6You have to provide URL, player's name or file of the skin you want."
-                            ),
-                            false
-                    );
-                    return 1;
-                })
-            )
-            .then(CommandManager.literal("clear")
-                .executes(ctx -> {
-                        ServerPlayerEntity player = (ServerPlayerEntity) ctx.getSource().getEntityOrThrow();
-                        if(((TailoredPlayer) player).setSkin("", "")) {
-                            player.sendMessage(new LiteralText(
-                                        "§aYour skin was cleared successfully."
-                                ),
-                                false
-                            );
-                            return 1;
-                        }
-                        player.sendMessage(new LiteralText(
-                                        "§cAn error occurred when trying to clear your skin."
-                                ),
-                                false
-                        );
-                        return 0;
-                    }
-                )
-            )
+                .then(literal("clear").executes(context -> clearSkin(context.getSource())))
         );
+    }
+
+    private static int clearSkin(ServerCommandSource source) throws CommandSyntaxException {
+        ServerPlayerEntity player = source.getPlayer();
+
+        if(((TailoredPlayer) player).setSkin("", "")) {
+            player.sendMessage(new LiteralText(
+                            "Your skin was cleared successfully."
+                    ).formatted(Formatting.GREEN),
+                    false
+            );
+            return 1;
+        }
+        player.sendMessage(new LiteralText(
+                        "An error occurred when trying to clear your skin."
+                ).formatted(Formatting.RED),
+                false
+        );
+        return 0;
     }
 
     /**
      * Gets the file.
      *
-     * @param player player that will have skin changed.
+     * @param src src that is changing the skin.
      * @param skinFilePath file path
      * @param useSlim whether slim format should be used
      * @return 1 if image is valid, otherwise 0
      */
-    private static int setSkinFromFile(ServerPlayerEntity player, String skinFilePath, boolean useSlim) {
-        if(Objects.requireNonNull(player.getServer()).isDedicated()) {
-            player.sendMessage(new LiteralText(
-                    "§6FabricTailor mod is running in server environment.\n" +
+    private static int setSkinFromFile(ServerCommandSource src, String skinFilePath, boolean useSlim) {
+        if(src.getMinecraftServer().isDedicated()) {
+            src.sendFeedback(new LiteralText(
+                    "FabricTailor mod is running in server environment.\n" +
                             "Make sure the path points to the skin file on the SERVER."
-                    ),
+                    ).formatted(Formatting.GOLD),
                     false
             );
         }
@@ -164,21 +163,20 @@ public class SkinCommand {
         File skinFile = new File(skinFilePath);
         try (FileInputStream input = new FileInputStream(skinFile)) {
             if(input.read() == 137) {
-                player.sendMessage(new LiteralText(
-                                "§6Uploading skin. Please wait."
-                        ),
+                src.sendFeedback(new LiteralText(
+                                "Uploading skin. Please wait."
+                        ).formatted(Formatting.GOLD),
                         false
                 );
                 THREADPOOL.submit(() -> {
                     try {
                         String reply = urlRequest(new URL("https://api.mineskin.org/generate/upload?model=" + (useSlim ? "slim" : "steve")), skinFile);
-                        setSkinFromReply(reply, player, true);
-                    } catch (IOException e) {
-                        player.sendMessage(
+                        setSkinFromReply(reply, src.getPlayer(), true);
+                    } catch (IOException | CommandSyntaxException e) {
+                        src.sendError(
                                 new LiteralText(
-                                        "§cA problem occurred when trying to upload the skin."
-                                ),
-                                false
+                                        "A problem occurred when trying to upload the skin."
+                                ).formatted(Formatting.RED)
                         );
                     }
                 });
@@ -187,36 +185,35 @@ public class SkinCommand {
         } catch (IOException ignored) {
             // Not an image
         }
-        player.sendMessage(new LiteralText("§cThe provided file is not a valid PNG image."), false);
+        src.sendError(new LiteralText("The provided file is not a valid PNG image.").formatted(Formatting.RED));
         return 0;
     }
 
     /**
      * Sets skin setting from the provided URL.
      *
-     * @param player player who executed the command
+     * @param src executor of the command
      * @param skinUrl string url of the skin
      * @return 1
      */
-    public static int fetchSkinByUrl(ServerPlayerEntity player, String skinUrl, boolean useSlim) {
-        player.sendMessage(
+    public static int fetchSkinByUrl(ServerCommandSource src, String skinUrl, boolean useSlim) {
+        src.sendFeedback(
                 new LiteralText(
-                        "§eTrying to set your skin ... Please wait."
-                ),
+                        "Trying to set the skin ... Please wait."
+                ).formatted(Formatting.AQUA),
                 false
         );
         THREADPOOL.submit(() -> {
             try {
                 URL url = new URL(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", skinUrl, useSlim ? "slim" : "steve"));
                 String reply = urlRequest(url, null);
-                setSkinFromReply(reply, player, true);
-            } catch (IOException e) {
+                setSkinFromReply(reply, src.getPlayer(), true);
+            } catch (IOException | CommandSyntaxException e) {
                 e.printStackTrace();
-                player.sendMessage(
+                src.sendError(
                         new LiteralText(
-                                "§cMalformed url!"
-                        ),
-                        false
+                                "Malformed url!"
+                        ).formatted(Formatting.RED)
                 );
             }
         });
@@ -226,17 +223,17 @@ public class SkinCommand {
     /**
      * Sets skin by playername.
      *
-     * @param player player to change skin for
+     * @param src src changing the skin
      * @param playername name of the player who has the skin wanted
      * @param giveFeedback whether player should receive feedback if skin setting was successful
      * @return 0
      */
-    public static int fetchSkinByName(ServerPlayerEntity player, String playername, boolean giveFeedback) {
+    public static int fetchSkinByName(ServerCommandSource src, String playername, boolean giveFeedback) {
         if(giveFeedback)
-            player.sendMessage(
+            src.sendFeedback(
                     new LiteralText(
-                            "§eTrying to set your skin ... Please wait."
-                    ),
+                            "Trying to set your skin ... Please wait."
+                    ).formatted(Formatting.BLUE),
                     false
             );
         THREADPOOL.submit(() -> {
@@ -245,14 +242,13 @@ public class SkinCommand {
             // it also includes mojang skins
             try {
                 String reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), null);
-                setSkinFromReply(reply, player, giveFeedback);
-            } catch (IOException e) {
+                setSkinFromReply(reply, src.getPlayer(), giveFeedback);
+            } catch (IOException | CommandSyntaxException e) {
                 if(giveFeedback)
-                    player.sendMessage(
+                    src.sendError(
                             new LiteralText(
-                                    "§cThis player doesn't seem to have any skins saved."
-                            ),
-                            false
+                                    "This player doesn't seem to have any skins saved."
+                            ).formatted(Formatting.RED)
                     );
             }
         });
@@ -265,15 +261,15 @@ public class SkinCommand {
      *
      * @param reply API reply
      * @param player player to send message to.
-     * @param giveFeedback whether feedback should be sent to player
+     * @param giveFeedback whether feedback should be sent to player.
      */
     private static void setSkinFromReply(String reply, ServerPlayerEntity player, boolean giveFeedback) {
         if(reply == null || (reply.contains("error") && giveFeedback)) {
             if(giveFeedback)
                 player.sendMessage(
                         new LiteralText(
-                                "§cAn error occurred when trying to fetch skin."
-                        ),
+                                "An error occurred when trying to fetch skin."
+                        ).formatted(Formatting.RED),
                         false
                 );
             return;
@@ -282,12 +278,16 @@ public class SkinCommand {
         String value = reply.split("\"value\":\"")[1].split("\"")[0];
         String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
-        // Setting skin
-        if(((TailoredPlayer) player).setSkin(value, signature) && giveFeedback) {
+        if(TATERZENS_LOADED) {
+            TaterzensCompatibility.setTaterzenSkin(player, value, signature);
+        }
+
+        // Setting player skin
+        else if(((TailoredPlayer) player).setSkin(value, signature) && giveFeedback) {
             player.sendMessage(
                     new LiteralText(
-                            "§aYour skin was set successfully."
-                    ),
+                            "Your skin was set successfully."
+                    ).formatted(Formatting.GREEN),
                     false
             );
         }
@@ -373,5 +373,9 @@ public class SkinCommand {
         ) {
             return br.readLine();
         }
+    }
+
+    static {
+        TATERZENS_LOADED = FabricLoader.getInstance().isModLoaded("taterzens");
     }
 }
