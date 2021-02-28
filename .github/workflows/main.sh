@@ -25,7 +25,7 @@ latestRelease=$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/release
 echo "Latest release is: $latestRelease"
 
 
-if [ "$latestRelease" == "$version" ]; then
+if [ "$latestRelease" == "$version" ] || [ "$version" == "0.0.0" ]; then
         echo "No need to publish release. Not necesarry stable yet."
 else
         echo "Hooray! New release!"
