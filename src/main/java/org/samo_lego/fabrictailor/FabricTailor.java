@@ -3,12 +3,10 @@ package org.samo_lego.fabrictailor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.samo_lego.fabrictailor.command.SkinCommand;
-import org.samo_lego.fabrictailor.command.TaterzenSkinCommand;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,8 +22,6 @@ public class FabricTailor implements ModInitializer {
 	public void onInitialize() {
 		// Registering /skin command
 		CommandRegistrationCallback.EVENT.register(SkinCommand::register);
-		if(FabricLoader.getInstance().isModLoaded("taterzens"))
-			CommandRegistrationCallback.EVENT.register(TaterzenSkinCommand::register);
 
 		// Stop server event
 		ServerLifecycleEvents.SERVER_STOPPED.register(this::onStopServer);
