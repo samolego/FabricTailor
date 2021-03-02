@@ -31,6 +31,7 @@ import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 public class SkinCommand {
     public static LiteralCommandNode<ServerCommandSource> skinNode;
     private static final boolean TATERZENS_LOADED;
+    private static final String SET_SKIN_ATTEMPT = "Trying to set the skin ... Please wait.";
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         skinNode = dispatcher.register(literal("skin")
@@ -197,12 +198,7 @@ public class SkinCommand {
      * @return 1
      */
     public static int fetchSkinByUrl(ServerCommandSource src, String skinUrl, boolean useSlim) {
-        src.sendFeedback(
-                new LiteralText(
-                        "Trying to set the skin ... Please wait."
-                ).formatted(Formatting.AQUA),
-                false
-        );
+        src.sendFeedback(new LiteralText(SET_SKIN_ATTEMPT).formatted(Formatting.AQUA), false);
         THREADPOOL.submit(() -> {
             try {
                 URL url = new URL(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", skinUrl, useSlim ? "slim" : "steve"));
@@ -231,9 +227,7 @@ public class SkinCommand {
     public static int fetchSkinByName(ServerCommandSource src, String playername, boolean giveFeedback) {
         if(giveFeedback)
             src.sendFeedback(
-                    new LiteralText(
-                            "Trying to set your skin ... Please wait."
-                    ).formatted(Formatting.BLUE),
+                    new LiteralText(SET_SKIN_ATTEMPT).formatted(Formatting.AQUA),
                     false
             );
         THREADPOOL.submit(() -> {
@@ -278,15 +272,13 @@ public class SkinCommand {
         String value = reply.split("\"value\":\"")[1].split("\"")[0];
         String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
-        if(TATERZENS_LOADED) {
-            TaterzensCompatibility.setTaterzenSkin(player, value, signature);
-        }
-
-        // Setting player skin
-        else if(((TailoredPlayer) player).setSkin(value, signature) && giveFeedback) {
+        if(
+                TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, value, signature) ||
+                (((TailoredPlayer) player).setSkin(value, signature) && giveFeedback)
+        ) {
             player.sendMessage(
                     new LiteralText(
-                            "Your skin was set successfully."
+                            "Skin was set successfully."
                     ).formatted(Formatting.GREEN),
                     false
             );
