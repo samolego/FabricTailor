@@ -44,7 +44,9 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     @Override
     public void reloadSkin() {
         // Refreshing tablist for each player
-        PlayerManager playerManager = player.server.getPlayerManager();
+        if(player.getServer() == null)
+            return;
+        PlayerManager playerManager = player.getServer().getPlayerManager();
         playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
         playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
 
@@ -55,7 +57,7 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         trackerEntry.getTrackingPlayers().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking));
 
         // need to change the player entity on the client
-        ServerWorld targetWorld = (ServerWorld) player.world;
+        ServerWorld targetWorld = player.getServerWorld();
         player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimension(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
         player.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
         player.server.getPlayerManager().sendCommandTree(player);
