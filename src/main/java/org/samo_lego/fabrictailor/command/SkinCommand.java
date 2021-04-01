@@ -127,7 +127,7 @@ public class SkinCommand {
     private static int clearSkin(ServerCommandSource source) throws CommandSyntaxException {
         ServerPlayerEntity player = source.getPlayer();
 
-        if(((TailoredPlayer) player).setSkin("", "")) {
+        if(((TailoredPlayer) player).setSkin("", "", true)) {
             player.sendMessage(new LiteralText(
                             "Your skin was cleared successfully."
                     ).formatted(Formatting.GREEN),
@@ -274,7 +274,7 @@ public class SkinCommand {
 
         if(
                 TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, value, signature) ||
-                (((TailoredPlayer) player).setSkin(value, signature) && giveFeedback)
+                (((TailoredPlayer) player).setSkin(value, signature, true) && giveFeedback)
         ) {
             player.sendMessage(
                     new LiteralText(

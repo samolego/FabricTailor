@@ -14,9 +14,10 @@ public interface TailoredPlayer {
      *
      * @param value skin texture value
      * @param signature skin texture signature
+     * @param reload
      * @return true if it was successful, otherwise false
      */
-    boolean setSkin(String value, String signature);
+    boolean setSkin(String value, String signature, boolean reload);
 
     /**
      * Gets player's skin value.

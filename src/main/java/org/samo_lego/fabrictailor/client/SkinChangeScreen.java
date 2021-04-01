@@ -94,7 +94,7 @@ public class SkinChangeScreen extends Screen {
         skinInput = new TextFieldWidget(this.textRenderer, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, new TranslatableText("itemGroup.search"));
         skinInput.setMaxLength(256);
         skinInput.setVisible(true);
-        skinInput.setHasBorder(true);
+        skinInput.setDrawsBackground(true);
         skinInput.setEditableColor(16777215);
 
         addChild(skinInput);

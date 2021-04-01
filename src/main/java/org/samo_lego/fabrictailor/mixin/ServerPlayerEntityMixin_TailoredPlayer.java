@@ -76,27 +76,28 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
      *
      * @param value skin texture value
      * @param signature skin texture signature
+     * @param reload whether to reload skin
      * @return true if it was successful, otherwise false
      */
-    public boolean setSkin(String value, String signature) {
+    public boolean setSkin(String value, String signature, boolean reload) {
         boolean result = false;
 
         try {
-            Property property = this.map.get("textures").iterator().next();
-            this.map.remove("textures", property);
+            this.map.removeAll("textures");
         } catch (Exception ignored) {
             // Player has no skin data, no worries
         }
 
         try {
-            map.put("textures", new Property("textures", value, signature));
+            this.map.put("textures", new Property("textures", value, signature));
 
             // Saving skin data
             this.skinValue = value;
             this.skinSignature = signature;
 
             // Reloading skin
-            this.reloadSkin();
+            if(reload)
+                this.reloadSkin();
 
             result = true;
         } catch (InsecureTextureException ignored) {
@@ -127,7 +128,7 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         if(this.skinSignature == null) {
             try {
                 Property property = map.get("textures").iterator().next();
-                this.skinSignature = property.getSignature()    ;
+                this.skinSignature = property.getSignature();
             } catch (Exception ignored) {
                 // Player has no skin data, no worries
             }
