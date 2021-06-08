@@ -5,7 +5,7 @@ import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -52,19 +52,19 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
 
         ServerChunkManager manager = player.getServerWorld().getChunkManager();
         ThreadedAnvilChunkStorage storage = manager.threadedAnvilChunkStorage;
-        EntityTrackerAccessor trackerEntry = ((ThreadedAnvilChunkStorageAccessor) storage).getEntityTrackers().get(player.getEntityId());
+        EntityTrackerAccessor trackerEntry = ((ThreadedAnvilChunkStorageAccessor) storage).getEntityTrackers().get(player.getId());
 
-        trackerEntry.getTrackingPlayers().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking));
+        trackerEntry.getListeners().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking.getPlayer()));
 
         // need to change the player entity on the client
         ServerWorld targetWorld = player.getServerWorld();
         player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimension(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
-        player.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.yaw, player.pitch);
+        player.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
         player.server.getPlayerManager().sendCommandTree(player);
         player.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
         player.networkHandler.sendPacket(new HealthUpdateS2CPacket(player.getHealth(), player.getHungerManager().getFoodLevel(), player.getHungerManager().getSaturationLevel()));
         for (StatusEffectInstance statusEffect : player.getStatusEffects()) {
-            player.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(player.getEntityId(), statusEffect));
+            player.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(player.getId(), statusEffect));
         }
         player.sendAbilitiesUpdate();
         playerManager.sendWorldInfo(player, targetWorld);
@@ -137,10 +137,10 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     }
 
 
-    @Inject(method = "writeCustomDataToTag(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
-    private void writeCustomDataToTag(CompoundTag tag, CallbackInfo ci) {
+    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
+    private void writeCustomDataToNbt(NbtCompound tag, CallbackInfo ci) {
         if(this.getSkinValue() != null && this.getSkinSignature() != null) {
-            CompoundTag skinDataTag = new CompoundTag();
+            NbtCompound skinDataTag = new NbtCompound();
             skinDataTag.putString("value", this.skinValue);
             skinDataTag.putString("signature", this.skinSignature);
 
@@ -148,9 +148,9 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         }
     }
 
-    @Inject(method = "readCustomDataFromTag(Lnet/minecraft/nbt/CompoundTag;)V", at = @At("TAIL"))
-    private void readCustomDataFromTag(CompoundTag tag, CallbackInfo ci) {
-        CompoundTag skinDataTag = tag.getCompound("fabrictailor:skin_data");
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    private void readCustomDataFromNbt(NbtCompound tag, CallbackInfo ci) {
+        NbtCompound skinDataTag = tag.getCompound("fabrictailor:skin_data");
         if(skinDataTag != null) {
             this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
             this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;

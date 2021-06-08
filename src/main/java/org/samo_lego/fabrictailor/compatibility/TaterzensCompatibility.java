@@ -1,6 +1,6 @@
 package org.samo_lego.fabrictailor.compatibility;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.samo_lego.taterzens.interfaces.TaterzenEditor;
 import org.samo_lego.taterzens.npc.TaterzenNPC;
@@ -11,7 +11,7 @@ public class TaterzensCompatibility {
         TaterzenNPC taterzen = ((TaterzenEditor) executor).getNpc();
 
         if(taterzen != null) {
-            CompoundTag skinTag = new CompoundTag();
+            NbtCompound skinTag = new NbtCompound();
             skinTag.putString("value", value);
             skinTag.putString("signature", signature);
 

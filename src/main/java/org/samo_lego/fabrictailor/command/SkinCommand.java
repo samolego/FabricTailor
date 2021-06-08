@@ -1,9 +1,13 @@
 package org.samo_lego.fabrictailor.command;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.entity.SkullBlockEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -224,27 +228,53 @@ public class SkinCommand {
      * @param giveFeedback whether player should receive feedback if skin setting was successful
      * @return 0
      */
-    public static int fetchSkinByName(ServerCommandSource src, String playername, boolean giveFeedback) {
+    public static int fetchSkinByName(ServerCommandSource src, String playername, boolean giveFeedback) throws CommandSyntaxException {
         if(giveFeedback)
             src.sendFeedback(
                     new LiteralText(SET_SKIN_ATTEMPT).formatted(Formatting.AQUA),
                     false
             );
+        ServerPlayerEntity player = src.getPlayer();
+
         THREADPOOL.submit(() -> {
             // If user has no skin data
             // Getting skin data from ely.by api, since it can be used with usernames
             // it also includes mojang skins
-            try {
-                String reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), null);
-                setSkinFromReply(reply, src.getPlayer(), giveFeedback);
-            } catch (IOException | CommandSyntaxException e) {
-                if(giveFeedback)
-                    src.sendError(
-                            new LiteralText(
-                                    "This player doesn't seem to have any skins saved."
-                            ).formatted(Formatting.RED)
-                    );
-            }
+            // Try to get Mojang skin first
+            GameProfile profile = new GameProfile(null, playername);
+            SkullBlockEntity.loadProperties(profile, gameProfile -> {
+                PropertyMap propertyMap = gameProfile.getProperties();
+                if(propertyMap.containsKey("textures")) {
+                    Property textures = propertyMap.get("textures").iterator().next();
+                    String value = textures.getValue();
+                    String signature = textures.getSignature();
+                    if(
+                            TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, value, signature) ||
+                                    (((TailoredPlayer) player).setSkin(value, signature, true) && giveFeedback)
+                    ) {
+                        player.sendMessage(
+                                new LiteralText(
+                                        "Skin was set successfully."
+                                ).formatted(Formatting.GREEN),
+                                false
+                        );
+                    }
+                } else {
+                    String reply = null;
+                    try {
+                        reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), null);
+                    } catch(IOException e) {
+                        if(giveFeedback)
+                            src.sendError(
+                                    new LiteralText(
+                                            "This player doesn't seem to have any skins saved."
+                                    ).formatted(Formatting.RED)
+                            );
+
+                    }
+                    setSkinFromReply(reply, player, giveFeedback);
+                }
+            });
         });
         return 0;
     }
