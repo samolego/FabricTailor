@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.samo_lego.fabrictailor"},{"l":"org.samo_lego.fabrictailor.casts"},{"l":"org.samo_lego.fabrictailor.client"},{"l":"org.samo_lego.fabrictailor.command"},{"l":"org.samo_lego.fabrictailor.compatibility"},{"l":"org.samo_lego.fabrictailor.mixin"}];updateSearchResults();
