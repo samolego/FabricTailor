@@ -1,18 +1,10 @@
+import com.modrinth.minotaur.TaskModrinthUpload
+
 plugins {
 	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
-}
-
-repositories {
-	maven {
-		url 'https://jitpack.io'
-	}
-	maven {
-		url 'https://masa.dy.fi/maven'
-	}
-	maven {
-		url 'https://oss.sonatype.org/content/repositories/snapshots'
-	}
+	id "com.matthewprenger.cursegradle" version "1.4.0"
+	id "com.modrinth.minotaur" version "1.1.0"
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
@@ -22,10 +14,19 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-dependencies {
-	implementation 'org.jetbrains:annotations:20.1.0'
+repositories {
+	maven {
+		url 'https://oss.sonatype.org/content/repositories/snapshots'
+	}
+	maven {
+		url 'https://jitpack.io'
+	}
+}
 
-	//to change the versions see the gradle.properties file
+def ENV = System.getenv()
+
+dependencies {
+	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -33,6 +34,8 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	// LuckPerms
+	modImplementation 'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
 	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.1.0')
 
 	//modImplementation "carpet:fabric-carpet:1.16-${project.carpet_core_version}"
@@ -45,7 +48,6 @@ processResources {
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
-
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -95,3 +97,47 @@ publishing {
 	}
 }
 
+// from FAPI https://github.com/FabricMC/fabric/blob/1.16/build.gradle
+curseforge {
+	if (ENV.CURSEFORGE_API_KEY) {
+		apiKey = ENV.CURSEFORGE_API_KEY
+	}
+
+	project {
+		id = "390114"
+		changelog = "A changelog can be found at https://github.com/samolego/FabricTailor/releases/latest"
+		releaseType = "release"
+		addGameVersion "${project.minecraft_version}"
+		addGameVersion "Fabric"
+
+		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
+			displayName = "[${project.minecraft_version}] FabricTailor ${version}"
+		}
+
+		afterEvaluate {
+			uploadTask.dependsOn("remapJar")
+		}
+	}
+
+	options {
+		forgeGradleIntegration = false
+	}
+}
+
+task modrinth(type: TaskModrinthUpload, dependsOn: remapJar) {
+	onlyIf {
+		ENV.MODRINTH_TOKEN
+	}
+
+	token = ENV.MODRINTH_TOKEN
+	projectId = "g8w1NapE"
+	changelog = "A changelog can be found at https://github.com/samolego/FabricTailor/releases/latest"
+	versionNumber = version
+	versionName = "[${project.minecraft_version}] FabricTailor ${version}"
+	releaseType = "release"
+
+	uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+
+	addGameVersion("${project.minecraft_version}")
+	addLoader('fabric')
+}
