@@ -18,9 +18,7 @@ public abstract class MixinPlayerManager {
     private void onPlayerConnect(ClientConnection clientConnection, ServerPlayerEntity player, CallbackInfo ci) throws CommandSyntaxException {
         String value = ((TailoredPlayer) player).getSkinValue();
         String signature = ((TailoredPlayer) player).getSkinSignature();
-        if(value != null && signature != null)
-            ((TailoredPlayer) player).setSkin(value, signature, false);
-        else
+        if(value == null || signature == null)
             // Trying to fetch skin by playername
             fetchSkinByName(player.getCommandSource(), player.getGameProfile().getName(), false);
     }

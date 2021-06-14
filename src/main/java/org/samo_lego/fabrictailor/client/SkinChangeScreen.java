@@ -73,7 +73,7 @@ public class SkinChangeScreen extends Screen {
                     this.renderTooltip(matrixStack, new TranslatableText("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
                 }
         );
-        this.addDrawable(openExplorerButton);
+        this.addDrawableChild(openExplorerButton);
 
         // Checkbox for slim skin model
         this.skinModelCheckbox = new CheckboxWidget(
@@ -84,7 +84,7 @@ public class SkinChangeScreen extends Screen {
                 new TranslatableText("button.fabrictailor.use_slim"),
                 false
         );
-        this.addDrawable(skinModelCheckbox);
+        this.addDrawableChild(skinModelCheckbox);
 
         // Both should be hidden at first (default tab is "player")
         this.openExplorerButton.visible = false;
@@ -100,7 +100,7 @@ public class SkinChangeScreen extends Screen {
         addSelectableChild(skinInput);
 
         // "Set skin" button
-        this.addDrawable(
+        this.addDrawableChild(
                 new ButtonWidget(
                         width / 2,
                         height / 2 + 30,
@@ -121,7 +121,7 @@ public class SkinChangeScreen extends Screen {
                 )
         );
 
-        this.addDrawable(
+        this.addDrawableChild(
                 new ButtonWidget(
                         width / 2 - BUTTON_WIDTH - 2, height - BUTTON_HEIGHT - verticalSpacing,
                         BUTTON_WIDTH,
@@ -136,7 +136,7 @@ public class SkinChangeScreen extends Screen {
         );
 
         // "Cancel" button which closes the screen
-        this.addDrawable(
+        this.addDrawableChild(
                 new ButtonWidget(
                         width / 2 + 2, height - BUTTON_HEIGHT - verticalSpacing,
                         BUTTON_WIDTH,

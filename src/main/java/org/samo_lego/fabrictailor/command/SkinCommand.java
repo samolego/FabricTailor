@@ -238,8 +238,7 @@ public class SkinCommand {
 
         THREADPOOL.submit(() -> {
             // If user has no skin data
-            // Getting skin data from ely.by api, since it can be used with usernames
-            // it also includes mojang skins
+
             // Try to get Mojang skin first
             GameProfile profile = new GameProfile(null, playername);
             SkullBlockEntity.loadProperties(profile, gameProfile -> {
@@ -260,6 +259,8 @@ public class SkinCommand {
                         );
                     }
                 } else {
+                    // Getting skin data from ely.by api, since it can be used with usernames
+                    // it also includes mojang skins
                     String reply = null;
                     try {
                         reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), null);

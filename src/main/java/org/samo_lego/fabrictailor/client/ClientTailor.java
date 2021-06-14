@@ -19,14 +19,14 @@ public class ClientTailor implements ClientModInitializer {
 
     public static KeyBinding keyBinding;
 
-    private static final SkinChangeScreen SKIN_CHANGE_SCREEN = new SkinChangeScreen();
+    protected static final SkinChangeScreen SKIN_CHANGE_SCREEN = new SkinChangeScreen();
 
     @Override
     public void onInitializeClient() {
         keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.fabrictailor.toggle_skin_gui",
                 InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_K, // K for opening th window
+                GLFW.GLFW_KEY_K, // K for opening the window
                 "category.fabrictailor.skin_category"
         ));
 

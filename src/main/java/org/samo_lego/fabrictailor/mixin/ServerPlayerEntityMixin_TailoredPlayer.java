@@ -154,6 +154,8 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         if(skinDataTag != null) {
             this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
             this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;
+
+            this.setSkin(this.skinValue, this.skinSignature, false);
         }
     }
 }
