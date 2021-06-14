@@ -14,7 +14,14 @@ import static org.samo_lego.fabrictailor.command.SkinCommand.fetchSkinByName;
 
 @Mixin(PlayerManager.class)
 public abstract class MixinPlayerManager {
-    @Inject(method = "onPlayerConnect(Lnet/minecraft/network/ClientConnection;Lnet/minecraft/server/network/ServerPlayerEntity;)V", at = @At("HEAD"))
+    @Inject(
+            method = "onPlayerConnect(Lnet/minecraft/network/ClientConnection;Lnet/minecraft/server/network/ServerPlayerEntity;)V",
+            at = @At(
+                    target = "Lnet/minecraft/server/PlayerManager;loadPlayerData(Lnet/minecraft/server/network/ServerPlayerEntity;)Lnet/minecraft/nbt/NbtCompound;",
+                    value = "INVOKE_ASSIGN",
+                    shift = At.Shift.AFTER
+            )
+    )
     private void onPlayerConnect(ClientConnection clientConnection, ServerPlayerEntity player, CallbackInfo ci) throws CommandSyntaxException {
         String value = ((TailoredPlayer) player).getSkinValue();
         String signature = ((TailoredPlayer) player).getSkinSignature();

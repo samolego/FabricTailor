@@ -141,8 +141,8 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     private void writeCustomDataToNbt(NbtCompound tag, CallbackInfo ci) {
         if(this.getSkinValue() != null && this.getSkinSignature() != null) {
             NbtCompound skinDataTag = new NbtCompound();
-            skinDataTag.putString("value", this.skinValue);
-            skinDataTag.putString("signature", this.skinSignature);
+            skinDataTag.putString("value", this.getSkinValue());
+            skinDataTag.putString("signature", this.getSkinSignature());
 
             tag.put("fabrictailor:skin_data", skinDataTag);
         }

@@ -34,8 +34,8 @@ import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 
 public class SkinCommand {
     public static LiteralCommandNode<ServerCommandSource> skinNode;
-    private static final boolean TATERZENS_LOADED;
-    private static final String SET_SKIN_ATTEMPT = "Trying to set the skin ... Please wait.";
+    protected static final boolean TATERZENS_LOADED;
+    protected static final String SET_SKIN_ATTEMPT = "Trying to set the skin ... Please wait.";
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         skinNode = dispatcher.register(literal("skin")
@@ -128,7 +128,7 @@ public class SkinCommand {
         );
     }
 
-    private static int clearSkin(ServerCommandSource source) throws CommandSyntaxException {
+    protected static int clearSkin(ServerCommandSource source) throws CommandSyntaxException {
         ServerPlayerEntity player = source.getPlayer();
 
         if(((TailoredPlayer) player).setSkin("", "", true)) {
@@ -155,7 +155,7 @@ public class SkinCommand {
      * @param useSlim whether slim format should be used
      * @return 1 if image is valid, otherwise 0
      */
-    private static int setSkinFromFile(ServerCommandSource src, String skinFilePath, boolean useSlim) {
+    protected static int setSkinFromFile(ServerCommandSource src, String skinFilePath, boolean useSlim) {
         if(src.getMinecraftServer().isDedicated()) {
             src.sendFeedback(new LiteralText(
                     "FabricTailor mod is running in server environment.\n" +
@@ -240,16 +240,19 @@ public class SkinCommand {
             // If user has no skin data
 
             // Try to get Mojang skin first
-            GameProfile profile = new GameProfile(null, playername);
+            GameProfile profile = new GameProfile(player.getUuid(), playername);
             SkullBlockEntity.loadProperties(profile, gameProfile -> {
                 PropertyMap propertyMap = gameProfile.getProperties();
-                if(propertyMap.containsKey("textures")) {
+
+                // We check the uuid as well as there is a weird
+                // edge case when skin for your own self doesn't get fetched (#30)
+                if(propertyMap.containsKey("textures") && gameProfile.getId() != player.getUuid()) {
                     Property textures = propertyMap.get("textures").iterator().next();
                     String value = textures.getValue();
                     String signature = textures.getSignature();
                     if(
                             TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, value, signature) ||
-                                    (((TailoredPlayer) player).setSkin(value, signature, true) && giveFeedback)
+                            (((TailoredPlayer) player).setSkin(value, signature, true) && giveFeedback)
                     ) {
                         player.sendMessage(
                                 new LiteralText(
@@ -258,23 +261,25 @@ public class SkinCommand {
                                 false
                         );
                     }
-                } else {
-                    // Getting skin data from ely.by api, since it can be used with usernames
-                    // it also includes mojang skins
-                    String reply = null;
-                    try {
-                        reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), null);
-                    } catch(IOException e) {
-                        if(giveFeedback)
-                            src.sendError(
-                                    new LiteralText(
-                                            "This player doesn't seem to have any skins saved."
-                                    ).formatted(Formatting.RED)
-                            );
 
-                    }
-                    setSkinFromReply(reply, player, giveFeedback);
+                    return;
                 }
+                // Getting skin data from ely.by api, since it can be used with usernames
+                // it also includes mojang skins
+                String reply = null;
+                try {
+                    reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), null);
+                } catch(IOException e) {
+                    if(giveFeedback)
+                        src.sendError(
+                                new LiteralText(
+                                        "This player doesn't seem to have any skins saved."
+                                ).formatted(Formatting.RED)
+                        );
+
+                }
+                setSkinFromReply(reply, player, giveFeedback);
+
             });
         });
         return 0;
@@ -288,7 +293,7 @@ public class SkinCommand {
      * @param player player to send message to.
      * @param giveFeedback whether feedback should be sent to player.
      */
-    private static void setSkinFromReply(String reply, ServerPlayerEntity player, boolean giveFeedback) {
+    protected static void setSkinFromReply(String reply, ServerPlayerEntity player, boolean giveFeedback) {
         if(reply == null || (reply.contains("error") && giveFeedback)) {
             if(giveFeedback)
                 player.sendMessage(
@@ -325,7 +330,7 @@ public class SkinCommand {
      * @return reply from website as string
      * @throws IOException IOException is thrown when connection fails for some reason.
      */
-    private static String urlRequest(URL url, File image) throws IOException {
+    protected static String urlRequest(URL url, File image) throws IOException {
         URLConnection connection = url.openConnection();
 
         String reply = null;
@@ -388,7 +393,7 @@ public class SkinCommand {
      * @return API reply as String
      * @throws IOException exception when something went wrong
      */
-    private static String getContent(URLConnection connection) throws IOException {
+    protected static String getContent(URLConnection connection) throws IOException {
         try (
                 InputStream is = connection.getInputStream();
                 InputStreamReader isr = new InputStreamReader(is);
