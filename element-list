@@ -4,3 +4,4 @@ org.samo_lego.fabrictailor.client
 org.samo_lego.fabrictailor.command
 org.samo_lego.fabrictailor.compatibility
 org.samo_lego.fabrictailor.mixin
+org.samo_lego.fabrictailor.util
