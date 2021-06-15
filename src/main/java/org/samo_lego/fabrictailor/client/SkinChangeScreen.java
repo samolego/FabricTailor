@@ -12,13 +12,17 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import org.samo_lego.fabrictailor.client.SkinTab.TailorStyle;
+import org.samo_lego.fabrictailor.util.TranslatedText;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+
+import static org.samo_lego.fabrictailor.mixin.AdvancementsScreenAccessor.getTABS_TEXTURE;
+import static org.samo_lego.fabrictailor.mixin.AdvancementsScreenAccessor.getWINDOW_TEXTURE;
 
 
 @Environment(EnvType.CLIENT)
@@ -26,8 +30,6 @@ public class SkinChangeScreen extends Screen {
 
     public static final int BUTTON_HEIGHT = 20;
     public static final int BUTTON_WIDTH = 100;
-    private static final Identifier TABS_TEXTURE = new Identifier("textures/gui/advancements/tabs.png");
-    private static final Identifier BACKGROUND_TEXTURE = new Identifier("textures/gui/advancements/window.png");
 
     /**
      * Skin tabs:
@@ -42,12 +44,12 @@ public class SkinChangeScreen extends Screen {
     private TextFieldWidget skinInput;
     private int startX;
     private int startY;
-    private SkinTab selectedTab;
-    private CheckboxWidget skinModelCheckbox;
+    protected SkinTab selectedTab;
+    protected CheckboxWidget skinModelCheckbox;
     private ButtonWidget openExplorerButton;
 
     protected SkinChangeScreen() {
-        super(new TranslatableText("gui.fabrictailor.change_skin"));
+        super(new TranslatedText("gui.fabrictailor.change_skin"));
     }
 
     /**
@@ -65,12 +67,12 @@ public class SkinChangeScreen extends Screen {
                 height / 2 + 10,
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
-                new TranslatableText("button.fabrictailor.open_explorer"),
+                new TranslatedText("button.fabrictailor.open_explorer"),
                 (buttonWidget) -> {
                     Util.getOperatingSystem().open(new File(""));
                 },
                 (buttonWidget, matrixStack, i, j) -> {
-                    this.renderTooltip(matrixStack, new TranslatableText("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
+                    this.renderTooltip(matrixStack, new TranslatedText("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
                 }
         );
         this.addDrawableChild(openExplorerButton);
@@ -81,7 +83,7 @@ public class SkinChangeScreen extends Screen {
                 height / 2 - 12,
                 150,
                 20,
-                new TranslatableText("button.fabrictailor.use_slim"),
+                new TranslatedText("button.fabrictailor.use_slim"),
                 false
         );
         this.addDrawableChild(skinModelCheckbox);
@@ -91,13 +93,13 @@ public class SkinChangeScreen extends Screen {
         this.skinModelCheckbox.visible = false;
 
         // Text field input
-        skinInput = new TextFieldWidget(this.textRenderer, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, new TranslatableText("itemGroup.search"));
+        skinInput = new TextFieldWidget(this.textRenderer, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, new TranslatableText("itemGroup.search").formatted(Formatting.WHITE));
         skinInput.setMaxLength(256);
         skinInput.setVisible(true);
         skinInput.setDrawsBackground(true);
         skinInput.setEditableColor(16777215);
 
-        addSelectableChild(skinInput);
+        this.addSelectableChild(skinInput);
 
         // "Set skin" button
         this.addDrawableChild(
@@ -106,7 +108,7 @@ public class SkinChangeScreen extends Screen {
                         height / 2 + 30,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
-                        new TranslatableText("button.fabrictailor.set_skin"),
+                        new TranslatedText("button.fabrictailor.set_skin"),
                         onClick -> {
                             String skin = skinInput.getText();
                             String skinCommand = this.selectedTab.getSkinCommand();
@@ -126,7 +128,7 @@ public class SkinChangeScreen extends Screen {
                         width / 2 - BUTTON_WIDTH - 2, height - BUTTON_HEIGHT - verticalSpacing,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
-                        new TranslatableText("button.fabrictailor.clear_skin"),
+                        new TranslatedText("button.fabrictailor.clear_skin"),
                         onClick -> {
                             // Same as above; works, but ugly
                             client.player.networkHandler.sendPacket(new ChatMessageC2SPacket("/skin clear"));
@@ -149,6 +151,14 @@ public class SkinChangeScreen extends Screen {
         );
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.skinInput != null) {
+            this.skinInput.tick();
+        }
+
+    }
     /**
      * Renders the skin changing screen.
      *
@@ -171,7 +181,7 @@ public class SkinChangeScreen extends Screen {
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        this.client.getTextureManager().bindTexture(BACKGROUND_TEXTURE);
+        RenderSystem.setShaderTexture(0, getWINDOW_TEXTURE());
         this.drawTexture(matrixStack, startX, startY, 0, 0, 252, 140);
 
         // Drawing Player
@@ -198,7 +208,7 @@ public class SkinChangeScreen extends Screen {
      */
     private void drawTabs(MatrixStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
         // Setting texture
-        this.client.getTextureManager().bindTexture(TABS_TEXTURE);
+        RenderSystem.setShaderTexture(0, getTABS_TEXTURE());
 
         // Tabs
         for(int i = 0; i < TABS.length; ++i) {

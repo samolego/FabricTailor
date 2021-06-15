@@ -4,6 +4,7 @@
   "package": "org.samo_lego.fabrictailor.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "AdvancementsScreenAccessor"
   ],
   "mixins": [
     "EntityTrackerAccessor",

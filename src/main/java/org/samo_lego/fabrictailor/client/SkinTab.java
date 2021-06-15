@@ -3,48 +3,48 @@ package org.samo_lego.fabrictailor.client;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.text.TranslatableText;
+import org.samo_lego.fabrictailor.util.TranslatedText;
 
 public class SkinTab extends DrawableHelper {
 
     private final TailorStyle type;
-    private final TranslatableText TITLE;
-    private final TranslatableText DESCRIPTION;
+    private final TranslatedText TITLE;
+    private final TranslatedText DESCRIPTION;
     private final ItemStack ICON;
     private final int width;
     private final int height;
     private String skinCommand = "/skin set ";
 
     public SkinTab(TailorStyle type, int width, int height) {
-        this.TITLE = new TranslatableText(type.getTitle());
+        this.TITLE = new TranslatedText(type.getTitle());
         this.width = width;
         this.height = height;
         this.type = type;
 
         switch(type) {
-            case PLAYER:
+            case PLAYER -> {
                 this.ICON = new ItemStack(Items.PLAYER_HEAD);
-                this.DESCRIPTION = new TranslatableText("description.fabrictailor.title_player");
+                this.DESCRIPTION = new TranslatedText("description.fabrictailor.title_player");
                 this.skinCommand += "player ";
-                break;
-            case LOCAL:
+            }
+            case LOCAL -> {
                 this.ICON = new ItemStack(Items.MAGENTA_GLAZED_TERRACOTTA);
-                this.DESCRIPTION = new TranslatableText("description.fabrictailor.title_local");
+                this.DESCRIPTION = new TranslatedText("description.fabrictailor.title_local");
                 this.skinCommand += "upload ";
-                break;
-            default:
+            }
+            default -> {
                 this.ICON = new ItemStack(Items.GLOBE_BANNER_PATTERN);
-                this.DESCRIPTION = new TranslatableText("description.fabrictailor.title_url");
+                this.DESCRIPTION = new TranslatedText("description.fabrictailor.title_url");
                 this.skinCommand += "URL ";
-                break;
+            }
         }
     }
 
-    public TranslatableText getTitle() {
+    public TranslatedText getTitle() {
         return this.TITLE;
     }
 
-    public TranslatableText getDescription() {
+    public TranslatedText getDescription() {
         return this.DESCRIPTION;
     }
     public ItemStack getIcon() {
