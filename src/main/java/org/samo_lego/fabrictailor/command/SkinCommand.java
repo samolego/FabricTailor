@@ -15,6 +15,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.compatibility.TaterzensCompatibility;
+import org.samo_lego.fabrictailor.util.TranslatedText;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -35,7 +36,7 @@ import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 public class SkinCommand {
     public static LiteralCommandNode<ServerCommandSource> skinNode;
     protected static final boolean TATERZENS_LOADED;
-    protected static final String SET_SKIN_ATTEMPT = "Trying to set the skin ... Please wait.";
+    protected static final TranslatedText SET_SKIN_ATTEMPT = new TranslatedText("command.fabrictailor.skin.set.attempt");
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         skinNode = dispatcher.register(literal("skin")
@@ -65,9 +66,7 @@ public class SkinCommand {
                                 )
                                 .executes(ctx -> {
                                     ctx.getSource().sendError(
-                                            new LiteralText(
-                                                    "You have to provide URL and variant of the skin you want."
-                                            ).formatted(Formatting.RED)
+                                            new TranslatedText("command.fabrictailor.skin.set.404.url").formatted(Formatting.RED)
                                     );
                                     return 1;
                                 })
@@ -95,9 +94,7 @@ public class SkinCommand {
                                 )
                                 .executes(ctx -> {
                                     ctx.getSource().sendError(
-                                            new LiteralText(
-                                                    "You have to provide file path and variant of the skin you want."
-                                            ).formatted(Formatting.RED)
+                                            new TranslatedText("command.fabrictailor.skin.set.404.path").formatted(Formatting.RED)
                                     );
                                     return 1;
                                 })
@@ -108,18 +105,14 @@ public class SkinCommand {
                                 )
                                 .executes(ctx -> {
                                     ctx.getSource().sendError(
-                                            new LiteralText(
-                                                    "You have to provide player's name."
-                                            ).formatted(Formatting.RED)
+                                            new TranslatedText("command.fabrictailor.skin.set.404.playername").formatted(Formatting.RED)
                                     );
                                     return 1;
                                 })
                         )
                         .executes(ctx -> {
                             ctx.getSource().sendError(
-                                    new LiteralText(
-                                            "You have to provide URL, player's name or file of the skin you want."
-                                    ).formatted(Formatting.RED)
+                                    new TranslatedText("command.fabrictailor.skin.set.404").formatted(Formatting.RED)
                             );
                             return 1;
                         })
@@ -132,16 +125,13 @@ public class SkinCommand {
         ServerPlayerEntity player = source.getPlayer();
 
         if(((TailoredPlayer) player).setSkin("", "", true)) {
-            player.sendMessage(new LiteralText(
-                            "Your skin was cleared successfully."
-                    ).formatted(Formatting.GREEN),
+            player.sendMessage(
+                    new TranslatedText("command.fabrictailor.skin.clear.success").formatted(Formatting.GREEN),
                     false
             );
             return 1;
         }
-        player.sendMessage(new LiteralText(
-                        "An error occurred when trying to clear your skin."
-                ).formatted(Formatting.RED),
+        player.sendMessage(new TranslatedText("command.fabrictailor.skin.clear.error").formatted(Formatting.RED),
                 false
         );
         return 0;
@@ -157,10 +147,8 @@ public class SkinCommand {
      */
     protected static int setSkinFromFile(ServerCommandSource src, String skinFilePath, boolean useSlim) {
         if(src.getMinecraftServer().isDedicated()) {
-            src.sendFeedback(new LiteralText(
-                    "FabricTailor mod is running in server environment.\n" +
-                            "Make sure the path points to the skin file on the SERVER."
-                    ).formatted(Formatting.GOLD),
+            src.sendFeedback(
+                    new TranslatedText("hint.fabrictailor.server_skin_path").formatted(Formatting.GOLD),
                     false
             );
         }
@@ -168,9 +156,7 @@ public class SkinCommand {
         File skinFile = new File(skinFilePath);
         try (FileInputStream input = new FileInputStream(skinFile)) {
             if(input.read() == 137) {
-                src.sendFeedback(new LiteralText(
-                                "Uploading skin. Please wait."
-                        ).formatted(Formatting.GOLD),
+                src.sendFeedback(new TranslatedText("command.fabrictailor.skin.please_wait").formatted(Formatting.GOLD),
                         false
                 );
                 THREADPOOL.submit(() -> {
@@ -179,9 +165,7 @@ public class SkinCommand {
                         setSkinFromReply(reply, src.getPlayer(), true);
                     } catch (IOException | CommandSyntaxException e) {
                         src.sendError(
-                                new LiteralText(
-                                        "A problem occurred when trying to upload the skin."
-                                ).formatted(Formatting.RED)
+                                new TranslatedText("command.fabrictailor.skin.upload.failed").formatted(Formatting.RED)
                         );
                     }
                 });
@@ -190,7 +174,7 @@ public class SkinCommand {
         } catch (IOException ignored) {
             // Not an image
         }
-        src.sendError(new LiteralText("The provided file is not a valid PNG image.").formatted(Formatting.RED));
+        src.sendError(new TranslatedText("error.fabrictailor.invalid_skin").formatted(Formatting.RED));
         return 0;
     }
 
@@ -202,7 +186,7 @@ public class SkinCommand {
      * @return 1
      */
     public static int fetchSkinByUrl(ServerCommandSource src, String skinUrl, boolean useSlim) {
-        src.sendFeedback(new LiteralText(SET_SKIN_ATTEMPT).formatted(Formatting.AQUA), false);
+        src.sendFeedback(SET_SKIN_ATTEMPT.formatted(Formatting.AQUA), false);
         THREADPOOL.submit(() -> {
             try {
                 URL url = new URL(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", skinUrl, useSlim ? "slim" : "steve"));
@@ -211,9 +195,7 @@ public class SkinCommand {
             } catch (IOException | CommandSyntaxException e) {
                 e.printStackTrace();
                 src.sendError(
-                        new LiteralText(
-                                "Malformed url!"
-                        ).formatted(Formatting.RED)
+                        new TranslatedText("command.fabrictailor.skin.upload.malformed_url").formatted(Formatting.RED)
                 );
             }
         });
@@ -231,7 +213,7 @@ public class SkinCommand {
     public static int fetchSkinByName(ServerCommandSource src, String playername, boolean giveFeedback) throws CommandSyntaxException {
         if(giveFeedback)
             src.sendFeedback(
-                    new LiteralText(SET_SKIN_ATTEMPT).formatted(Formatting.AQUA),
+                    SET_SKIN_ATTEMPT.formatted(Formatting.AQUA),
                     false
             );
         ServerPlayerEntity player = src.getPlayer();
@@ -244,9 +226,9 @@ public class SkinCommand {
             SkullBlockEntity.loadProperties(profile, gameProfile -> {
                 PropertyMap propertyMap = gameProfile.getProperties();
 
-                // We check the uuid as well as there is a weird
+                // We check if player is online as well as there is
                 // edge case when skin for your own self doesn't get fetched (#30)
-                if(propertyMap.containsKey("textures") && gameProfile.getId() != player.getUuid()) {
+                if(propertyMap.containsKey("textures") && src.getMinecraftServer().getPlayerManager().getPlayer(playername) != null) {
                     Property textures = propertyMap.get("textures").iterator().next();
                     String value = textures.getValue();
                     String signature = textures.getSignature();
@@ -255,9 +237,7 @@ public class SkinCommand {
                             (((TailoredPlayer) player).setSkin(value, signature, true) && giveFeedback)
                     ) {
                         player.sendMessage(
-                                new LiteralText(
-                                        "Skin was set successfully."
-                                ).formatted(Formatting.GREEN),
+                                new TranslatedText("command.fabrictailor.skin.set.success").formatted(Formatting.GREEN),
                                 false
                         );
                     }
@@ -272,9 +252,7 @@ public class SkinCommand {
                 } catch(IOException e) {
                     if(giveFeedback)
                         src.sendError(
-                                new LiteralText(
-                                        "This player doesn't seem to have any skins saved."
-                                ).formatted(Formatting.RED)
+                                new TranslatedText("command.fabrictailor.skin.set.error").formatted(Formatting.RED)
                         );
 
                 }
@@ -335,8 +313,7 @@ public class SkinCommand {
 
         String reply = null;
 
-        if(connection instanceof HttpsURLConnection) {
-            HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
+        if(connection instanceof HttpsURLConnection httpsConnection) {
             httpsConnection.setUseCaches(false);
             httpsConnection.setDoOutput(true);
             httpsConnection.setDoInput(true);

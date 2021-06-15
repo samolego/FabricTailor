@@ -21,6 +21,9 @@ repositories {
 	maven {
 		url 'https://jitpack.io'
 	}
+	maven {
+		url 'https://masa.dy.fi/maven'
+	}
 }
 
 def ENV = System.getenv()
@@ -38,8 +41,9 @@ dependencies {
 	modImplementation 'me.lucko:fabric-permissions-api:0.1-SNAPSHOT'
 	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.1.0')
 
-	//modImplementation "carpet:fabric-carpet:1.16-${project.carpet_core_version}"
+	//modRuntime("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
 	//modRuntime "com.github.gnembon:fabric-carpet:${project.carpet_branch}-SNAPSHOT"
+	modRuntime "carpet:fabric-carpet:${project.minecraft_version}-${project.carpet_core_version}"
 }
 
 processResources {
