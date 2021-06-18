@@ -102,8 +102,7 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
             result = true;
         } catch (InsecureTextureException ignored) {
             // No skin data
-        }
-        catch (Error e) {
+        } catch (Error e) {
             // Something went wrong when trying to set the skin
             errorLog(e.getMessage());
         }
@@ -155,7 +154,13 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
             this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
             this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;
 
-            this.setSkin(this.skinValue, this.skinSignature, false);
+            if(this.skinValue != null && this.skinSignature != null) {
+                this.setSkin(this.skinValue, this.skinSignature, false);
+            }
         }
+        /*if(this.skinValue == null || this.skinSignature == null) {
+            System.out.println("Fetching skin! ");
+            fetchSkinByName(player, player.getGameProfile().getName(), false);
+        }*/
     }
 }

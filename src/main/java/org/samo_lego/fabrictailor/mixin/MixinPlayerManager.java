@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static org.samo_lego.fabrictailor.command.SkinCommand.fetchSkinByName;
+import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByName;
 
 @Mixin(PlayerManager.class)
 public abstract class MixinPlayerManager {
@@ -27,6 +27,6 @@ public abstract class MixinPlayerManager {
         String signature = ((TailoredPlayer) player).getSkinSignature();
         if(value == null || signature == null)
             // Trying to fetch skin by playername
-            fetchSkinByName(player.getCommandSource(), player.getGameProfile().getName(), false);
+            fetchSkinByName(player, player.getGameProfile().getName(), false);
     }
 }

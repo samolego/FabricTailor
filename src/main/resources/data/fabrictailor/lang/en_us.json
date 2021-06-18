@@ -33,7 +33,7 @@
   "command.fabrictailor.skin.clear.error": "An error occurred when trying to clear your skin.",
   "command.fabrictailor.skin.please_wait": "Uploading skin. Please wait.",
   "command.fabrictailor.skin.upload.failed": "A problem occurred when trying to upload the skin.",
-"command.fabrictailor.skin.upload.malformed_url": "Malformed url!",
+  "command.fabrictailor.skin.upload.malformed_url": "Malformed url!",
 
   "error.fabrictailor.invalid_skin": "The provided file is not a valid PNG image."
 }
