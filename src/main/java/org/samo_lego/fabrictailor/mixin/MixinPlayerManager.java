@@ -1,6 +1,5 @@
 package org.samo_lego.fabrictailor.mixin;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,7 +21,7 @@ public abstract class MixinPlayerManager {
                     shift = At.Shift.AFTER
             )
     )
-    private void onPlayerConnect(ClientConnection clientConnection, ServerPlayerEntity player, CallbackInfo ci) throws CommandSyntaxException {
+    private void onPlayerConnect(ClientConnection clientConnection, ServerPlayerEntity player, CallbackInfo ci) {
         String value = ((TailoredPlayer) player).getSkinValue();
         String signature = ((TailoredPlayer) player).getSkinSignature();
         if(value == null || signature == null)

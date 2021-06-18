@@ -122,25 +122,26 @@ public class SkinFetcher {
 
         SkullBlockEntity.loadProperties(profile, gameProfile -> {
             PropertyMap propertyMap = gameProfile.getProperties();
-            MinecraftServer server = player.getServer();
 
             // We check if player is online as well as there is
             // edge case when skin for your own self doesn't get fetched (#30)
-            if(propertyMap.containsKey("textures") && server != null && server.getPlayerManager().getPlayer(playername) == null) {
+            if(propertyMap.containsKey("textures")) {
                 Property textures = propertyMap.get("textures").iterator().next();
                 String value = textures.getValue();
                 String signature = textures.getSignature();
                 if(
-                        TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, value, signature) ||
-                        (((TailoredPlayer) player).setSkin(value, signature, true) && giveFeedback)
+                        !value.equals("") && !signature.equals("") &&
+                        (
+                            TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, value, signature) ||
+                            (((TailoredPlayer) player).setSkin(value, signature, true) && giveFeedback)
+                        )
                 ) {
                     player.sendMessage(
                             new TranslatedText("command.fabrictailor.skin.set.success").formatted(Formatting.GREEN),
                             false
                     );
+                    return;
                 }
-
-                return;
             }
             // Getting skin data from ely.by api, since it can be used with usernames
             // it also includes mojang skins

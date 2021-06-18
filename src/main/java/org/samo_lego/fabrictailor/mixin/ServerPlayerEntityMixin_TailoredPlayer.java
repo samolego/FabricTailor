@@ -158,9 +158,5 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
                 this.setSkin(this.skinValue, this.skinSignature, false);
             }
         }
-        /*if(this.skinValue == null || this.skinSignature == null) {
-            System.out.println("Fetching skin! ");
-            fetchSkinByName(player, player.getGameProfile().getName(), false);
-        }*/
     }
 }
