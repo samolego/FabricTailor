@@ -10,7 +10,8 @@
   ],
   "contact": {
     "homepage": "https://samolego.github.io",
-    "sources": "https://github.com/samolego/FabricTailor"
+    "sources": "https://github.com/samolego/FabricTailor",
+    "issues": "https://github.com/samolego/FabricTailor"
   },
 
   "license": "LGPLv3",
@@ -32,9 +33,6 @@
   "depends": {
     "fabricloader": ">=0.8.8",
     "fabric": "*"
-  },
-  "suggests": {
-    "flamingo": "*"
   },
   "custom": {
     "modupdater": {
