@@ -1,6 +1,6 @@
 # Fabric Tailor
 [![GitHub license](https://img.shields.io/github/license/samolego/FabricTailor)](https://github.com/samolego/FabricTailor/blob/master/LICENSE)
-![Gradle Build](https://github.com/samolego/FabricTailor/workflows/Gradle%20Build/badge.svg)
+[![build](https://github.com/samolego/FabricTailor/actions/workflows/building.yml/badge.svg)](https://github.com/samolego/FabricTailor/actions/workflows/building.yml)
 ![Serverside](https://img.shields.io/badge/Working-server--side%20only-blue)
 ![Singleplayer](https://img.shields.io/badge/Working-singleplayer-darkblue)
 [![Curseforge downloads](http://cf.way2muchnoise.eu/full_fabrictailor_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/fabrictailor)

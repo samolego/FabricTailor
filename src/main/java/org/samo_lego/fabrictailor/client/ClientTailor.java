@@ -32,7 +32,7 @@ public class ClientTailor implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if(keyBinding.wasPressed()) {
-                client.openScreen(SKIN_CHANGE_SCREEN);
+                client.setScreen(SKIN_CHANGE_SCREEN);
             }
         });
     }
