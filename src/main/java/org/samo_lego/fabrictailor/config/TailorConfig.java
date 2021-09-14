@@ -13,21 +13,25 @@ import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 public class TailorConfig {
     private static final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
 
-    @SerializedName("// Default skin for new players. Use command `/fabrictailor setDefaultSkin` to set those values.")
-    public final String _comment_defaultSkin = "";
-    @SerializedName("default_skin")
-    public DefaultSkin defaultSkin = new DefaultSkin();
-
-    public static class DefaultSkin {
-        public String value = "";
-        public String signature = "";
-    }
 
     @SerializedName("// Whether to allow players to have capes. WARNING! This will toggle ALL capes!")
     public final String _comment_allowCapes = "(default: true)";
     @SerializedName("allow_capes")
     public boolean allowCapes = true;
 
+    @SerializedName("// Default skin for new players. Use command `/fabrictailor setDefaultSkin` to set those values.")
+    public final String _comment_defaultSkin = "";
+    @SerializedName("default_skin")
+    public DefaultSkin defaultSkin = new DefaultSkin();
+
+    public static class DefaultSkin {
+        @SerializedName("// Whether to apply the default skin to ALL new players, not just those without skin.")
+        public final String _comment_applyToAll = "(default: false)";
+        @SerializedName("apply_to_all")
+        public boolean applyToAll = false;
+        public String value = "";
+        public String signature = "";
+    }
 
     /**
      * Loads config file.

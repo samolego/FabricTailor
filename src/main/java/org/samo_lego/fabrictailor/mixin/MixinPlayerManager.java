@@ -27,20 +27,25 @@ public abstract class MixinPlayerManager {
     private void onPlayerConnect(ClientConnection clientConnection, ServerPlayerEntity player, CallbackInfo ci) {
         String value = ((TailoredPlayer) player).getSkinValue();
         String signature = ((TailoredPlayer) player).getSkinSignature();
-        if(value == null || signature == null) {
-            value = config.defaultSkin.value;
-            signature = config.defaultSkin.signature;
 
-            Property skinData;
-            if(!value.isEmpty() && !signature.isEmpty()) {
-                skinData = new Property("textures", value, signature);
-            } else {
-                // Trying to fetch skin by playername
+        if(value == null || signature == null) {
+
+            Property skinData = null;
+
+            if(!config.defaultSkin.applyToAll)
                 skinData = fetchSkinByName(player.getGameProfile().getName());
+
+            if(skinData == null) {
+                value = config.defaultSkin.value;
+                signature = config.defaultSkin.signature;
+
+                if(!value.isEmpty() && !signature.isEmpty())
+                    skinData = new Property("textures", value, signature);
             }
 
-            ((TailoredPlayer) player).setSkin(skinData, false);
+            // Try to set skin now
+            if(skinData != null)
+                ((TailoredPlayer) player).setSkin(skinData, false);
         }
-
     }
 }
