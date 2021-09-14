@@ -7,5 +7,6 @@ org.samo_lego.fabrictailor.command
 org.samo_lego.fabrictailor.compatibility
 org.samo_lego.fabrictailor.config
 org.samo_lego.fabrictailor.mixin
-org.samo_lego.fabrictailor.mixin.client
+org.samo_lego.fabrictailor.mixin.accessors
+org.samo_lego.fabrictailor.mixin.accessors.client
 org.samo_lego.fabrictailor.util

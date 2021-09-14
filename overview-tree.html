@@ -62,7 +62,8 @@ loadScripts(document, 'script');</script>
 <li><a href="org/samo_lego/fabrictailor/compatibility/package-tree.html">org.samo_lego.fabrictailor.compatibility</a>, </li>
 <li><a href="org/samo_lego/fabrictailor/config/package-tree.html">org.samo_lego.fabrictailor.config</a>, </li>
 <li><a href="org/samo_lego/fabrictailor/mixin/package-tree.html">org.samo_lego.fabrictailor.mixin</a>, </li>
-<li><a href="org/samo_lego/fabrictailor/mixin/client/package-tree.html">org.samo_lego.fabrictailor.mixin.client</a>, </li>
+<li><a href="org/samo_lego/fabrictailor/mixin/accessors/package-tree.html">org.samo_lego.fabrictailor.mixin.accessors</a>, </li>
+<li><a href="org/samo_lego/fabrictailor/mixin/accessors/client/package-tree.html">org.samo_lego.fabrictailor.mixin.accessors.client</a>, </li>
 <li><a href="org/samo_lego/fabrictailor/util/package-tree.html">org.samo_lego.fabrictailor.util</a></li>
 </ul>
 </div>
@@ -98,6 +99,7 @@ loadScripts(document, 'script');</script>
 </ul>
 </li>
 <li class="circle">org.samo_lego.fabrictailor.<a href="org/samo_lego/fabrictailor/FabricTailor.html" title="class in org.samo_lego.fabrictailor"><span class="type-name-link">FabricTailor</span></a> (implements net.fabricmc.api.ModInitializer)</li>
+<li class="circle">org.samo_lego.fabrictailor.command.<a href="org/samo_lego/fabrictailor/command/FabrictailorCommand.html" title="class in org.samo_lego.fabrictailor.command"><span class="type-name-link">FabrictailorCommand</span></a></li>
 <li class="circle">org.samo_lego.fabrictailor.mixin.<a href="org/samo_lego/fabrictailor/mixin/MixinPlayerManager.html" title="class in org.samo_lego.fabrictailor.mixin"><span class="type-name-link">MixinPlayerManager</span></a></li>
 <li class="circle">org.samo_lego.fabrictailor.mixin.<a href="org/samo_lego/fabrictailor/mixin/ServerPlayerEntityMixin_TailoredPlayer.html" title="class in org.samo_lego.fabrictailor.mixin"><span class="type-name-link">ServerPlayerEntityMixin_TailoredPlayer</span></a> (implements org.samo_lego.fabrictailor.casts.<a href="org/samo_lego/fabrictailor/casts/TailoredPlayer.html" title="interface in org.samo_lego.fabrictailor.casts">TailoredPlayer</a>)</li>
 <li class="circle">org.samo_lego.fabrictailor.mixin.<a href="org/samo_lego/fabrictailor/mixin/ServerPlayNetworkHandlerMixin_PacketListener.html" title="class in org.samo_lego.fabrictailor.mixin"><span class="type-name-link">ServerPlayNetworkHandlerMixin_PacketListener</span></a></li>
@@ -105,6 +107,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.samo_lego.fabrictailor.command.<a href="org/samo_lego/fabrictailor/command/SkinCommand.html" title="class in org.samo_lego.fabrictailor.command"><span class="type-name-link">SkinCommand</span></a></li>
 <li class="circle">org.samo_lego.fabrictailor.util.<a href="org/samo_lego/fabrictailor/util/SkinFetcher.html" title="class in org.samo_lego.fabrictailor.util"><span class="type-name-link">SkinFetcher</span></a></li>
 <li class="circle">org.samo_lego.fabrictailor.config.<a href="org/samo_lego/fabrictailor/config/TailorConfig.html" title="class in org.samo_lego.fabrictailor.config"><span class="type-name-link">TailorConfig</span></a></li>
+<li class="circle">org.samo_lego.fabrictailor.config.<a href="org/samo_lego/fabrictailor/config/TailorConfig.DefaultSkin.html" title="class in org.samo_lego.fabrictailor.config"><span class="type-name-link">TailorConfig.DefaultSkin</span></a></li>
 <li class="circle">org.samo_lego.fabrictailor.compatibility.<a href="org/samo_lego/fabrictailor/compatibility/TaterzensCompatibility.html" title="class in org.samo_lego.fabrictailor.compatibility"><span class="type-name-link">TaterzensCompatibility</span></a></li>
 </ul>
 </li>
@@ -113,10 +116,11 @@ loadScripts(document, 'script');</script>
 <section class="hierarchy">
 <h2 title="Interface Hierarchy">Interface Hierarchy</h2>
 <ul>
-<li class="circle">org.samo_lego.fabrictailor.mixin.client.<a href="org/samo_lego/fabrictailor/mixin/client/AdvancementsScreenAccessor.html" title="interface in org.samo_lego.fabrictailor.mixin.client"><span class="type-name-link">AdvancementsScreenAccessor</span></a></li>
-<li class="circle">org.samo_lego.fabrictailor.mixin.<a href="org/samo_lego/fabrictailor/mixin/EntityTrackerAccessor.html" title="interface in org.samo_lego.fabrictailor.mixin"><span class="type-name-link">EntityTrackerAccessor</span></a></li>
+<li class="circle">org.samo_lego.fabrictailor.mixin.accessors.client.<a href="org/samo_lego/fabrictailor/mixin/accessors/client/AdvancementsScreenAccessor.html" title="interface in org.samo_lego.fabrictailor.mixin.accessors.client"><span class="type-name-link">AdvancementsScreenAccessor</span></a></li>
+<li class="circle">org.samo_lego.fabrictailor.mixin.accessors.<a href="org/samo_lego/fabrictailor/mixin/accessors/ClientSettingsC2SAccessor.html" title="interface in org.samo_lego.fabrictailor.mixin.accessors"><span class="type-name-link">ClientSettingsC2SAccessor</span></a></li>
+<li class="circle">org.samo_lego.fabrictailor.mixin.accessors.<a href="org/samo_lego/fabrictailor/mixin/accessors/EntityTrackerAccessor.html" title="interface in org.samo_lego.fabrictailor.mixin.accessors"><span class="type-name-link">EntityTrackerAccessor</span></a></li>
 <li class="circle">org.samo_lego.fabrictailor.casts.<a href="org/samo_lego/fabrictailor/casts/TailoredPlayer.html" title="interface in org.samo_lego.fabrictailor.casts"><span class="type-name-link">TailoredPlayer</span></a></li>
-<li class="circle">org.samo_lego.fabrictailor.mixin.<a href="org/samo_lego/fabrictailor/mixin/ThreadedAnvilChunkStorageAccessor.html" title="interface in org.samo_lego.fabrictailor.mixin"><span class="type-name-link">ThreadedAnvilChunkStorageAccessor</span></a></li>
+<li class="circle">org.samo_lego.fabrictailor.mixin.accessors.<a href="org/samo_lego/fabrictailor/mixin/accessors/ThreadedAnvilChunkStorageAccessor.html" title="interface in org.samo_lego.fabrictailor.mixin.accessors"><span class="type-name-link">ThreadedAnvilChunkStorageAccessor</span></a></li>
 </ul>
 </section>
 </main>
