@@ -1,4 +1,4 @@
-package org.samo_lego.fabrictailor.client;
+package org.samo_lego.fabrictailor.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
@@ -11,19 +11,19 @@ import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import org.samo_lego.fabrictailor.client.SkinTab.TailorStyle;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import static org.samo_lego.fabrictailor.mixin.AdvancementsScreenAccessor.getTABS_TEXTURE;
-import static org.samo_lego.fabrictailor.mixin.AdvancementsScreenAccessor.getWINDOW_TEXTURE;
-
+import static org.samo_lego.fabrictailor.mixin.client.AdvancementsScreenAccessor.getTABS_TEXTURE;
+import static org.samo_lego.fabrictailor.mixin.client.AdvancementsScreenAccessor.getWINDOW_TEXTURE;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
@@ -35,20 +35,20 @@ public class SkinChangeScreen extends Screen {
      * Skin tabs:
      * local, url, player
      */
-    private static final SkinTab[] TABS = new SkinTab[]{
-            new SkinTab(TailorStyle.PLAYER, 27, 28),
-            new SkinTab(TailorStyle.URL, 27, 28),
-            new SkinTab(TailorStyle.LOCAL, 27, 28)
+    private static final SkinTabType[] TABS = new SkinTabType[] {
+            new PlayerSkinTab(),
+            new UrlSkinTab(),
+            new LocalSkinTab()
     };
 
     private TextFieldWidget skinInput;
     private int startX;
     private int startY;
-    protected SkinTab selectedTab;
+    protected SkinTabType selectedTab;
     protected CheckboxWidget skinModelCheckbox;
     private ButtonWidget openExplorerButton;
 
-    protected SkinChangeScreen() {
+    public SkinChangeScreen() {
         super(new TranslatedText("gui.fabrictailor.change_skin"));
     }
 
@@ -110,14 +110,12 @@ public class SkinChangeScreen extends Screen {
                         BUTTON_HEIGHT,
                         new TranslatedText("button.fabrictailor.set_skin"),
                         onClick -> {
-                            String skin = skinInput.getText();
-                            String skinCommand = this.selectedTab.getSkinCommand();
-                            if(this.selectedTab.hasModels())
-                                skinCommand += this.skinModelCheckbox.isChecked() ? "slim" : "classic";
-
-                            // Works, but ugly
-                            // :concern:
-                            client.player.networkHandler.sendPacket(new ChatMessageC2SPacket(skinCommand+ " " + skin));
+                            new CompletableFuture<>().completeAsync(() -> {
+                                CustomPayloadC2SPacket skinChangePacket = this.selectedTab.getSkinChangePacket(skinInput.getText(), this.skinModelCheckbox.isChecked());
+                                if (skinChangePacket != null)
+                                    client.player.networkHandler.sendPacket(skinChangePacket);
+                                return null;
+                            });
                             this.onClose();
                         }
                 )
@@ -130,7 +128,6 @@ public class SkinChangeScreen extends Screen {
                         BUTTON_HEIGHT,
                         new TranslatedText("button.fabrictailor.clear_skin"),
                         onClick -> {
-                            // Same as above; works, but ugly
                             client.player.networkHandler.sendPacket(new ChatMessageC2SPacket("/skin clear"));
                             this.onClose();
                         }
@@ -212,7 +209,7 @@ public class SkinChangeScreen extends Screen {
 
         // Tabs
         for(int i = 0; i < TABS.length; ++i) {
-            SkinTab tab = TABS[i];
+            SkinTabType tab = TABS[i];
 
             if(selectedTab == null) {
                 this.selectedTab = tab;
@@ -222,9 +219,9 @@ public class SkinChangeScreen extends Screen {
                 this.drawTexture(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
 
                 // Showing or hiding additional buttons
-                this.skinModelCheckbox.visible = i != 0;
+                this.skinModelCheckbox.visible = tab.hasSkinModels();
                 // Making sure we are in singleplayer to show open explorer button
-                this.openExplorerButton.visible = i == 2 && client.getServer() != null;
+                this.openExplorerButton.visible = tab.showExplorerButton();
             }
             else {
                 // rendering other tabs
@@ -250,7 +247,7 @@ public class SkinChangeScreen extends Screen {
     private void drawIcons(int startX, int startY) {
         // Icons
         for(int i = 0; i < TABS.length; ++i) {
-            SkinTab tab = TABS[i];
+            SkinTabType tab = TABS[i];
             itemRenderer.renderInGui(tab.getIcon(), startX + 231 - i * 27, startY - 18);
         }
         RenderSystem.disableBlend();
@@ -268,7 +265,7 @@ public class SkinChangeScreen extends Screen {
      */
     private void drawWidgetTooltip(MatrixStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
         for(int i = 0; i < TABS.length; ++i) {
-            SkinTab tab = TABS[i];
+            SkinTabType tab = TABS[i];
             if(tab.isSelected(startX + 225 - i * 27, startY - 28, mouseX, mouseY)) {
                 this.renderTooltip(matrixStack, tab.getTitle(), mouseX, mouseY);
             }
@@ -293,7 +290,7 @@ public class SkinChangeScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
             for(int i = 0; i < TABS.length; ++i) {
-                SkinTab tab = TABS[i];
+                SkinTabType tab = TABS[i];
                 if(tab.isSelected(startX + 225 - i * 27, startY - 28, (int) mouseX, (int) mouseY)) {
                     this.selectedTab = tab;
                     break;
@@ -315,7 +312,7 @@ public class SkinChangeScreen extends Screen {
      */
     @Override
     public void filesDragged(List<Path> paths) {
-        if(this.selectedTab.getType().equals(TailorStyle.LOCAL)) {
+        if(this.selectedTab instanceof LocalSkinTab) {
             this.skinInput.setText(paths.iterator().next().toString());
         }
     }

@@ -26,6 +26,6 @@ public abstract class MixinPlayerManager {
         String signature = ((TailoredPlayer) player).getSkinSignature();
         if(value == null || signature == null)
             // Trying to fetch skin by playername
-            fetchSkinByName(player, player.getGameProfile().getName(), false);
+            fetchSkinByName(player.getGameProfile().getName());
     }
 }

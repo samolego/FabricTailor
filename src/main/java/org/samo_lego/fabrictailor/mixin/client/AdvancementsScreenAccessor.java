@@ -1,4 +1,4 @@
-package org.samo_lego.fabrictailor.mixin;
+package org.samo_lego.fabrictailor.mixin.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

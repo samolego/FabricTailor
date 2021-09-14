@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor.casts;
 
+import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -10,6 +11,16 @@ public interface TailoredPlayer {
      * Reloads player's skin.
      */
     void reloadSkin();
+
+
+    /**
+     * Sets the skin to the specified player.
+     *
+     * @param skinData skin texture data
+     * @param reload whether to send packets around for skin reload
+     * @return true if it was successful, otherwise false
+     */
+    boolean setSkin(Property skinData, boolean reload);
 
     /**
      * Sets the skin to the specified player.

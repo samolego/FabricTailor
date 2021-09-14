@@ -9,11 +9,15 @@ import org.samo_lego.fabrictailor.command.SkinCommand;
 public class FabricTailor implements ModInitializer {
 
 	private static final Logger LOGGER = LogManager.getLogger();
+	public static final String MOD_ID = "fabrictailor";
 
 	@Override
 	public void onInitialize() {
 		// Registering /skin command
-		CommandRegistrationCallback.EVENT.register(SkinCommand::register);
+		CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+			SkinCommand.register(dispatcher, dedicated);
+			//FabrictailorCommand.register(dispatcher, dedicated);
+		});
 	}
 
 	// Logging methods

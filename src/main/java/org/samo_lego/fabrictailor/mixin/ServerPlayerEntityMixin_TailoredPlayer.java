@@ -19,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.security.SignatureException;
+
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
 @Mixin(ServerPlayerEntity.class)
@@ -74,12 +76,11 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     /**
      * Sets the skin to the specified player and reloads it with {@link ServerPlayerEntityMixin_TailoredPlayer#reloadSkin()} reloadSkin().
      *
-     * @param value skin texture value
-     * @param signature skin texture signature
-     * @param reload whether to reload skin
+     * @param skinData skin texture data
+     * @param reload whether to send packets around for skin reload
      * @return true if it was successful, otherwise false
      */
-    public boolean setSkin(String value, String signature, boolean reload) {
+    public boolean setSkin(Property skinData, boolean reload) {
         boolean result = false;
 
         try {
@@ -89,11 +90,11 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         }
 
         try {
-            this.map.put("textures", new Property("textures", value, signature));
+            this.map.put("textures", skinData);
 
             // Saving skin data
-            this.skinValue = value;
-            this.skinSignature = signature;
+            this.skinValue = skinData.getValue();
+            this.skinSignature = skinData.getSignature();
 
             // Reloading skin
             if(reload)
@@ -107,6 +108,11 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
             errorLog(e.getMessage());
         }
         return result;
+    }
+
+    @Override
+    public boolean setSkin(String value, String signature, boolean reload) {
+        return this.setSkin(new Property("textures", value, signature), reload);
     }
 
     @Override
