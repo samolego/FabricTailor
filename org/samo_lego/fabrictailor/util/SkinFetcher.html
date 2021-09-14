@@ -107,36 +107,27 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#clearSkin(net.minecraft.server.network.ServerPlayerEntity)">clearSkin</a></span>&#8203;(net.minecraft.server.network.ServerPlayerEntity&nbsp;player)</code></div>
-<div class="col-last even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#fetchSkinByName(net.minecraft.server.network.ServerPlayerEntity,java.lang.String,boolean)">fetchSkinByName</a></span>&#8203;(net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;playername,
- boolean&nbsp;giveFeedback)</code></div>
-<div class="col-last odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">
+<div class="col-first even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static @Nullable com.mojang.authlib.properties.Property</code></div>
+<div class="col-second even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#fetchSkinByName(java.lang.String)">fetchSkinByName</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;playername)</code></div>
+<div class="col-last even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">
 <div class="block">Sets skin by playername.</div>
 </div>
-<div class="col-first even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#fetchSkinByUrl(net.minecraft.server.network.ServerPlayerEntity,java.lang.String,boolean)">fetchSkinByUrl</a></span>&#8203;(net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinUrl,
- boolean&nbsp;useSlim)</code></div>
-<div class="col-last even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">
-<div class="block">Sets skin setting from the provided URL.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#setSkinFromFile(net.minecraft.server.network.ServerPlayerEntity,java.lang.String,boolean)">setSkinFromFile</a></span>&#8203;(net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinFilePath,
+<div class="col-first odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static @Nullable com.mojang.authlib.properties.Property</code></div>
+<div class="col-second odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#fetchSkinByUrl(java.lang.String,boolean)">fetchSkinByUrl</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinUrl,
  boolean&nbsp;useSlim)</code></div>
 <div class="col-last odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">
-<div class="block">Gets the file.</div>
+<div class="block">Sets skin setting from the provided URL.</div>
 </div>
-<div class="col-first even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>protected static void</code></div>
-<div class="col-second even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#setSkinFromReply(java.lang.String,net.minecraft.server.network.ServerPlayerEntity,boolean)">setSkinFromReply</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;reply,
- net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- boolean&nbsp;giveFeedback)</code></div>
+<div class="col-first even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>protected static @Nullable com.mojang.authlib.properties.Property</code></div>
+<div class="col-second even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#getSkinFromReply(java.lang.String)">getSkinFromReply</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;reply)</code></div>
 <div class="col-last even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">
 <div class="block">Sets skin from reply that was got from API.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static com.mojang.authlib.properties.Property</code></div>
+<div class="col-second odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#setSkinFromFile(java.lang.String,boolean)">setSkinFromFile</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinFilePath,
+ boolean&nbsp;useSlim)</code></div>
+<div class="col-last odd-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">
+<div class="block">Gets skin data from file.</div>
 </div>
 </div>
 </div>
@@ -170,68 +161,61 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="clearSkin(net.minecraft.server.network.ServerPlayerEntity)">
-<h3>clearSkin</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">clearSkin</span>&#8203;<span class="parameters">(net.minecraft.server.network.ServerPlayerEntity&nbsp;player)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="setSkinFromFile(net.minecraft.server.network.ServerPlayerEntity,java.lang.String,boolean)">
+<section class="detail" id="setSkinFromFile(java.lang.String,boolean)">
 <h3>setSkinFromFile</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSkinFromFile</span>&#8203;<span class="parameters">(net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinFilePath,
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">com.mojang.authlib.properties.Property</span>&nbsp;<span class="element-name">setSkinFromFile</span>&#8203;<span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinFilePath,
  boolean&nbsp;useSlim)</span></div>
-<div class="block">Gets the file.</div>
+<div class="block">Gets skin data from file.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>player</code> - player that is changing the skin.</dd>
 <dd><code>skinFilePath</code> - file path</dd>
 <dd><code>useSlim</code> - whether slim format should be used</dd>
+<dt>Returns:</dt>
+<dd>property containing skin value and signature if successful, otherwise null.</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="fetchSkinByUrl(net.minecraft.server.network.ServerPlayerEntity,java.lang.String,boolean)">
+<section class="detail" id="fetchSkinByUrl(java.lang.String,boolean)">
 <h3>fetchSkinByUrl</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">fetchSkinByUrl</span>&#8203;<span class="parameters">(net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinUrl,
+<div class="member-signature"><span class="annotations">@Nullable
+</span><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable com.mojang.authlib.properties.Property</span>&nbsp;<span class="element-name">fetchSkinByUrl</span>&#8203;<span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;skinUrl,
  boolean&nbsp;useSlim)</span></div>
 <div class="block">Sets skin setting from the provided URL.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>player</code> - player to change skin for</dd>
 <dd><code>skinUrl</code> - string url of the skin</dd>
+<dt>Returns:</dt>
+<dd>property containing skin value and signature if successful, otherwise null.</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="fetchSkinByName(net.minecraft.server.network.ServerPlayerEntity,java.lang.String,boolean)">
+<section class="detail" id="fetchSkinByName(java.lang.String)">
 <h3>fetchSkinByName</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">fetchSkinByName</span>&#8203;<span class="parameters">(net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;playername,
- boolean&nbsp;giveFeedback)</span></div>
+<div class="member-signature"><span class="annotations">@Nullable
+</span><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable com.mojang.authlib.properties.Property</span>&nbsp;<span class="element-name">fetchSkinByName</span>&#8203;<span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;playername)</span></div>
 <div class="block">Sets skin by playername.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>player</code> - player changing the skin</dd>
 <dd><code>playername</code> - name of the player who has the skin wanted</dd>
-<dd><code>giveFeedback</code> - whether player should receive feedback if skin setting was successful</dd>
+<dt>Returns:</dt>
+<dd>property containing skin value and signature if successful, otherwise null.</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="setSkinFromReply(java.lang.String,net.minecraft.server.network.ServerPlayerEntity,boolean)">
-<h3>setSkinFromReply</h3>
-<div class="member-signature"><span class="modifiers">protected static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSkinFromReply</span>&#8203;<span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;reply,
- net.minecraft.server.network.ServerPlayerEntity&nbsp;player,
- boolean&nbsp;giveFeedback)</span></div>
+<section class="detail" id="getSkinFromReply(java.lang.String)">
+<h3>getSkinFromReply</h3>
+<div class="member-signature"><span class="annotations">@Nullable
+</span><span class="modifiers">protected static</span>&nbsp;<span class="return-type">@Nullable com.mojang.authlib.properties.Property</span>&nbsp;<span class="element-name">getSkinFromReply</span>&#8203;<span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;reply)</span></div>
 <div class="block">Sets skin from reply that was got from API.
  Used internally only.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>reply</code> - API reply</dd>
-<dd><code>player</code> - player to send message to.</dd>
-<dd><code>giveFeedback</code> - whether feedback should be sent to player.</dd>
+<dt>Returns:</dt>
+<dd>property containing skin value and signature if successful, otherwise null.</dd>
 </dl>
 </section>
 </li>
