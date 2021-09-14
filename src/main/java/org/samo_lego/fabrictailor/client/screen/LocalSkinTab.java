@@ -38,7 +38,6 @@ public class LocalSkinTab extends DrawableHelper implements SkinTabType {
     @Override
     public CustomPayloadC2SPacket getSkinChangePacket(String filePath, boolean useSlim) {
         Property skinData = SkinFetcher.setSkinFromFile(filePath, useSlim);
-        System.out.println(skinData);
 
         if(skinData == null)
             return null;

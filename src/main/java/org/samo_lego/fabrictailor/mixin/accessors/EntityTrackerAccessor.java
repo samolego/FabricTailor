@@ -1,4 +1,4 @@
-package org.samo_lego.fabrictailor.mixin;
+package org.samo_lego.fabrictailor.mixin.accessors;
 
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.EntityTrackingListener;

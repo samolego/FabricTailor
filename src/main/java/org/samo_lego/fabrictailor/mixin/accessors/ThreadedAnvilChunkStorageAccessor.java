@@ -1,4 +1,4 @@
-package org.samo_lego.fabrictailor.mixin;
+package org.samo_lego.fabrictailor.mixin.accessors;
 
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

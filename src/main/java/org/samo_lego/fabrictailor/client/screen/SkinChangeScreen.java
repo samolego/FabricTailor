@@ -22,8 +22,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.samo_lego.fabrictailor.mixin.client.AdvancementsScreenAccessor.getTABS_TEXTURE;
-import static org.samo_lego.fabrictailor.mixin.client.AdvancementsScreenAccessor.getWINDOW_TEXTURE;
+import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getTABS_TEXTURE;
+import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getWINDOW_TEXTURE;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {

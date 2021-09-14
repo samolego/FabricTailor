@@ -4,14 +4,15 @@
   "package": "org.samo_lego.fabrictailor.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "client.AdvancementsScreenAccessor"
+    "accessors.client.AdvancementsScreenAccessor"
   ],
   "mixins": [
-    "EntityTrackerAccessor",
     "MixinPlayerManager",
     "ServerPlayerEntityMixin_TailoredPlayer",
     "ServerPlayNetworkHandlerMixin_PacketListener",
-    "ThreadedAnvilChunkStorageAccessor"
+    "accessors.ClientSettingsC2SAccessor",
+    "accessors.EntityTrackerAccessor",
+    "accessors.ThreadedAnvilChunkStorageAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

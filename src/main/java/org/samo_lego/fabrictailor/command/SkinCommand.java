@@ -97,7 +97,7 @@ public class SkinCommand {
         player.sendMessage(SET_SKIN_ATTEMPT.formatted(Formatting.AQUA), false);
         Property skinData = fetchSkinByUrl(skinUrl, useSlim);
         if(skinData == null) {
-            player.sendMessage(new TranslatedText("command.fabrictailor.skin.upload.malformed_url").formatted(Formatting.RED), false);
+            player.sendMessage(new TranslatedText("command.fabrictailor.skin.upload.failed").formatted(Formatting.RED), false);
             return -1;
         }
         return setSkin(player, skinData) ? 1 : 0;
@@ -147,7 +147,7 @@ public class SkinCommand {
         boolean success = false;
         if(
                 TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, skinData) ||
-                        (((TailoredPlayer) player).setSkin(skinData, true))
+                (((TailoredPlayer) player).setSkin(skinData, true))
         ) {
             result = new TranslatedText("command.fabrictailor.skin.set.success").formatted(Formatting.GREEN);
             success = true;

@@ -61,7 +61,6 @@ public class SkinFetcher {
             return getSkinFromReply(reply);
         } catch (IOException e) {
             errorLog(e.getMessage());
-
         }
         return null;
     }
@@ -78,14 +77,11 @@ public class SkinFetcher {
             String reply = urlRequest(new URL("https://api.mojang.com/users/profiles/minecraft/" + playername), true, null);
 
             if(reply == null || !reply.contains("id")) {
-                System.out.println("elyby fallback");
                 reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), false, null);
             } else {
-                System.out.println("mojang skin, " + reply);
                 String uuid = PARSER.parse(reply).getAsJsonObject().get("id").getAsString();
                 reply = urlRequest(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false"), true, null);
             }
-            System.out.println(reply);
             return getSkinFromReply(reply);
         } catch (IOException e) {
             errorLog(e.getMessage());
@@ -102,7 +98,6 @@ public class SkinFetcher {
      */
     @Nullable
     protected static Property getSkinFromReply(String reply) {
-        System.out.println("Reply: " + reply);
         if(reply == null || reply.contains("error") || reply.isEmpty()) {
             return null;
         }
@@ -110,10 +105,6 @@ public class SkinFetcher {
         String value = reply.split("\"value\":\"")[1].split("\"")[0];
         String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
-        //JsonObject properties = PARSER.parse(reply).getAsJsonObject().getAsJsonArray("properties").get(0).getAsJsonObject();
-        //String value = properties.get("value").getAsString();
-        //String signature = properties.get("signature").getAsString();
-        System.out.println("Prop: " + new Property("textures", value, signature));
         return new Property("textures", value, signature);
     }
 
@@ -170,7 +161,6 @@ public class SkinFetcher {
                 writer.append("--").append(boundary).append("--").append(LINE);
                 writer.close();
             }
-            System.out.println(httpsConnection.getResponseCode());
             if(httpsConnection.getResponseCode() == HttpURLConnection.HTTP_OK)
                 reply = getContent(connection);
             httpsConnection.disconnect();
@@ -178,7 +168,6 @@ public class SkinFetcher {
         else {
             reply = getContent(connection);
         }
-        System.out.println(reply);
         return reply;
     }
 
