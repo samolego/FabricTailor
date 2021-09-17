@@ -113,11 +113,17 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code><a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color"><code><span class="member-name-link"><a href="#_comment_defaultSkin">_comment_defaultSkin</a></span></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>boolean</code></div>
-<div class="col-second even-row-color"><code><span class="member-name-link"><a href="#allowCapes">allowCapes</a></span></code></div>
+<div class="col-first even-row-color"><code><a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><span class="member-name-link"><a href="#_comment_skinChangeTimer">_comment_skinChangeTimer</a></span></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code><a href="TailorConfig.DefaultSkin.html" title="class in org.samo_lego.fabrictailor.config">TailorConfig.DefaultSkin</a></code></div>
-<div class="col-second odd-row-color"><code><span class="member-name-link"><a href="#defaultSkin">defaultSkin</a></span></code></div>
+<div class="col-first odd-row-color"><code>boolean</code></div>
+<div class="col-second odd-row-color"><code><span class="member-name-link"><a href="#allowCapes">allowCapes</a></span></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="TailorConfig.DefaultSkin.html" title="class in org.samo_lego.fabrictailor.config">TailorConfig.DefaultSkin</a></code></div>
+<div class="col-second even-row-color"><code><span class="member-name-link"><a href="#defaultSkin">defaultSkin</a></span></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>long</code></div>
+<div class="col-second odd-row-color"><code><span class="member-name-link"><a href="#skinChangeTimer">skinChangeTimer</a></span></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
@@ -147,7 +153,8 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code>static <a href="TailorConfig.html" title="class in org.samo_lego.fabrictailor.config">TailorConfig</a></code></div>
-<div class="col-second even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#loadConfigFile(java.io.File)">loadConfigFile</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;file)</code></div>
+<div class="col-second even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#loadConfigFile(java.io.File,boolean)">loadConfigFile</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;file,
+ boolean&nbsp;serverEnvironment)</code></div>
 <div class="col-last even-row-color method-summary-table-tab1 method-summary-table-tab4 method-summary-table">
 <div class="block">Loads config file.</div>
 </div>
@@ -174,6 +181,24 @@ loadScripts(document, 'script');</script>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="_comment_allowCapes">
+<h3>_comment_allowCapes</h3>
+<div class="member-signature"><span class="annotations">@SerializedName("// Whether to allow players to have capes. WARNING! This will toggle ALL capes!")
+</span><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">_comment_allowCapes</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd><a href="../../../../constant-values.html#org.samo_lego.fabrictailor.config.TailorConfig._comment_allowCapes">Constant Field Values</a></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="allowCapes">
+<h3>allowCapes</h3>
+<div class="member-signature"><span class="annotations">@SerializedName("allow_capes")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">allowCapes</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="_comment_defaultSkin">
 <h3>_comment_defaultSkin</h3>
 <div class="member-signature"><span class="annotations">@SerializedName("// Default skin for new players. Use command `/fabrictailor setDefaultSkin` to set those values.")
@@ -192,21 +217,21 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="_comment_allowCapes">
-<h3>_comment_allowCapes</h3>
-<div class="member-signature"><span class="annotations">@SerializedName("// Whether to allow players to have capes. WARNING! This will toggle ALL capes!")
-</span><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">_comment_allowCapes</span></div>
+<section class="detail" id="_comment_skinChangeTimer">
+<h3>_comment_skinChangeTimer</h3>
+<div class="member-signature"><span class="annotations">@SerializedName("// How quickly can player change the skin, in seconds. -1 for no limit. If using this in server environment, -1 is not recommended.")
+</span><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">_comment_skinChangeTimer</span></div>
 <dl class="notes">
 <dt>See Also:</dt>
-<dd><a href="../../../../constant-values.html#org.samo_lego.fabrictailor.config.TailorConfig._comment_allowCapes">Constant Field Values</a></dd>
+<dd><a href="../../../../constant-values.html#org.samo_lego.fabrictailor.config.TailorConfig._comment_skinChangeTimer">Constant Field Values</a></dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="allowCapes">
-<h3>allowCapes</h3>
-<div class="member-signature"><span class="annotations">@SerializedName("allow_capes")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">allowCapes</span></div>
+<section class="detail" id="skinChangeTimer">
+<h3>skinChangeTimer</h3>
+<div class="member-signature"><span class="annotations">@SerializedName("skin_change_timer")
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">long</span>&nbsp;<span class="element-name">skinChangeTimer</span></div>
 </section>
 </li>
 </ul>
@@ -232,9 +257,10 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="loadConfigFile(java.io.File)">
+<section class="detail" id="loadConfigFile(java.io.File,boolean)">
 <h3>loadConfigFile</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="TailorConfig.html" title="class in org.samo_lego.fabrictailor.config">TailorConfig</a></span>&nbsp;<span class="element-name">loadConfigFile</span>&#8203;<span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;file)</span></div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="TailorConfig.html" title="class in org.samo_lego.fabrictailor.config">TailorConfig</a></span>&nbsp;<span class="element-name">loadConfigFile</span>&#8203;<span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;file,
+ boolean&nbsp;serverEnvironment)</span></div>
 <div class="block">Loads config file.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
