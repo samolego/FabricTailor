@@ -18,9 +18,8 @@ public interface TailoredPlayer {
      *
      * @param skinData skin texture data
      * @param reload whether to send packets around for skin reload
-     * @return true if it was successful, otherwise false
      */
-    boolean setSkin(Property skinData, boolean reload);
+    void setSkin(Property skinData, boolean reload);
 
     /**
      * Sets the skin to the specified player.
@@ -28,9 +27,8 @@ public interface TailoredPlayer {
      * @param value skin texture value
      * @param signature skin texture signature
      * @param reload whether to send packets around for skin reload
-     * @return true if it was successful, otherwise false
      */
-    boolean setSkin(String value, String signature, boolean reload);
+    void setSkin(String value, String signature, boolean reload);
 
     /**
      * Gets player's skin value.
@@ -47,4 +45,15 @@ public interface TailoredPlayer {
      */
     @Nullable
     String getSkinSignature();
+
+    /**
+     * Gets the most recent time when player changed their skin.
+     * @return time of skin change.
+     */
+    long getLastSkinChange();
+
+    /**
+     * Clears player's skin.
+     */
+    void clearSkin();
 }

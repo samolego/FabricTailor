@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -22,6 +23,8 @@ import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.command.argument.MessageArgumentType.getMessage;
 import static net.minecraft.command.argument.MessageArgumentType.message;
 import static net.minecraft.server.command.CommandManager.literal;
+import static org.samo_lego.fabrictailor.FabricTailor.config;
+import static org.samo_lego.fabrictailor.client.network.SkinChangePacket.FABRICTAILOR_CHANNEL;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.*;
 
 public class SkinCommand {
@@ -143,23 +146,38 @@ public class SkinCommand {
     }
 
     private static boolean setSkin(ServerPlayerEntity player, @NotNull Property skinData) {
-        MutableText result;
         boolean success = false;
-        if(
-                TATERZENS_LOADED && TaterzensCompatibility.setTaterzenSkin(player, skinData) ||
-                (((TailoredPlayer) player).setSkin(skinData, true))
-        ) {
-            result = new TranslatedText("command.fabrictailor.skin.set.success").formatted(Formatting.GREEN);
+
+        long lastChange = ((TailoredPlayer) player).getLastSkinChange();
+        long now = System.currentTimeMillis();
+
+        if(now - lastChange > config.skinChangeTimer * 1000) {
+
+            if(!TATERZENS_LOADED || !TaterzensCompatibility.setTaterzenSkin(player, skinData)) {
+                ((TailoredPlayer) player).setSkin(skinData, true);
+            }
+
             success = true;
+            player.sendMessage(new TranslatedText("command.fabrictailor.skin.set.success").formatted(Formatting.GREEN), false);
+
         } else {
-            result = SKIN_SET_ERROR;
+            // Prevent skin change spamming
+            player.sendMessage(
+                    new TranslatedText("command.fabrictailor.skin.timer.please_wait", now - config.skinChangeTimer * 1000 - lastChange),
+                    false
+            );
         }
-        player.sendMessage(result, false);
+
         return success;
     }
 
     public static boolean clearSkin(ServerPlayerEntity player) {
-        if(((TailoredPlayer) player).setSkin("", "", true)) {
+
+        long lastChange = ((TailoredPlayer) player).getLastSkinChange();
+        long now = System.currentTimeMillis();
+
+        if(now - lastChange > config.skinChangeTimer * 1000) {
+            ((TailoredPlayer) player).clearSkin();
             player.sendMessage(
                     new TranslatedText("command.fabrictailor.skin.clear.success").formatted(Formatting.GREEN),
                     false
@@ -167,7 +185,9 @@ public class SkinCommand {
             return true;
         }
 
-        player.sendMessage(new TranslatedText("command.fabrictailor.skin.clear.error").formatted(Formatting.RED),
+        // Prevent skin change spamming
+        player.sendMessage(
+                new TranslatedText("command.fabrictailor.skin.timer.please_wait", now - config.skinChangeTimer * 1000 - lastChange),
                 false
         );
         return false;

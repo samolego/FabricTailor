@@ -28,6 +28,7 @@
   "command.fabrictailor.skin.clear.success": "Skin was cleared successfully.",
   "command.fabrictailor.skin.clear.error": "An error occurred when trying to clear your skin.",
   "command.fabrictailor.skin.please_wait": "Uploading skin. Please wait.",
+  "command.fabrictailor.skin.timer.please_wait": "You've changed your skin recently. You must wait for %s seconds to change it again.",
   "command.fabrictailor.skin.upload.failed": "A problem occurred when trying to upload the skin.",
   "command.fabrictailor.skin.upload.malformed_url": "Malformed url!",
 

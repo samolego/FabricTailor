@@ -2,6 +2,7 @@ package org.samo_lego.fabrictailor;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +37,7 @@ public class FabricTailor implements ModInitializer {
 	}
 
 	public static void reloadConfig() {
-		config = TailorConfig.loadConfigFile(configFile);
+		// Ugly trick for server detection
+		config = TailorConfig.loadConfigFile(configFile, new File("./server.properties").exists());
 	}
 }

@@ -17,6 +17,7 @@ import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.mixin.accessors.EntityTrackerAccessor;
 import org.samo_lego.fabrictailor.mixin.accessors.ThreadedAnvilChunkStorageAccessor;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,9 +30,14 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     private final ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
     private final GameProfile gameProfile = player.getGameProfile();
 
+    @Unique
     private String skinValue;
+    @Unique
     private String skinSignature;
+    @Unique
     private final PropertyMap map = this.gameProfile.getProperties();
+    @Unique
+    private long lastSkinChangeTime;
 
 
     /**
@@ -78,11 +84,8 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
      *
      * @param skinData skin texture data
      * @param reload whether to send packets around for skin reload
-     * @return true if it was successful, otherwise false
      */
-    public boolean setSkin(Property skinData, boolean reload) {
-        boolean result = false;
-
+    public void setSkin(Property skinData, boolean reload) {
         try {
             this.map.removeAll("textures");
         } catch (Exception ignored) {
@@ -100,19 +103,19 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
             if(reload)
                 this.reloadSkin();
 
-            result = true;
+            this.lastSkinChangeTime = System.currentTimeMillis();
+
         } catch (InsecureTextureException ignored) {
             // No skin data
         } catch (Error e) {
             // Something went wrong when trying to set the skin
             errorLog(e.getMessage());
         }
-        return result;
     }
 
     @Override
-    public boolean setSkin(String value, String signature, boolean reload) {
-        return this.setSkin(new Property("textures", value, signature), reload);
+    public void setSkin(String value, String signature, boolean reload) {
+        this.setSkin(new Property("textures", value, signature), reload);
     }
 
     @Override
@@ -139,6 +142,22 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
             }
         }
         return this.skinSignature;
+    }
+
+    @Override
+    public long getLastSkinChange() {
+        return this.lastSkinChangeTime;
+    }
+
+    @Override
+    public void clearSkin() {
+        try {
+            this.map.removeAll("textures");
+            this.reloadSkin();
+        } catch (Exception ignored) {
+            // Player has no skin data, no worries
+        }
+
     }
 
 

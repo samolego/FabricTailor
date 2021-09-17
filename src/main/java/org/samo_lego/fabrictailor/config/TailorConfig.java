@@ -24,6 +24,11 @@ public class TailorConfig {
     @SerializedName("default_skin")
     public DefaultSkin defaultSkin = new DefaultSkin();
 
+    @SerializedName("// How quickly can player change the skin, in seconds. -1 for no limit. If using this in server environment, -1 is not recommended.")
+    public final String _comment_skinChangeTimer = "(default in singleplayer: -1, default for server: 60)";
+    @SerializedName("skin_change_timer")
+    public long skinChangeTimer = -1;
+
     public static class DefaultSkin {
         @SerializedName("// Whether to apply the default skin to ALL new players, not just those without skin.")
         public final String _comment_applyToAll = "(default: false)";
@@ -39,7 +44,7 @@ public class TailorConfig {
      * @param file file to load the language file from.
      * @return TaterzenLanguage object
      */
-    public static TailorConfig loadConfigFile(File file) {
+    public static TailorConfig loadConfigFile(File file, boolean serverEnvironment) {
         TailorConfig config;
         if (file.exists()) {
             try (BufferedReader fileReader = new BufferedReader(
@@ -51,7 +56,11 @@ public class TailorConfig {
             }
         }
         else {
+            // Config doesn't exist yet
             config = new TailorConfig();
+            if(serverEnvironment) {
+                config.skinChangeTimer = 60;
+            }
         }
         config.saveConfigFile(file);
 
