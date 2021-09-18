@@ -28,9 +28,8 @@ public abstract class MixinPlayerManager {
         String value = ((TailoredPlayer) player).getSkinValue();
         String signature = ((TailoredPlayer) player).getSkinSignature();
 
+        Property skinData = null;
         if(value == null || signature == null) {
-
-            Property skinData = null;
 
             if(!config.defaultSkin.applyToAll)
                 skinData = fetchSkinByName(player.getGameProfile().getName());
@@ -43,9 +42,13 @@ public abstract class MixinPlayerManager {
                     skinData = new Property("textures", value, signature);
             }
 
-            // Try to set skin now
-            if(skinData != null)
-                ((TailoredPlayer) player).setSkin(skinData, false);
+
+        } else {
+            skinData = new Property("textures", value, signature);
         }
+        // Try to set skin now
+        if(skinData != null)
+            ((TailoredPlayer) player).setSkin(skinData, false);
+            ((TailoredPlayer) player).resetLastSkinChange();
     }
 }

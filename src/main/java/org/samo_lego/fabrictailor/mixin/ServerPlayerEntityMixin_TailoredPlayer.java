@@ -30,14 +30,10 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     private final ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
     private final GameProfile gameProfile = player.getGameProfile();
 
-    @Unique
     private String skinValue;
-    @Unique
     private String skinSignature;
-    @Unique
     private final PropertyMap map = this.gameProfile.getProperties();
-    @Unique
-    private long lastSkinChangeTime;
+    private long lastSkinChangeTime = 0;
 
 
     /**
@@ -157,7 +153,11 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         } catch (Exception ignored) {
             // Player has no skin data, no worries
         }
+    }
 
+    @Override
+    public void resetLastSkinChange() {
+        this.lastSkinChangeTime = 0;
     }
 
 

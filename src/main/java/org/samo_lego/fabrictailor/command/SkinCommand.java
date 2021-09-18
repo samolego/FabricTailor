@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
@@ -151,7 +152,7 @@ public class SkinCommand {
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
         long now = System.currentTimeMillis();
 
-        if(now - lastChange > config.skinChangeTimer * 1000) {
+        if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
 
             if(!TATERZENS_LOADED || !TaterzensCompatibility.setTaterzenSkin(player, skinData)) {
                 ((TailoredPlayer) player).setSkin(skinData, true);
@@ -162,8 +163,11 @@ public class SkinCommand {
 
         } else {
             // Prevent skin change spamming
+            MutableText timeLeft = new LiteralText(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+                    .formatted(Formatting.LIGHT_PURPLE);
             player.sendMessage(
-                    new TranslatedText("command.fabrictailor.skin.timer.please_wait", now - config.skinChangeTimer * 1000 - lastChange),
+                    new TranslatedText("command.fabrictailor.skin.timer.please_wait", timeLeft)
+                            .formatted(Formatting.RED),
                     false
             );
         }
@@ -176,7 +180,7 @@ public class SkinCommand {
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
         long now = System.currentTimeMillis();
 
-        if(now - lastChange > config.skinChangeTimer * 1000) {
+        if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             ((TailoredPlayer) player).clearSkin();
             player.sendMessage(
                     new TranslatedText("command.fabrictailor.skin.clear.success").formatted(Formatting.GREEN),
@@ -186,10 +190,14 @@ public class SkinCommand {
         }
 
         // Prevent skin change spamming
+        MutableText timeLeft = new LiteralText(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+                .formatted(Formatting.LIGHT_PURPLE);
         player.sendMessage(
-                new TranslatedText("command.fabrictailor.skin.timer.please_wait", now - config.skinChangeTimer * 1000 - lastChange),
+                new TranslatedText("command.fabrictailor.skin.timer.please_wait", timeLeft)
+                        .formatted(Formatting.RED),
                 false
         );
+        ;
         return false;
     }
 }

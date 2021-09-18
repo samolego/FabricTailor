@@ -33,7 +33,7 @@ public interface TailoredPlayer {
     /**
      * Gets player's skin value.
      *
-     * @return skin value as string
+     * @return skin value as string, null if player has no skin set.
      */
     @Nullable
     String getSkinValue();
@@ -41,7 +41,7 @@ public interface TailoredPlayer {
     /**
      * Gets player's skin signature.
      *
-     * @return skin signature as string
+     * @return skin signature as string, null if player has no skin set.
      */
     @Nullable
     String getSkinSignature();
@@ -51,6 +51,11 @@ public interface TailoredPlayer {
      * @return time of skin change.
      */
     long getLastSkinChange();
+
+    /**
+     * Resets the skin timer.
+     */
+    void resetLastSkinChange();
 
     /**
      * Clears player's skin.
