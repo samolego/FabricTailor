@@ -121,16 +121,21 @@ loadScripts(document, 'script');</script>
 <div class="block">Reloads player's skin.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code><span class="member-name-link"><a href="#setSkin(com.mojang.authlib.properties.Property,boolean)">setSkin</a></span>&#8203;(com.mojang.authlib.properties.Property&nbsp;skinData,
- boolean&nbsp;reload)</code></div>
+<div class="col-second odd-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code><span class="member-name-link"><a href="#resetLastSkinChange()">resetLastSkinChange</a></span>()</code></div>
 <div class="col-last odd-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3">
-<div class="block">Sets the skin to the specified player.</div>
+<div class="block">Resets the skin timer.</div>
 </div>
 <div class="col-first even-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code><span class="member-name-link"><a href="#setSkin(java.lang.String,java.lang.String,boolean)">setSkin</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;signature,
+<div class="col-second even-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code><span class="member-name-link"><a href="#setSkin(com.mojang.authlib.properties.Property,boolean)">setSkin</a></span>&#8203;(com.mojang.authlib.properties.Property&nbsp;skinData,
  boolean&nbsp;reload)</code></div>
 <div class="col-last even-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3">
+<div class="block">Sets the skin to the specified player.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3"><code><span class="member-name-link"><a href="#setSkin(java.lang.String,java.lang.String,boolean)">setSkin</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
+ <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;signature,
+ boolean&nbsp;reload)</code></div>
+<div class="col-last odd-row-color method-summary-table-tab2 method-summary-table method-summary-table-tab3">
 <div class="block">Sets the skin to the specified player.</div>
 </div>
 </div>
@@ -190,7 +195,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Gets player's skin value.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>skin value as string</dd>
+<dd>skin value as string, null if player has no skin set.</dd>
 </dl>
 </section>
 </li>
@@ -202,7 +207,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Gets player's skin signature.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>skin signature as string</dd>
+<dd>skin signature as string, null if player has no skin set.</dd>
 </dl>
 </section>
 </li>
@@ -215,6 +220,13 @@ loadScripts(document, 'script');</script>
 <dt>Returns:</dt>
 <dd>time of skin change.</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="resetLastSkinChange()">
+<h3>resetLastSkinChange</h3>
+<div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">resetLastSkinChange</span>()</div>
+<div class="block">Resets the skin timer.</div>
 </section>
 </li>
 <li>

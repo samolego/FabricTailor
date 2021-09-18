@@ -140,16 +140,21 @@ implements <a href="../casts/TailoredPlayer.html" title="interface in org.samo_l
  under GNU Lesser General Public License.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#setSkin(com.mojang.authlib.properties.Property,boolean)">setSkin</a></span>&#8203;(com.mojang.authlib.properties.Property&nbsp;skinData,
- boolean&nbsp;reload)</code></div>
+<div class="col-second odd-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#resetLastSkinChange()">resetLastSkinChange</a></span>()</code></div>
 <div class="col-last odd-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table">
-<div class="block">Sets the skin to the specified player and reloads it with <a href="#reloadSkin()"><code>reloadSkin()</code></a> reloadSkin().</div>
+<div class="block">Resets the skin timer.</div>
 </div>
 <div class="col-first even-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#setSkin(java.lang.String,java.lang.String,boolean)">setSkin</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
- <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;signature,
+<div class="col-second even-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#setSkin(com.mojang.authlib.properties.Property,boolean)">setSkin</a></span>&#8203;(com.mojang.authlib.properties.Property&nbsp;skinData,
  boolean&nbsp;reload)</code></div>
 <div class="col-last even-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table">
+<div class="block">Sets the skin to the specified player and reloads it with <a href="#reloadSkin()"><code>reloadSkin()</code></a> reloadSkin().</div>
+</div>
+<div class="col-first odd-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table"><code><span class="member-name-link"><a href="#setSkin(java.lang.String,java.lang.String,boolean)">setSkin</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;value,
+ <a href="https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;signature,
+ boolean&nbsp;reload)</code></div>
+<div class="col-last odd-row-color method-summary-table-tab2 method-summary-table-tab4 method-summary-table">
 <div class="block">Sets the skin to the specified player.</div>
 </div>
 </div>
@@ -241,7 +246,7 @@ implements <a href="../casts/TailoredPlayer.html" title="interface in org.samo_l
 <dt>Specified by:</dt>
 <dd><code><a href="../casts/TailoredPlayer.html#getSkinValue()">getSkinValue</a></code>&nbsp;in interface&nbsp;<code><a href="../casts/TailoredPlayer.html" title="interface in org.samo_lego.fabrictailor.casts">TailoredPlayer</a></code></dd>
 <dt>Returns:</dt>
-<dd>skin value as string</dd>
+<dd>skin value as string, null if player has no skin set.</dd>
 </dl>
 </section>
 </li>
@@ -255,7 +260,7 @@ implements <a href="../casts/TailoredPlayer.html" title="interface in org.samo_l
 <dt>Specified by:</dt>
 <dd><code><a href="../casts/TailoredPlayer.html#getSkinSignature()">getSkinSignature</a></code>&nbsp;in interface&nbsp;<code><a href="../casts/TailoredPlayer.html" title="interface in org.samo_lego.fabrictailor.casts">TailoredPlayer</a></code></dd>
 <dt>Returns:</dt>
-<dd>skin signature as string</dd>
+<dd>skin signature as string, null if player has no skin set.</dd>
 </dl>
 </section>
 </li>
@@ -282,6 +287,18 @@ implements <a href="../casts/TailoredPlayer.html" title="interface in org.samo_l
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../casts/TailoredPlayer.html#clearSkin()">clearSkin</a></code>&nbsp;in interface&nbsp;<code><a href="../casts/TailoredPlayer.html" title="interface in org.samo_lego.fabrictailor.casts">TailoredPlayer</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="resetLastSkinChange()">
+<h3>resetLastSkinChange</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">resetLastSkinChange</span>()</div>
+<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code><a href="../casts/TailoredPlayer.html#resetLastSkinChange()">TailoredPlayer</a></code></span></div>
+<div class="block">Resets the skin timer.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../casts/TailoredPlayer.html#resetLastSkinChange()">resetLastSkinChange</a></code>&nbsp;in interface&nbsp;<code><a href="../casts/TailoredPlayer.html" title="interface in org.samo_lego.fabrictailor.casts">TailoredPlayer</a></code></dd>
 </dl>
 </section>
 </li>
