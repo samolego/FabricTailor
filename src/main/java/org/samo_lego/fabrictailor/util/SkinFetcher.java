@@ -1,6 +1,5 @@
 package org.samo_lego.fabrictailor.util;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +18,6 @@ import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
 
 public class SkinFetcher {
-    private static final JsonParser PARSER = new JsonParser();
 
     /**
      * Gets skin data from file.
@@ -79,7 +77,7 @@ public class SkinFetcher {
             if(reply == null || !reply.contains("id")) {
                 reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), false, null);
             } else {
-                String uuid = PARSER.parse(reply).getAsJsonObject().get("id").getAsString();
+                String uuid = JsonParser.parseString(reply).getAsJsonObject().get("id").getAsString();
                 reply = urlRequest(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false"), true, null);
             }
             return getSkinFromReply(reply);
