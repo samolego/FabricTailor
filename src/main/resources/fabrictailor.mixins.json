@@ -2,9 +2,12 @@
   "required": true,
   "minVersion": "0.8",
   "package": "org.samo_lego.fabrictailor.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_16",
   "client": [
-    "accessors.client.AdvancementsScreenAccessor"
+    "accessors.client.AdvancementsScreenAccessor",
+    "accessors.client.CustomPayloadC2SPacketAccessor",
+    "client.ClientLoginNetworkHandler_ServerJoin",
+    "client.ClientPlayNetworkHandlerMixin_FTChecker"
   ],
   "mixins": [
     "MixinPlayerManager",

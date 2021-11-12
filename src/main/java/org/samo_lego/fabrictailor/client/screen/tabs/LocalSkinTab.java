@@ -1,24 +1,23 @@
-package org.samo_lego.fabrictailor.client.screen;
+package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import org.samo_lego.fabrictailor.client.network.SkinChangePacket;
+import org.samo_lego.fabrictailor.network.SkinPackets;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
-public class UrlSkinTab extends DrawableHelper implements SkinTabType {
-
+public class LocalSkinTab extends DrawableHelper implements SkinTabType {
     private final TranslatedText TITLE;
     private final TranslatedText DESCRIPTION;
     private final ItemStack ICON;
 
-    public UrlSkinTab() {
-        this.TITLE = new TranslatedText("tab.fabrictailor.title_url");
-        this.DESCRIPTION = new TranslatedText("description.fabrictailor.title_url");
-        this.ICON = new ItemStack(Items.GLOBE_BANNER_PATTERN);
+    public LocalSkinTab() {
+        this.ICON = new ItemStack(Items.MAGENTA_GLAZED_TERRACOTTA);
+        this.DESCRIPTION = new TranslatedText("description.fabrictailor.title_local");
+        this.TITLE = new TranslatedText("tab.fabrictailor.title_local");
     }
 
     @Override
@@ -36,13 +35,17 @@ public class UrlSkinTab extends DrawableHelper implements SkinTabType {
         return this.ICON;
     }
 
-
     @Override
-    public CustomPayloadC2SPacket getSkinChangePacket(String url, boolean useSlim) {
-        Property skinData = SkinFetcher.fetchSkinByUrl(url, useSlim);
+    public CustomPayloadC2SPacket getSkinChangePacket(String filePath, boolean useSlim) {
+        Property skinData = SkinFetcher.setSkinFromFile(filePath, useSlim);
 
         if(skinData == null)
             return null;
-        return SkinChangePacket.create(skinData);
+        return SkinPackets.createSkinChangePacket(skinData);
+    }
+
+    @Override
+    public boolean showExplorerButton() {
+        return true;
     }
 }

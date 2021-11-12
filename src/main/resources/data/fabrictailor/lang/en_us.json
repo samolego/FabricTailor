@@ -2,6 +2,7 @@
   "button.fabrictailor.clear_skin": "Clear skin",
   "button.fabrictailor.open_explorer": "Open explorer",
   "button.fabrictailor.set_skin": "Set skin",
+  "button.fabrictailor.set_default_skin": "Set default skin",
   "button.fabrictailor.use_slim": "Slim model",
 
   "description.fabrictailor.title_local": "Skin path:",
@@ -35,5 +36,6 @@
   "command.fabrictailor.config.reloadSuccess": "Config was reloaded successfully!",
   "command.fabrictailor.config.defaultSkin": "Default skin for new players was set successfully!",
 
-  "error.fabrictailor.invalid_skin": "The provided file is not a valid PNG image."
+  "error.fabrictailor.invalid_skin": "The provided file is not a valid PNG image.",
+  "error.fabrictailor.not_installed": "FabricTailor mod is sadly not installed on this server. Please contact admin for more info."
 }
