@@ -6,6 +6,7 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.c2s.play.ClientSettingsC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -21,7 +22,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
+import static org.samo_lego.fabrictailor.mixin.accessors.PlayerEntityAccessor.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
@@ -157,6 +160,17 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     @Override
     public void resetLastSkinChange() {
         this.lastSkinChangeTime = 0;
+    }
+
+    @Inject(method = "setClientSettings", at = @At("TAIL"))
+    private void disableCapeIfNeeded(ClientSettingsC2SPacket packet, CallbackInfo ci) {
+        if(!config.allowCapes) {
+            byte playerModel = (byte) packet.playerModelBitMask();
+
+            // Fake cape rule to be off
+            playerModel = (byte) (playerModel & ~(1));
+            this.player.getDataTracker().set(getPLAYER_MODEL_PARTS(), playerModel);
+        }
     }
 
 
