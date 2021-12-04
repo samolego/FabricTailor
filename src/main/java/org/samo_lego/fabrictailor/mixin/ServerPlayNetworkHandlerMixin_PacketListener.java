@@ -1,7 +1,6 @@
 package org.samo_lego.fabrictailor.mixin;
 
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.ClientSettingsC2SPacket;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -45,25 +44,6 @@ public class ServerPlayNetworkHandlerMixin_PacketListener {
                         false
                 );
             }
-        }
-    }
-
-    @Inject(
-            method = "onClientSettings",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerPlayerEntity;setClientSettings(Lnet/minecraft/network/packet/c2s/play/ClientSettingsC2SPacket;)V"
-            )
-    )
-    private void checkClientSettings(ClientSettingsC2SPacket packet, CallbackInfo ci) {
-        if(!config.allowCapes) {
-            byte playerModel = (byte) packet.playerModelBitMask();
-
-            // Fake cape rule to be off
-            playerModel = (byte) (playerModel & ~(1));
-
-            //fixme mixins with records?
-            //((ClientSettingsC2SAccessor) packet).setPlayerModelBitMask(playerModel);
         }
     }
 }
