@@ -1,20 +1,20 @@
 package org.samo_lego.fabrictailor.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ScreenTexts;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ServerboundChatPacket;
+import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
 import java.io.File;
@@ -22,8 +22,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getTABS_TEXTURE;
-import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getWINDOW_TEXTURE;
+import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getTABS_LOCATION;
+import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getWINDOW_LOCATION;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
@@ -41,12 +41,12 @@ public class SkinChangeScreen extends Screen {
             new LocalSkinTab()
     };
 
-    private TextFieldWidget skinInput;
+    private EditBox skinInput;
     private int startX;
     private int startY;
     protected SkinTabType selectedTab;
-    protected CheckboxWidget skinModelCheckbox;
-    private ButtonWidget openExplorerButton;
+    protected Checkbox skinModelCheckbox;
+    private Button openExplorerButton;
 
     public SkinChangeScreen() {
         super(new TranslatedText("gui.fabrictailor.change_skin"));
@@ -58,27 +58,27 @@ public class SkinChangeScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        this.client.keyboard.setRepeatEvents(true);
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int verticalSpacing = 8;
 
         // Button for opening file manager
-        this.openExplorerButton = new ButtonWidget(
+        this.openExplorerButton = new Button(
                 width / 2,
                 height / 2 + 10,
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
                 new TranslatedText("button.fabrictailor.open_explorer"),
                 (buttonWidget) -> {
-                    Util.getOperatingSystem().open(new File(""));
+                    Util.getPlatform().openFile(new File(""));
                 },
                 (buttonWidget, matrixStack, i, j) -> {
                     this.renderTooltip(matrixStack, new TranslatedText("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
                 }
         );
-        this.addDrawableChild(openExplorerButton);
+        this.addRenderableWidget(openExplorerButton);
 
         // Checkbox for slim skin model
-        this.skinModelCheckbox = new CheckboxWidget(
+        this.skinModelCheckbox = new Checkbox(
                 width / 2,
                 height / 2 - 12,
                 150,
@@ -86,24 +86,24 @@ public class SkinChangeScreen extends Screen {
                 new TranslatedText("button.fabrictailor.use_slim"),
                 false
         );
-        this.addDrawableChild(skinModelCheckbox);
+        this.addRenderableWidget(skinModelCheckbox);
 
         // Both should be hidden at first (default tab is "player")
         this.openExplorerButton.visible = false;
         this.skinModelCheckbox.visible = false;
 
         // Text field input
-        skinInput = new TextFieldWidget(this.textRenderer, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, new TranslatableText("itemGroup.search").formatted(Formatting.WHITE));
+        skinInput = new EditBox(this.font, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, new TranslatableComponent("itemGroup.search").withStyle(ChatFormatting.WHITE));
         skinInput.setMaxLength(256);
         skinInput.setVisible(true);
-        skinInput.setDrawsBackground(true);
-        skinInput.setEditableColor(16777215);
+        skinInput.setBordered(true);
+        skinInput.setTextColor(16777215);
 
-        this.addSelectableChild(skinInput);
+        this.addWidget(skinInput);
 
         // "Set skin" button
-        this.addDrawableChild(
-                new ButtonWidget(
+        this.addRenderableWidget(
+                new Button(
                         width / 2,
                         height / 2 + 30,
                         BUTTON_WIDTH,
@@ -111,9 +111,9 @@ public class SkinChangeScreen extends Screen {
                         new TranslatedText("button.fabrictailor.set_skin"),
                         onClick -> {
                             new CompletableFuture<>().completeAsync(() -> {
-                                CustomPayloadC2SPacket skinChangePacket = this.selectedTab.getSkinChangePacket(skinInput.getText(), this.skinModelCheckbox.isChecked());
+                                ServerboundCustomPayloadPacket skinChangePacket = this.selectedTab.getSkinChangePacket(skinInput.getValue(), this.skinModelCheckbox.selected());
                                 if (skinChangePacket != null)
-                                    client.player.networkHandler.sendPacket(skinChangePacket);
+                                    minecraft.player.connection.send(skinChangePacket);
                                 return null;
                             });
                             this.onClose();
@@ -121,26 +121,26 @@ public class SkinChangeScreen extends Screen {
                 )
         );
 
-        this.addDrawableChild(
-                new ButtonWidget(
+        this.addRenderableWidget(
+                new Button(
                         width / 2 - BUTTON_WIDTH - 2, height - BUTTON_HEIGHT - verticalSpacing,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
                         new TranslatedText("button.fabrictailor.clear_skin"),
                         onClick -> {
-                            client.player.networkHandler.sendPacket(new ChatMessageC2SPacket("/skin clear"));
+                            minecraft.player.connection.send(new ServerboundChatPacket("/skin clear"));
                             this.onClose();
                         }
                 )
         );
 
         // "Cancel" button which closes the screen
-        this.addDrawableChild(
-                new ButtonWidget(
+        this.addRenderableWidget(
+                new Button(
                         width / 2 + 2, height - BUTTON_HEIGHT - verticalSpacing,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
-                        ScreenTexts.CANCEL,
+                        CommonComponents.GUI_CANCEL,
                         onClick -> {
                             this.onClose();
                         }
@@ -165,25 +165,25 @@ public class SkinChangeScreen extends Screen {
      * @param delta
      */
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float delta) {
         // Darkens background
         this.renderBackground(matrixStack, 0);
         super.render(matrixStack, mouseX, mouseY, delta);
 
         // Screen title
-        drawCenteredText(matrixStack, textRenderer, title, width / 2, 15, 0xffffff);
+        drawCenteredString(matrixStack, font, title, width / 2, 15, 0xffffff);
 
         // Starting position of the window texture
         this.startX = (this.width - 252) / 2;
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        RenderSystem.setShaderTexture(0, getWINDOW_TEXTURE());
-        this.drawTexture(matrixStack, startX, startY, 0, 0, 252, 140);
+        RenderSystem.setShaderTexture(0, getWINDOW_LOCATION());
+        this.blit(matrixStack, startX, startY, 0, 0, 252, 140);
 
         // Drawing Player
         // Luckily vanilla code is available
-        InventoryScreen.drawEntity(startX + 50, startY + 120, 50, (float)width / 2 - 75 - mouseX, (float)height / 2 - mouseY, client.player);
+        InventoryScreen.renderEntityInInventory(startX + 50, startY + 120, 50, (float)width / 2 - 75 - mouseX, (float)height / 2 - mouseY, minecraft.player);
 
         // Render input field
         skinInput.render(matrixStack, startX, startY, delta);
@@ -203,9 +203,9 @@ public class SkinChangeScreen extends Screen {
      * @param mouseX mouse x
      * @param mouseY mouse y
      */
-    private void drawTabs(MatrixStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
+    private void drawTabs(PoseStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
         // Setting texture
-        RenderSystem.setShaderTexture(0, getTABS_TEXTURE());
+        RenderSystem.setShaderTexture(0, getTABS_LOCATION());
 
         // Tabs
         for(int i = 0; i < TABS.length; ++i) {
@@ -216,7 +216,7 @@ public class SkinChangeScreen extends Screen {
             }
             else if(selectedTab == tab) {
                 // Rendering "selected" tab
-                this.drawTexture(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
+                this.blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
 
                 // Showing or hiding additional buttons
                 this.skinModelCheckbox.visible = tab.hasSkinModels();
@@ -225,14 +225,14 @@ public class SkinChangeScreen extends Screen {
             }
             else {
                 // rendering other tabs
-                this.drawTexture(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
+                this.blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
             }
         }
         // Rendering title
-        this.textRenderer.drawWithShadow(matrixStack, this.selectedTab.getTitle(), startX + 10, startY + 5, 16777215);
+        this.font.drawShadow(matrixStack, this.selectedTab.getTitle(), startX + 10, startY + 5, 16777215);
 
         // Rendering description above input field
-        this.textRenderer.drawWithShadow(matrixStack, this.selectedTab.getDescription(), (float) width / 2, (float) height / 2 - 40, 16777215);
+        this.font.drawShadow(matrixStack, this.selectedTab.getDescription(), (float) width / 2, (float) height / 2 - 40, 16777215);
 
         RenderSystem.defaultBlendFunc();
     }
@@ -248,7 +248,7 @@ public class SkinChangeScreen extends Screen {
         // Icons
         for(int i = 0; i < TABS.length; ++i) {
             SkinTabType tab = TABS[i];
-            itemRenderer.renderInGui(tab.getIcon(), startX + 231 - i * 27, startY - 18);
+            itemRenderer.renderAndDecorateFakeItem(tab.getIcon(), startX + 231 - i * 27, startY - 18);
         }
         RenderSystem.disableBlend();
     }
@@ -263,7 +263,7 @@ public class SkinChangeScreen extends Screen {
      * @param mouseX mouse x
      * @param mouseY mouse y
      */
-    private void drawWidgetTooltip(MatrixStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
+    private void drawWidgetTooltip(PoseStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
         for(int i = 0; i < TABS.length; ++i) {
             SkinTabType tab = TABS[i];
             if(tab.isSelected(startX + 225 - i * 27, startY - 28, mouseX, mouseY)) {
@@ -273,7 +273,7 @@ public class SkinChangeScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(MatrixStack matrices) {
+    public void renderBackground(PoseStack matrices) {
         this.renderBackground(matrices, 0);
     }
 
@@ -302,7 +302,7 @@ public class SkinChangeScreen extends Screen {
 
     @Override
     public void removed() {
-        client.keyboard.setRepeatEvents(false);
+        minecraft.keyboardHandler.setSendRepeatsToGui(false);
     }
 
     /**
@@ -311,9 +311,9 @@ public class SkinChangeScreen extends Screen {
      * @param paths paths of the files; only first is used
      */
     @Override
-    public void filesDragged(List<Path> paths) {
+    public void onFilesDrop(List<Path> paths) {
         if(this.selectedTab instanceof LocalSkinTab) {
-            this.skinInput.setText(paths.iterator().next().toString());
+            this.skinInput.setValue(paths.iterator().next().toString());
         }
     }
 }

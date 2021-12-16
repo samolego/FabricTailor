@@ -4,19 +4,18 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.c2s.play.ClientSettingsC2SPacket;
-import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
-import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.level.biome.BiomeManager;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.mixin.accessors.EntityTrackerAccessor;
-import org.samo_lego.fabrictailor.mixin.accessors.ThreadedAnvilChunkStorageAccessor;
+import org.samo_lego.fabrictailor.mixin.accessors.ChunkMapAccessor;
+import org.samo_lego.fabrictailor.mixin.accessors.TrackedEntityAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,10 +25,10 @@ import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 import static org.samo_lego.fabrictailor.mixin.accessors.PlayerEntityAccessor.getPLAYER_MODEL_PARTS;
 
-@Mixin(ServerPlayerEntity.class)
+@Mixin(ServerPlayer.class)
 public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
 
-    private final ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+    private final ServerPlayer player = (ServerPlayer) (Object) this;
     private final GameProfile gameProfile = player.getGameProfile();
 
     private String skinValue;
@@ -52,29 +51,29 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         // Refreshing tablist for each player
         if(player.getServer() == null)
             return;
-        PlayerManager playerManager = player.getServer().getPlayerManager();
-        playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.REMOVE_PLAYER, player));
-        playerManager.sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.ADD_PLAYER, player));
+        PlayerList playerManager = player.getServer().getPlayerList();
+        playerManager.broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, player));
+        playerManager.broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, player));
 
-        ServerChunkManager manager = player.getWorld().getChunkManager();
-        ThreadedAnvilChunkStorage storage = manager.threadedAnvilChunkStorage;
-        EntityTrackerAccessor trackerEntry = ((ThreadedAnvilChunkStorageAccessor) storage).getEntityTrackers().get(player.getId());
+        ServerChunkCache manager = player.getLevel().getChunkSource();
+        ChunkMap storage = manager.chunkMap;
+        TrackedEntityAccessor trackerEntry = ((ChunkMapAccessor) storage).getEntityTrackers().get(player.getId());
 
-        trackerEntry.getListeners().forEach(tracking -> trackerEntry.getEntry().startTracking(tracking.getPlayer()));
+        trackerEntry.getSeenBy().forEach(tracking -> trackerEntry.getServerEntity().addPairing(tracking.getPlayer()));
 
         // need to change the player entity on the client
-        ServerWorld targetWorld = player.getWorld();
-        player.networkHandler.sendPacket(new PlayerRespawnS2CPacket(targetWorld.getDimension(), targetWorld.getRegistryKey(), BiomeAccess.hashSeed(targetWorld.getSeed()), player.interactionManager.getGameMode(), player.interactionManager.getPreviousGameMode(), targetWorld.isDebugWorld(), targetWorld.isFlat(), true));
-        player.networkHandler.requestTeleport(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
-        player.server.getPlayerManager().sendCommandTree(player);
-        player.networkHandler.sendPacket(new ExperienceBarUpdateS2CPacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
-        player.networkHandler.sendPacket(new HealthUpdateS2CPacket(player.getHealth(), player.getHungerManager().getFoodLevel(), player.getHungerManager().getSaturationLevel()));
-        for (StatusEffectInstance statusEffect : player.getStatusEffects()) {
-            player.networkHandler.sendPacket(new EntityStatusEffectS2CPacket(player.getId(), statusEffect));
+        ServerLevel targetWorld = player.getLevel();
+        player.connection.send(new ClientboundRespawnPacket(targetWorld.dimensionType(), targetWorld.dimension(), BiomeManager.obfuscateSeed(targetWorld.getSeed()), player.gameMode.getGameModeForPlayer(), player.gameMode.getPreviousGameModeForPlayer(), targetWorld.isDebug(), targetWorld.isFlat(), true));
+        player.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+        player.server.getPlayerList().sendPlayerPermissionLevel(player);
+        player.connection.send(new ClientboundSetExperiencePacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
+        player.connection.send(new ClientboundSetHealthPacket(player.getHealth(), player.getFoodData().getFoodLevel(), player.getFoodData().getSaturationLevel()));
+        for (MobEffectInstance statusEffect : player.getActiveEffects()) {
+            player.connection.send(new ClientboundUpdateMobEffectPacket(player.getId(), statusEffect));
         }
-        player.sendAbilitiesUpdate();
-        playerManager.sendWorldInfo(player, targetWorld);
-        playerManager.sendPlayerStatus(player);
+        player.onUpdateAbilities();
+        playerManager.sendLevelInfo(player, targetWorld);
+        playerManager.sendAllPlayerInfo(player);
     }
 
     /**
@@ -162,22 +161,22 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         this.lastSkinChangeTime = 0;
     }
 
-    @Inject(method = "setClientSettings", at = @At("TAIL"))
-    private void disableCapeIfNeeded(ClientSettingsC2SPacket packet, CallbackInfo ci) {
+    @Inject(method = "updateOptions", at = @At("TAIL"))
+    private void disableCapeIfNeeded(ServerboundClientInformationPacket packet, CallbackInfo ci) {
         if(!config.allowCapes) {
-            byte playerModel = (byte) packet.playerModelBitMask();
+            byte playerModel = (byte) packet.modelCustomisation();
 
             // Fake cape rule to be off
             playerModel = (byte) (playerModel & ~(1));
-            this.player.getDataTracker().set(getPLAYER_MODEL_PARTS(), playerModel);
+            this.player.getEntityData().set(getPLAYER_MODEL_PARTS(), playerModel);
         }
     }
 
 
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    private void writeCustomDataToNbt(NbtCompound tag, CallbackInfo ci) {
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void writeCustomDataToNbt(CompoundTag tag, CallbackInfo ci) {
         if(this.getSkinValue() != null && this.getSkinSignature() != null) {
-            NbtCompound skinDataTag = new NbtCompound();
+            CompoundTag skinDataTag = new CompoundTag();
             skinDataTag.putString("value", this.getSkinValue());
             skinDataTag.putString("signature", this.getSkinSignature());
 
@@ -185,9 +184,9 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
         }
     }
 
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    private void readCustomDataFromNbt(NbtCompound tag, CallbackInfo ci) {
-        NbtCompound skinDataTag = tag.getCompound("fabrictailor:skin_data");
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    private void readCustomDataFromNbt(CompoundTag tag, CallbackInfo ci) {
+        CompoundTag skinDataTag = tag.getCompound("fabrictailor:skin_data");
         if(skinDataTag != null) {
             this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
             this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;

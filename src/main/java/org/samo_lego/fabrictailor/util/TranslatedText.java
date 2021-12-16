@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.samo_lego.fabrictailor.FabricTailor;
 
 import java.io.BufferedReader;
@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
-public class TranslatedText extends TranslatableText {
+public class TranslatedText extends TranslatableComponent {
     private static final boolean SERVER_TRANSLATIONS_LOADED = FabricLoader.getInstance().isModLoaded("server_translations_api");
     private static final JsonObject LANG;
 

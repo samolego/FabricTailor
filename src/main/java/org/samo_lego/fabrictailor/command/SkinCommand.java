@@ -5,14 +5,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.Formatting;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.compatibility.TaterzensCompatibility;
@@ -21,132 +20,132 @@ import org.samo_lego.fabrictailor.util.TranslatedText;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
-import static net.minecraft.command.argument.MessageArgumentType.getMessage;
-import static net.minecraft.command.argument.MessageArgumentType.message;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
+import static net.minecraft.commands.arguments.MessageArgument.getMessage;
+import static net.minecraft.commands.arguments.MessageArgument.message;
 import static org.samo_lego.fabrictailor.FabricTailor.config;
-import static org.samo_lego.fabrictailor.client.network.SkinChangePacket.FABRICTAILOR_CHANNEL;
-import static org.samo_lego.fabrictailor.util.SkinFetcher.*;
+import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByUrl;
+import static org.samo_lego.fabrictailor.util.SkinFetcher.setSkinFromFile;
 
 public class SkinCommand {
-    private static final MutableText SKIN_SET_ERROR = new TranslatedText("command.fabrictailor.skin.set.404").formatted(Formatting.RED);
+    private static final MutableComponent SKIN_SET_ERROR = new TranslatedText("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED);
     private static final boolean TATERZENS_LOADED = FabricLoader.getInstance().isModLoaded("taterzens");;
     private static final TranslatedText SET_SKIN_ATTEMPT = new TranslatedText("command.fabrictailor.skin.set.attempt");
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
         dispatcher.register(literal("skin")
             .then(literal("set")
                     .then(literal("URL")
                             .then(literal("classic")
-                                    .then(CommandManager.argument("skin URL", message())
+                                    .then(Commands.argument("skin URL", message())
                                             .executes(context -> setSkinUrl(context, false))
                                     )
                             )
                             .then(literal("slim")
-                                    .then(CommandManager.argument("skin URL", message())
+                                    .then(Commands.argument("skin URL", message())
                                             .executes(context -> setSkinUrl(context, true))
                                     )
                             )
                             .executes(ctx -> {
-                                ctx.getSource().sendError(
-                                        new TranslatedText("command.fabrictailor.skin.set.404.url").formatted(Formatting.RED)
+                                ctx.getSource().sendFailure(
+                                        new TranslatedText("command.fabrictailor.skin.set.404.url").withStyle(ChatFormatting.RED)
                                 );
                                 return 1;
                             })
                     )
                     .then(literal("upload")
                             .then(literal("classic")
-                                    .then(CommandManager.argument("skin file path", message())
+                                    .then(Commands.argument("skin file path", message())
                                             .executes(context -> setSkinFile(context, false))
                                     )
                             )
                             .then(literal("slim")
-                                    .then(CommandManager.argument("skin file path", message())
+                                    .then(Commands.argument("skin file path", message())
                                             .executes(context -> setSkinFile(context, true))
                                     )
                             )
                             .executes(ctx -> {
-                                ctx.getSource().sendError(
-                                        new TranslatedText("command.fabrictailor.skin.set.404.path").formatted(Formatting.RED)
+                                ctx.getSource().sendFailure(
+                                        new TranslatedText("command.fabrictailor.skin.set.404.path").withStyle(ChatFormatting.RED)
                                 );
                                 return 1;
                             })
                     )
                     .then(literal("player")
-                            .then(CommandManager.argument("playername", greedyString())
+                            .then(Commands.argument("playername", greedyString())
                                     .executes(SkinCommand::setSkinPlayer)
                             )
                             .executes(ctx -> {
-                                ctx.getSource().sendError(
-                                        new TranslatedText("command.fabrictailor.skin.set.404.playername").formatted(Formatting.RED)
+                                ctx.getSource().sendFailure(
+                                        new TranslatedText("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
                                 );
                                 return 1;
                             })
                     )
                     .executes(ctx -> {
-                        ctx.getSource().sendError(
-                                new TranslatedText("command.fabrictailor.skin.set.404").formatted(Formatting.RED)
+                        ctx.getSource().sendFailure(
+                                new TranslatedText("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED)
                         );
                         return 1;
                     })
             )
-            .then(literal("clear").executes(context -> clearSkin(context.getSource().getPlayer()) ? 1 : 0))
+            .then(literal("clear").executes(context -> clearSkin(context.getSource().getPlayerOrException()) ? 1 : 0))
         );
     }
 
-    private static int setSkinUrl(CommandContext<ServerCommandSource> context, boolean useSlim) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayer();
+    private static int setSkinUrl(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
         String skinUrl = getMessage(context, "skin URL").getString();
 
-        player.sendMessage(SET_SKIN_ATTEMPT.formatted(Formatting.AQUA), false);
+        player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
         Property skinData = fetchSkinByUrl(skinUrl, useSlim);
         if(skinData == null) {
-            player.sendMessage(new TranslatedText("command.fabrictailor.skin.upload.failed").formatted(Formatting.RED), false);
+            player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.upload.failed").withStyle(ChatFormatting.RED), false);
             return -1;
         }
         return setSkin(player, skinData) ? 1 : 0;
     }
 
-    private static int setSkinFile(CommandContext<ServerCommandSource> context, boolean useSlim) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayer();
+    private static int setSkinFile(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
         String skinFilePath = getMessage(context, "skin file path").getString();
 
         // Warn about server path for uploads
         MinecraftServer server = player.getServer();
-        if(server != null && server.isDedicated()) {
-            player.sendMessage(
-                    new TranslatedText("hint.fabrictailor.server_skin_path").formatted(Formatting.GOLD),
+        if(server != null && server.isDedicatedServer()) {
+            player.displayClientMessage(
+                    new TranslatedText("hint.fabrictailor.server_skin_path").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
 
-        player.sendMessage(new TranslatedText("command.fabrictailor.skin.please_wait").formatted(Formatting.GOLD),
+        player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
                 false
         );
 
         Property skinData = setSkinFromFile(skinFilePath, useSlim);
         if(skinData == null) {
-            player.sendMessage(SKIN_SET_ERROR, false);
+            player.displayClientMessage(SKIN_SET_ERROR, false);
             return -1;
         }
 
         return setSkin(player, skinData) ? 1 : 0;
     }
 
-    private static int setSkinPlayer(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayer();
+    private static int setSkinPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
         String playername = getString(context, "playername");
 
         Property skinData = SkinFetcher.fetchSkinByName(playername);
 
         if(skinData == null) {
-            player.sendMessage(SKIN_SET_ERROR, false);
+            player.displayClientMessage(SKIN_SET_ERROR, false);
             return -1;
         }
         return setSkin(player, skinData) ? 1 : 0;
     }
 
-    private static boolean setSkin(ServerPlayerEntity player, @NotNull Property skinData) {
+    private static boolean setSkin(ServerPlayer player, @NotNull Property skinData) {
         boolean success = false;
 
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
@@ -159,15 +158,15 @@ public class SkinCommand {
             }
 
             success = true;
-            player.sendMessage(new TranslatedText("command.fabrictailor.skin.set.success").formatted(Formatting.GREEN), false);
+            player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
 
         } else {
             // Prevent skin change spamming
-            MutableText timeLeft = new LiteralText(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
-                    .formatted(Formatting.LIGHT_PURPLE);
-            player.sendMessage(
+            MutableComponent timeLeft = new TextComponent(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+                    .withStyle(ChatFormatting.LIGHT_PURPLE);
+            player.displayClientMessage(
                     new TranslatedText("command.fabrictailor.skin.timer.please_wait", timeLeft)
-                            .formatted(Formatting.RED),
+                            .withStyle(ChatFormatting.RED),
                     false
             );
         }
@@ -175,26 +174,26 @@ public class SkinCommand {
         return success;
     }
 
-    public static boolean clearSkin(ServerPlayerEntity player) {
+    public static boolean clearSkin(ServerPlayer player) {
 
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
         long now = System.currentTimeMillis();
 
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             ((TailoredPlayer) player).clearSkin();
-            player.sendMessage(
-                    new TranslatedText("command.fabrictailor.skin.clear.success").formatted(Formatting.GREEN),
+            player.displayClientMessage(
+                    new TranslatedText("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
                     false
             );
             return true;
         }
 
         // Prevent skin change spamming
-        MutableText timeLeft = new LiteralText(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
-                .formatted(Formatting.LIGHT_PURPLE);
-        player.sendMessage(
+        MutableComponent timeLeft = new TextComponent(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+                .withStyle(ChatFormatting.LIGHT_PURPLE);
+        player.displayClientMessage(
                 new TranslatedText("command.fabrictailor.skin.timer.please_wait", timeLeft)
-                        .formatted(Formatting.RED),
+                        .withStyle(ChatFormatting.RED),
                 false
         );
         ;

@@ -1,18 +1,18 @@
 package org.samo_lego.fabrictailor.compatibility;
 
 import com.mojang.authlib.properties.Property;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import org.samo_lego.taterzens.interfaces.ITaterzenEditor;
 import org.samo_lego.taterzens.npc.TaterzenNPC;
 
 public class TaterzensCompatibility {
 
-    public static boolean setTaterzenSkin(ServerPlayerEntity executor, Property skinData) {
+    public static boolean setTaterzenSkin(ServerPlayer executor, Property skinData) {
         TaterzenNPC taterzen = ((ITaterzenEditor) executor).getNpc();
 
         if(taterzen != null) {
-            NbtCompound skinTag = new NbtCompound();
+            CompoundTag skinTag = new CompoundTag();
             skinTag.putString("value", skinData.getValue());
             skinTag.putString("signature", skinData.getSignature());
 

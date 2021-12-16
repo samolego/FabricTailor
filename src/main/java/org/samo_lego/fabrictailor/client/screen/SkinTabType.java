@@ -1,7 +1,7 @@
 package org.samo_lego.fabrictailor.client.screen;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
+import net.minecraft.world.item.ItemStack;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
 interface SkinTabType {
@@ -15,7 +15,7 @@ interface SkinTabType {
         return mouseX > startX && mouseX < startX + this.width && mouseY > startY && mouseY < startY + this.height;
     }
 
-    CustomPayloadC2SPacket getSkinChangePacket(String param, boolean useSlim);
+    ServerboundCustomPayloadPacket getSkinChangePacket(String param, boolean useSlim);
 
     default boolean hasSkinModels() {
         return true;

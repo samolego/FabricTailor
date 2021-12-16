@@ -1,15 +1,15 @@
 package org.samo_lego.fabrictailor.client.screen;
 
 import com.mojang.authlib.properties.Property;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.samo_lego.fabrictailor.client.network.SkinChangePacket;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
-public class PlayerSkinTab extends DrawableHelper implements SkinTabType {
+public class PlayerSkinTab extends GuiComponent implements SkinTabType {
 
     private final TranslatedText TITLE;
     private final TranslatedText DESCRIPTION;
@@ -42,7 +42,7 @@ public class PlayerSkinTab extends DrawableHelper implements SkinTabType {
     }
 
     @Override
-    public CustomPayloadC2SPacket getSkinChangePacket(String playername, boolean _ignored) {
+    public ServerboundCustomPayloadPacket getSkinChangePacket(String playername, boolean _ignored) {
         Property skinData = SkinFetcher.fetchSkinByName(playername);
 
         if(skinData == null)

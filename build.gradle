@@ -32,8 +32,8 @@ def ENV = System.getenv()
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	/*mappings loom.officialMojangMappings()/*loom.layered() {
+	//mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.officialMojangMappings()/*loom.layered() {
 		officialMojangMappings()
 		parchment("org.parchmentmc.data:parchment-1.17.1:2021.08.23-nightly-SNAPSHOT@zip")
 	}*/

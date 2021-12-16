@@ -2,21 +2,21 @@ package org.samo_lego.fabrictailor.mixin.accessors.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Environment(EnvType.CLIENT)
 @Mixin(AdvancementsScreen.class)
 public interface AdvancementsScreenAccessor {
-    @Accessor("WINDOW_TEXTURE")
-    static Identifier getWINDOW_TEXTURE() {
+    @Accessor("WINDOW_LOCATION")
+    static ResourceLocation getWINDOW_LOCATION() {
         throw new AssertionError();
     }
 
-    @Accessor("TABS_TEXTURE")
-    static Identifier getTABS_TEXTURE() {
+    @Accessor("TABS_LOCATION")
+    static ResourceLocation getTABS_LOCATION() {
         throw new AssertionError();
     }
 }
