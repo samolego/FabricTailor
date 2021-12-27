@@ -1,4 +1,4 @@
-package org.samo_lego.fabrictailor.client.screen;
+package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import net.minecraft.client.gui.GuiComponent;
@@ -36,12 +36,12 @@ public class LocalSkinTab extends GuiComponent implements SkinTabType {
     }
 
     @Override
-    public ServerboundCustomPayloadPacket getSkinChangePacket(String filePath, boolean useSlim) {
+    public CustomPayloadC2SPacket getSkinChangePacket(String filePath, boolean useSlim) {
         Property skinData = SkinFetcher.setSkinFromFile(filePath, useSlim);
 
         if(skinData == null)
             return null;
-        return SkinChangePacket.create(skinData);
+        return SkinPackets.createSkinChangePacket(skinData);
     }
 
     @Override

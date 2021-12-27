@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.samo_lego.config2brigadier.IBrigadierConfigurator;
 import org.samo_lego.fabrictailor.command.FabrictailorCommand;
 import org.samo_lego.fabrictailor.command.SkinCommand;
 import org.samo_lego.fabrictailor.config.TailorConfig;
@@ -30,8 +31,9 @@ public class FabricTailor implements ModInitializer {
 		});
 
 		configFile = new File(FabricLoader.getInstance().getConfigDir() + "/fabrictailor.json");
-		reloadConfig();
-		config.saveConfigFile(configFile);
+		// Ugly trick for server detection
+		config = TailorConfig.loadConfigFile(configFile, new File("./server.properties").exists());
+		config.save();
 	}
 
 	public static void errorLog(String error) {
@@ -39,7 +41,8 @@ public class FabricTailor implements ModInitializer {
 	}
 
 	public static void reloadConfig() {
-		// Ugly trick for server detection
-		config = TailorConfig.loadConfigFile(configFile, new File("./server.properties").exists());
+		// Ugly check if we are running server environment
+		TailorConfig newConfig = TailorConfig.loadConfigFile(configFile, new File("./server.properties").exists());
+		config.reload(newConfig);
 	}
 }

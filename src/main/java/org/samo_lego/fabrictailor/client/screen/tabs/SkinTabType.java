@@ -1,10 +1,10 @@
-package org.samo_lego.fabrictailor.client.screen;
+package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.world.item.ItemStack;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
-interface SkinTabType {
+public interface SkinTabType {
     int width = 27;
     int height = 28;
 

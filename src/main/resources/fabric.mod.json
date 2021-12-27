@@ -24,7 +24,8 @@
     ],
     "client": [
       "org.samo_lego.fabrictailor.client.ClientTailor"
-    ]
+    ],
+    "modmenu": [ "org.samo_lego.fabrictailor.client.screen.ModMenuSettings" ]
   },
   "mixins": [
     "fabrictailor.mixins.json"
@@ -35,9 +36,11 @@
     "fabric": "*"
   },
   "custom": {
-    "modupdater": {
-      "strategy": "curseforge",
-      "projectID": 390114
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/9PAesuHFnp"
+      }
     }
   }
+
 }

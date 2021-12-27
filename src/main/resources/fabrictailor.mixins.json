@@ -4,7 +4,10 @@
   "package": "org.samo_lego.fabrictailor.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "accessors.client.AdvancementsScreenAccessor"
+    "accessors.client.AdvancementsScreenAccessor",
+    "accessors.client.CustomPayloadC2SPacketAccessor",
+    "client.ClientLoginNetworkHandler_ServerJoin",
+    "client.ClientPlayNetworkHandlerMixin_FTChecker"
   ],
   "mixins": [
     "MixinPlayerManager",

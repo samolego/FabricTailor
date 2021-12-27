@@ -1,4 +1,4 @@
-package org.samo_lego.fabrictailor.client.screen;
+package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import net.minecraft.client.gui.GuiComponent;
@@ -43,6 +43,6 @@ public class UrlSkinTab extends GuiComponent implements SkinTabType {
 
         if(skinData == null)
             return null;
-        return SkinChangePacket.create(skinData);
+        return SkinPackets.createSkinChangePacket(skinData);
     }
 }

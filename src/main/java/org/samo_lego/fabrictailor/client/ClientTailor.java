@@ -7,8 +7,10 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
+import org.samo_lego.fabrictailor.util.TranslatedText;
 
 /**
  * This doesn't work in server environment,
@@ -19,8 +21,14 @@ import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
 public class ClientTailor implements ClientModInitializer {
 
     public static KeyMapping keyBinding;
+    /**
+     * Whether mod is present on server
+     */
+    public static boolean TAILORED_SERVER = false;
+    public static boolean ALLOW_DEFAULT_SKIN = true;
 
     protected static final SkinChangeScreen SKIN_CHANGE_SCREEN = new SkinChangeScreen();
+    private boolean forceOpen = false;
 
     @Override
     public void onInitializeClient() {
@@ -32,8 +40,14 @@ public class ClientTailor implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if(keyBinding.consumeClick()) {
-                client.setScreen(SKIN_CHANGE_SCREEN);
+            if(skinKeybind.consumeClick()) {
+                if (TAILORED_SERVER && forceOpen) {
+                    client.setScreen(SKIN_CHANGE_SCREEN);
+                    forceOpen = false;
+                } else {
+                    client.player.sendMessage(new TranslatedText("error.fabrictailor.not_installed").formatted(Formatting.RED), true);
+                    forceOpen = true;
+                }
             }
         });
     }

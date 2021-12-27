@@ -21,6 +21,19 @@ public class FabrictailorCommand {
             .then(literal("setDefaultSkin").executes(FabrictailorCommand::setDefaultSkin))
             .then(literal("reloadConfig").executes(FabrictailorCommand::reloadConfig))
         );
+
+        LiteralCommandNode<ServerCommandSource> configNode = literal("config")
+                .then(literal("reload")
+                        .executes(FabrictailorCommand::reloadConfig)
+                )
+                .build();
+        LiteralCommandNode<ServerCommandSource> editNode = literal("edit").build();
+
+        // Generate command for in-game editing
+        config.generateCommand(editNode);
+
+        configNode.addChild(editNode);
+        rootNode.addChild(configNode);
     }
 
 
@@ -40,7 +53,7 @@ public class FabrictailorCommand {
         config.defaultSkin.value = ((TailoredPlayer) player).getSkinValue();
         config.defaultSkin.signature = ((TailoredPlayer) player).getSkinSignature();
 
-        config.saveConfigFile(configFile);
+        config.save();
 
         context.getSource().sendSuccess(
                 new TranslatedText("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN),

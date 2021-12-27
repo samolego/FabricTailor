@@ -121,6 +121,8 @@ public class SkinChangeScreen extends Screen {
                 )
         );
 
+        int buttonY = height - BUTTON_HEIGHT - verticalSpacing;
+        int clearX = ALLOW_DEFAULT_SKIN || this.client.isInSingleplayer() ? width / 2 - 3 * BUTTON_WIDTH / 2 - 2 : width / 2 - BUTTON_WIDTH - 2;
         this.addRenderableWidget(
                 new Button(
                         width / 2 - BUTTON_WIDTH - 2, height - BUTTON_HEIGHT - verticalSpacing,
@@ -135,6 +137,7 @@ public class SkinChangeScreen extends Screen {
         );
 
         // "Cancel" button which closes the screen
+        int cancelX = ALLOW_DEFAULT_SKIN || this.client.isInSingleplayer() ? width / 2 + BUTTON_WIDTH / 2 + 2 : width / 2 + 2;
         this.addRenderableWidget(
                 new Button(
                         width / 2 + 2, height - BUTTON_HEIGHT - verticalSpacing,
@@ -146,6 +149,23 @@ public class SkinChangeScreen extends Screen {
                         }
                 )
         );
+
+        if (ALLOW_DEFAULT_SKIN || this.client.isInSingleplayer()) {
+            // Default skin button
+            this.addDrawableChild(
+                    new ButtonWidget(
+                            width / 2 - BUTTON_WIDTH / 2 - 1, buttonY,
+                            BUTTON_WIDTH,
+                            BUTTON_HEIGHT,
+                            new TranslatedText("button.fabrictailor.set_default_skin"),
+                            onClick -> {
+                                client.player.networkHandler.sendPacket(new ChatMessageC2SPacket("/fabrictailor setDefaultSkin"));
+                                this.onClose();
+                            }
+
+                    )
+            );
+        }
     }
 
     @Override
