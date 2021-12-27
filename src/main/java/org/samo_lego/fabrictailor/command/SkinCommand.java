@@ -23,6 +23,7 @@ import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.commands.Commands.literal;
 import static net.minecraft.commands.arguments.MessageArgument.getMessage;
 import static net.minecraft.commands.arguments.MessageArgument.message;
+import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByUrl;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.setSkinFromFile;
@@ -98,12 +99,16 @@ public class SkinCommand {
         String skinUrl = getMessage(context, "skin URL").getString();
 
         player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
-        Property skinData = fetchSkinByUrl(skinUrl, useSlim);
-        if(skinData == null) {
-            player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.upload.failed").withStyle(ChatFormatting.RED), false);
-            return -1;
-        }
-        return setSkin(player, skinData) ? 1 : 0;
+        THREADPOOL.submit(() -> {
+            Property skinData = fetchSkinByUrl(skinUrl, useSlim);
+            if(skinData == null) {
+                player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.upload.failed").withStyle(ChatFormatting.RED), false);
+            } else {
+                setSkin(player, skinData);
+            }
+        });
+
+        return 1;
     }
 
     private static int setSkinFile(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
@@ -123,31 +128,35 @@ public class SkinCommand {
                 false
         );
 
-        Property skinData = setSkinFromFile(skinFilePath, useSlim);
-        if(skinData == null) {
-            player.displayClientMessage(SKIN_SET_ERROR, false);
-            return -1;
-        }
+        THREADPOOL.submit(() -> {
+            Property skinData = setSkinFromFile(skinFilePath, useSlim);
+            if(skinData == null) {
+                player.displayClientMessage(SKIN_SET_ERROR, false);
+            } else {
+                setSkin(player, skinData);
+            }
+        });
 
-        return setSkin(player, skinData) ? 1 : 0;
+        return 1;
     }
 
     private static int setSkinPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         String playername = getString(context, "playername");
 
-        Property skinData = SkinFetcher.fetchSkinByName(playername);
+        THREADPOOL.submit(() -> {
+            Property skinData = SkinFetcher.fetchSkinByName(playername);
 
-        if(skinData == null) {
-            player.displayClientMessage(SKIN_SET_ERROR, false);
-            return -1;
-        }
-        return setSkin(player, skinData) ? 1 : 0;
+            if(skinData == null) {
+                player.displayClientMessage(SKIN_SET_ERROR, false);
+            } else {
+                setSkin(player, skinData);
+            }
+        });
+        return 1;
     }
 
-    private static boolean setSkin(ServerPlayer player, @NotNull Property skinData) {
-        boolean success = false;
-
+    private static void setSkin(ServerPlayer player, @NotNull Property skinData) {
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
         long now = System.currentTimeMillis();
 
@@ -157,7 +166,6 @@ public class SkinCommand {
                 ((TailoredPlayer) player).setSkin(skinData, true);
             }
 
-            success = true;
             player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
 
         } else {
@@ -171,7 +179,6 @@ public class SkinCommand {
             );
         }
 
-        return success;
     }
 
     public static boolean clearSkin(ServerPlayer player) {

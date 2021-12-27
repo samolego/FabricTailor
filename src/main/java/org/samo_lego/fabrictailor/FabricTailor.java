@@ -2,7 +2,6 @@ package org.samo_lego.fabrictailor;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +10,8 @@ import org.samo_lego.fabrictailor.command.SkinCommand;
 import org.samo_lego.fabrictailor.config.TailorConfig;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FabricTailor implements ModInitializer {
 
@@ -18,6 +19,7 @@ public class FabricTailor implements ModInitializer {
 	public static final String MOD_ID = "fabrictailor";
 	public static TailorConfig config;
 	public static File configFile;
+	public static final ExecutorService THREADPOOL = Executors.newCachedThreadPool();
 
 	@Override
 	public void onInitialize() {
