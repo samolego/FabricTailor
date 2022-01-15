@@ -3,10 +3,13 @@ org.samo_lego.fabrictailor.casts
 org.samo_lego.fabrictailor.client
 org.samo_lego.fabrictailor.client.network
 org.samo_lego.fabrictailor.client.screen
+org.samo_lego.fabrictailor.client.screen.tabs
 org.samo_lego.fabrictailor.command
 org.samo_lego.fabrictailor.compatibility
 org.samo_lego.fabrictailor.config
 org.samo_lego.fabrictailor.mixin
 org.samo_lego.fabrictailor.mixin.accessors
 org.samo_lego.fabrictailor.mixin.accessors.client
+org.samo_lego.fabrictailor.mixin.client
+org.samo_lego.fabrictailor.network
 org.samo_lego.fabrictailor.util
