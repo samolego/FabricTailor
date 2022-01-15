@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import org.samo_lego.fabrictailor.client.network.SkinChangePacket;
+import org.samo_lego.fabrictailor.network.SkinPackets;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 

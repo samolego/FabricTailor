@@ -1,22 +1,4 @@
 {
-  "button.fabrictailor.clear_skin": "Počisti izgled",
-  "button.fabrictailor.open_explorer": "Odpri raziskovalca",
-  "button.fabrictailor.set_skin": "Nastavi izgled",
-  "button.fabrictailor.set_default_skin": "Nastavi privzeti izgled",
-  "button.fabrictailor.use_slim": "Ozek model",
-
-  "description.fabrictailor.title_local": "Pot datoteke za izgled:",
-  "description.fabrictailor.title_player": "Igralčevo ime:",
-  "description.fabrictailor.title_url": "Url izgleda:",
-
-  "gui.fabrictailor.change_skin": "Spremeni izgled",
-
-  "hint.fabrictailor.dragAndDrop": "Sliko lahko tudi povlečeš semle notri!",
-  "hint.fabrictailor.server_skin_path": "FabricTailor mod teče v strežniškem okolju. Pot do slike izgleda mora tako kazati na datoteko na STREŽNIKU.",
-
-  "tab.fabrictailor.title_local": "Naloži lokalni izgled",
-  "tab.fabrictailor.title_player": "Pridobi od igralca",
-  "tab.fabrictailor.title_url": "Pridobi z URL naslova",
 
   "command.fabrictailor.skin.set.attempt": "Poteka nastavitev izgleda ... Prosim počakaj.",
   "command.fabrictailor.skin.404": "Prišlo je do napake pri pridobivanju slike izgleda.",
@@ -34,8 +16,5 @@
   "command.fabrictailor.skin.upload.malformed_url": "Nepravilen url!",
 
   "command.fabrictailor.config.reloadSuccess": "Nastavitve so bile uspešno osvežene!",
-  "command.fabrictailor.config.defaultSkin": "Privzet izgled za nove igralce je bil uspešno nastavljen.",
-
-  "error.fabrictailor.invalid_skin": "Ta datoteka ni veljavna PNG slika.",
-  "error.fabrictailor.not_installed": "FabricTailor mod na tem strežniku žal ni nameščen. Prosim kontaktiraj skrbnika."
+  "command.fabrictailor.config.defaultSkin": "Privzet izgled za nove igralce je bil uspešno nastavljen."
 }

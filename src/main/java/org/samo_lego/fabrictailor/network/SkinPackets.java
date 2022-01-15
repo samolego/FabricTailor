@@ -2,34 +2,34 @@ package org.samo_lego.fabrictailor.network;
 
 import com.mojang.authlib.properties.Property;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
 
 public class SkinPackets {
-    public static final Identifier FABRICTAILOR_HELLO = new Identifier(MOD_ID, "hello");
-    public static final Identifier FABRICTAILOR_SKIN_CHANGE = new Identifier(MOD_ID, "skin_change");
-    public static final Identifier FABRICTAILOR_DEFAULT_SKIN = new Identifier(MOD_ID, "default_skin_request");
+    public static final ResourceLocation FABRICTAILOR_HELLO = new ResourceLocation(MOD_ID, "hello");
+    public static final ResourceLocation FABRICTAILOR_SKIN_CHANGE = new ResourceLocation(MOD_ID, "skin_change");
+    public static final ResourceLocation FABRICTAILOR_DEFAULT_SKIN = new ResourceLocation(MOD_ID, "default_skin_request");
 
-    public static CustomPayloadC2SPacket createSkinChangePacket(@NotNull Property skinData) {
-        return new CustomPayloadC2SPacket(FABRICTAILOR_SKIN_CHANGE, generateSkinData(skinData.getValue(), skinData.getSignature()));
+    public static ServerboundCustomPayloadPacket createSkinChangePacket(@NotNull Property skinData) {
+        return new ServerboundCustomPayloadPacket(FABRICTAILOR_SKIN_CHANGE, generateSkinData(skinData.getValue(), skinData.getSignature()));
     }
 
-    public static CustomPayloadS2CPacket createHelloPacket(boolean allowDefaultSkinButton) {
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+    public static ClientboundCustomPayloadPacket createHelloPacket(boolean allowDefaultSkinButton) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeBoolean(allowDefaultSkinButton);
 
-        return new CustomPayloadS2CPacket(FABRICTAILOR_HELLO, buf);
+        return new ClientboundCustomPayloadPacket(FABRICTAILOR_HELLO, buf);
     }
 
-    private static PacketByteBuf generateSkinData(String value, String signature) {
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeString(value);
-        buf.writeString(signature);
+    private static FriendlyByteBuf generateSkinData(String value, String signature) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        buf.writeUtf(value);
+        buf.writeUtf(signature);
 
         return buf;
     }

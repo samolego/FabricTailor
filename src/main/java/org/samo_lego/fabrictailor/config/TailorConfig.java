@@ -4,11 +4,22 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import org.samo_lego.config2brigadier.IBrigadierConfigurator;
+import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
+import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import static org.samo_lego.fabrictailor.FabricTailor.*;
+import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
+import static org.samo_lego.fabrictailor.FabricTailor.configFile;
+import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
 public class TailorConfig implements IBrigadierConfigurator {
     private static final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
@@ -16,6 +27,7 @@ public class TailorConfig implements IBrigadierConfigurator {
 
     @SerializedName("// Whether to allow players to have capes. WARNING! This will toggle ALL capes!")
     public final String _comment_allowCapes = "(default: true)";
+    @BrigadierDescription(defaultOption = "true")
     @SerializedName("allow_capes")
     public boolean allowCapes = true;
 
@@ -26,6 +38,7 @@ public class TailorConfig implements IBrigadierConfigurator {
 
     @SerializedName("// How quickly can player change the skin, in seconds. -1 for no limit. If using this in server environment, -1 is not recommended.")
     public final String _comment_skinChangeTimer = "(default in singleplayer: -1, default for server: 60)";
+    @BrigadierDescription(defaultOption = "-1")
     @SerializedName("skin_change_timer")
     public long skinChangeTimer = -1;
 
@@ -42,9 +55,12 @@ public class TailorConfig implements IBrigadierConfigurator {
     public static class DefaultSkin {
         @SerializedName("// Whether to apply the default skin to ALL new players, not just those without skin.")
         public final String _comment_applyToAll = "(default: false)";
+        @BrigadierDescription(defaultOption = "false")
         @SerializedName("apply_to_all")
         public boolean applyToAll = false;
+        @BrigadierExcluded
         public String value = "";
+        @BrigadierExcluded
         public String signature = "";
     }
 

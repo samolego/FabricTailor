@@ -1,3 +1,25 @@
 {
-  "key.fabrictailor.toggle_skin_gui": "Meni za izgled"
+  "button.fabrictailor.clear_skin": "Počisti izgled",
+  "button.fabrictailor.open_explorer": "Odpri raziskovalca",
+  "button.fabrictailor.set_skin": "Nastavi izgled",
+  "button.fabrictailor.set_default_skin": "Nastavi privzeti izgled",
+  "button.fabrictailor.use_slim": "Ozek model",
+
+  "description.fabrictailor.title_local": "Pot datoteke za izgled:",
+  "description.fabrictailor.title_player": "Igralčevo ime:",
+  "description.fabrictailor.title_url": "Url izgleda:",
+
+  "gui.fabrictailor.change_skin": "Spremeni izgled",
+
+  "hint.fabrictailor.dragAndDrop": "Sliko lahko tudi povlečeš semle notri!",
+  "hint.fabrictailor.server_skin_path": "FabricTailor mod teče v strežniškem okolju. Pot do slike izgleda mora tako kazati na datoteko na STREŽNIKU.",
+
+  "tab.fabrictailor.title_local": "Naloži lokalni izgled",
+  "tab.fabrictailor.title_player": "Pridobi od igralca",
+  "tab.fabrictailor.title_url": "Pridobi z URL naslova",
+
+
+  "key.fabrictailor.toggle_skin_gui": "Meni za izgled",
+  "category.fabrictailor.skin_category": "FabricTailor",
+  "error.fabrictailor.not_installed": "FabricTailor mod na tem strežniku žal ni nameščen. Prosim kontaktiraj skrbnika."
 }

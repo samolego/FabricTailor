@@ -24,8 +24,7 @@
     ],
     "client": [
       "org.samo_lego.fabrictailor.client.ClientTailor"
-    ],
-    "modmenu": [ "org.samo_lego.fabrictailor.client.screen.ModMenuSettings" ]
+    ]
   },
   "mixins": [
     "fabrictailor.mixins.json"

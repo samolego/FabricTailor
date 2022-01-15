@@ -15,6 +15,10 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
+import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
+import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
+import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
+import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
 import java.io.File;
@@ -22,6 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getTABS_LOCATION;
 import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getWINDOW_LOCATION;
 
@@ -122,10 +127,11 @@ public class SkinChangeScreen extends Screen {
         );
 
         int buttonY = height - BUTTON_HEIGHT - verticalSpacing;
-        int clearX = ALLOW_DEFAULT_SKIN || this.client.isInSingleplayer() ? width / 2 - 3 * BUTTON_WIDTH / 2 - 2 : width / 2 - BUTTON_WIDTH - 2;
+        boolean allowDefaultSkinButton = ALLOW_DEFAULT_SKIN || this.minecraft.hasSingleplayerServer();
+
         this.addRenderableWidget(
                 new Button(
-                        width / 2 - BUTTON_WIDTH - 2, height - BUTTON_HEIGHT - verticalSpacing,
+                        width / 2 - BUTTON_WIDTH - (allowDefaultSkinButton ? BUTTON_WIDTH / 2 : 0) - 2, buttonY,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
                         new TranslatedText("button.fabrictailor.clear_skin"),
@@ -136,11 +142,9 @@ public class SkinChangeScreen extends Screen {
                 )
         );
 
-        // "Cancel" button which closes the screen
-        int cancelX = ALLOW_DEFAULT_SKIN || this.client.isInSingleplayer() ? width / 2 + BUTTON_WIDTH / 2 + 2 : width / 2 + 2;
         this.addRenderableWidget(
                 new Button(
-                        width / 2 + 2, height - BUTTON_HEIGHT - verticalSpacing,
+                        width / 2 + (allowDefaultSkinButton ? BUTTON_WIDTH / 2 : 0) + 2, buttonY,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
                         CommonComponents.GUI_CANCEL,
@@ -150,16 +154,16 @@ public class SkinChangeScreen extends Screen {
                 )
         );
 
-        if (ALLOW_DEFAULT_SKIN || this.client.isInSingleplayer()) {
+        if (allowDefaultSkinButton) {
             // Default skin button
-            this.addDrawableChild(
-                    new ButtonWidget(
+            this.addRenderableWidget(
+                    new Button(
                             width / 2 - BUTTON_WIDTH / 2 - 1, buttonY,
                             BUTTON_WIDTH,
                             BUTTON_HEIGHT,
                             new TranslatedText("button.fabrictailor.set_default_skin"),
                             onClick -> {
-                                client.player.networkHandler.sendPacket(new ChatMessageC2SPacket("/fabrictailor setDefaultSkin"));
+                                minecraft.player.connection.send(new ServerboundChatPacket("/fabrictailor setDefaultSkin"));
                                 this.onClose();
                             }
 

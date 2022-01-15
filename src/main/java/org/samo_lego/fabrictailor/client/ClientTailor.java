@@ -6,8 +6,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
 import org.samo_lego.fabrictailor.util.TranslatedText;
@@ -28,7 +28,7 @@ public class ClientTailor implements ClientModInitializer {
     public static boolean ALLOW_DEFAULT_SKIN = true;
 
     protected static final SkinChangeScreen SKIN_CHANGE_SCREEN = new SkinChangeScreen();
-    private boolean forceOpen = false;
+    public static boolean forceOpen = false;
 
     @Override
     public void onInitializeClient() {
@@ -40,12 +40,11 @@ public class ClientTailor implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if(skinKeybind.consumeClick()) {
-                if (TAILORED_SERVER && forceOpen) {
+            if(keyBinding.consumeClick()) {
+                if (TAILORED_SERVER || forceOpen) {
                     client.setScreen(SKIN_CHANGE_SCREEN);
-                    forceOpen = false;
                 } else {
-                    client.player.sendMessage(new TranslatedText("error.fabrictailor.not_installed").formatted(Formatting.RED), true);
+                    client.player.sendMessage(new TranslatedText("error.fabrictailor.not_installed").withStyle(ChatFormatting.RED), client.player.getUUID());
                     forceOpen = true;
                 }
             }
