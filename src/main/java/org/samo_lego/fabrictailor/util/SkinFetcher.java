@@ -5,7 +5,14 @@ import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -14,6 +21,7 @@ import java.nio.file.Files;
 import java.util.Scanner;
 import java.util.UUID;
 
+import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
 
@@ -72,6 +80,14 @@ public class SkinFetcher {
     @Nullable
     public static Property fetchSkinByName(String playername) {
         try {
+            // Check if custom skin server is set
+            if (!config.customSkinServer.isEmpty()) {
+                // Use custom skin server
+                String url = config.customSkinServer.replace("{player}", playername);
+
+                return fetchSkinByUrl(url, false);
+            }
+
             String reply = urlRequest(new URL("https://api.mojang.com/users/profiles/minecraft/" + playername), true, null);
 
             if(reply == null || !reply.contains("id")) {
