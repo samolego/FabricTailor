@@ -1,7 +1,7 @@
 import com.modrinth.minotaur.TaskModrinthUpload
 
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'maven-publish'
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 	id "com.modrinth.minotaur" version "1.1.0"
@@ -36,7 +36,20 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	// Make a collection of all api modules we wish to use
+	Set<String> apiModules = [
+			"fabric-api-base",
+			"fabric-command-api-v1",
+			"fabric-lifecycle-events-v1",
+			"fabric-networking-api-v1",
+			"fabric-registry-sync-v0"
+	]
+
+	// Add each module as a dependency
+	apiModules.forEach {
+		modImplementation(fabricApi.module(it, project.fabric_version))
+	}
 
 	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
 
