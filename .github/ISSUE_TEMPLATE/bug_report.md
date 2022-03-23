@@ -10,6 +10,10 @@ assignees: samolego
 ## For skin fetching problems
 - [ ] I have tried generating skin manually on [mineskin.org](https://mineskin.org/) and it works there.
 
+## Issue
+
+- [ ] I'm not using TLauncher (it messes up the skins, also, piracy is not supported)
+
 **Describe the bug**
 
 A clear description of what the bug is.
