@@ -2,17 +2,20 @@ package org.samo_lego.fabrictailor.command;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
+import org.samo_lego.fabrictailor.FabricTailor;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.compatibility.TaterzensCompatibility;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
@@ -38,13 +41,23 @@ public class SkinCommand {
             .then(literal("set")
                     .then(literal("URL")
                             .then(literal("classic")
-                                    .then(Commands.argument("skin URL", message())
+                                    .then(Commands.argument("skin URL", StringArgumentType.string())
                                             .executes(context -> setSkinUrl(context, false))
+                                    )
+                                    .then(Commands.argument("skin URL", StringArgumentType.string())
+                                            .then(Commands.argument("Target", EntityArgument.player())
+                                                    .executes(context -> setSkinUrl(context, false))
+                                            )
                                     )
                             )
                             .then(literal("slim")
-                                    .then(Commands.argument("skin URL", message())
+                                    .then(Commands.argument("skin URL", StringArgumentType.string())
                                             .executes(context -> setSkinUrl(context, true))
+                                    )
+                                    .then(Commands.argument("skin URL", StringArgumentType.string())
+                                            .then(Commands.argument("Target", EntityArgument.player())
+                                                    .executes(context -> setSkinUrl(context, true))
+                                            )
                                     )
                             )
                             .executes(ctx -> {
@@ -56,13 +69,23 @@ public class SkinCommand {
                     )
                     .then(literal("upload")
                             .then(literal("classic")
-                                    .then(Commands.argument("skin file path", message())
+                                    .then(Commands.argument("skin file path", StringArgumentType.string())
                                             .executes(context -> setSkinFile(context, false))
+                                    )
+                                    .then(Commands.argument("skin file path", StringArgumentType.string())
+                                            .then(Commands.argument("Target", EntityArgument.player())
+                                                    .executes(context -> setSkinFile(context,false))
+                                            )
                                     )
                             )
                             .then(literal("slim")
-                                    .then(Commands.argument("skin file path", message())
+                                    .then(Commands.argument("skin file path", StringArgumentType.string())
                                             .executes(context -> setSkinFile(context, true))
+                                    )
+                                    .then(Commands.argument("skin file path", StringArgumentType.string())
+                                            .then(Commands.argument("Target", EntityArgument.player())
+                                                    .executes(context -> setSkinFile(context,true))
+                                            )
                                     )
                             )
                             .executes(ctx -> {
@@ -73,8 +96,13 @@ public class SkinCommand {
                             })
                     )
                     .then(literal("player")
-                            .then(Commands.argument("playername", greedyString())
+                            .then(Commands.argument("playername", StringArgumentType.string())
                                     .executes(SkinCommand::setSkinPlayer)
+                            )
+                            .then(Commands.argument("playername", StringArgumentType.string())
+                                    .then(Commands.argument("Target",EntityArgument.player())
+                                            .executes(SkinCommand::setSkinPlayer)
+                                    )
                             )
                             .executes(ctx -> {
                                 ctx.getSource().sendFailure(
@@ -90,13 +118,29 @@ public class SkinCommand {
                         return 1;
                     })
             )
-            .then(literal("clear").executes(context -> clearSkin(context.getSource().getPlayerOrException()) ? 1 : 0))
+            .then(literal("clear")
+                    .executes(context -> clearSkin(context.getSource().getPlayerOrException()) ? 1 : 0)
+            )
+            .then(literal("clear")
+                    .then(Commands.argument("Target",EntityArgument.player())
+                            .executes(context -> clearSkin(getTargetPlayer(context)) ? 1 : 0)
+                    )
+            )
         );
     }
 
+    private static ServerPlayer getTargetPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
+        try {
+            StringArgumentType.getString(context,"Target");
+            return EntityArgument.getPlayer(context, "Target");
+        }catch (IllegalArgumentException e) {
+            return context.getSource().getPlayerOrException();
+        }
+    }
+
     private static int setSkinUrl(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
-        ServerPlayer player = context.getSource().getPlayerOrException();
-        String skinUrl = getMessage(context, "skin URL").getString();
+        ServerPlayer player = getTargetPlayer(context);
+        String skinUrl = StringArgumentType.getString(context, "skin URL");
 
         player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
         THREADPOOL.submit(() -> {
@@ -112,8 +156,8 @@ public class SkinCommand {
     }
 
     private static int setSkinFile(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
-        ServerPlayer player = context.getSource().getPlayerOrException();
-        String skinFilePath = getMessage(context, "skin file path").getString();
+        ServerPlayer player = getTargetPlayer(context);
+        String skinFilePath = StringArgumentType.getString(context, "skin file path");
 
         // Warn about server path for uploads
         MinecraftServer server = player.getServer();
@@ -141,8 +185,8 @@ public class SkinCommand {
     }
 
     private static int setSkinPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        ServerPlayer player = context.getSource().getPlayerOrException();
-        String playername = getString(context, "playername");
+        ServerPlayer player = getTargetPlayer(context);
+        String playername = StringArgumentType.getString(context, "playername");
 
         THREADPOOL.submit(() -> {
             Property skinData = SkinFetcher.fetchSkinByName(playername);
