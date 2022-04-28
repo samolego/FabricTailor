@@ -10,6 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
@@ -129,11 +130,16 @@ public class SkinCommand {
         );
     }
 
+    /*
+        Select target player to change skin
+        If there's an argument of "Target", select the Target
+        else select the executor
+     */
     private static ServerPlayer getTargetPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException{
-        try {
-            StringArgumentType.getString(context,"Target");
+        try{
+            context.getArgument("Target", EntitySelector.class);
             return EntityArgument.getPlayer(context, "Target");
-        }catch (IllegalArgumentException e) {
+        }catch (IllegalArgumentException e){
             return context.getSource().getPlayerOrException();
         }
     }
