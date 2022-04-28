@@ -1,0 +1,20 @@
+{
+
+  "command.fabrictailor.skin.set.attempt": "스킨 설정을 시도하는 중입니다... 잠시 기다려주세요.",
+  "command.fabrictailor.skin.404": "스킨을 가져오는 중 에러가 발생했습니다.",
+  "command.fabrictailor.skin.set.404": "원하는 스킨의 URL 주소 또는 플레이어 이름 혹은 파일 경로를 입력해야 합니다.",
+  "command.fabrictailor.skin.set.404.url": "원하는 스킨의 URL 주소와 모델을 입력해야 합니다.",
+  "command.fabrictailor.skin.set.404.path": "원하는 스킨의 파일 경로와 모델을 입력해야 합니다.",
+  "command.fabrictailor.skin.set.404.playername": "플레이어 이름을 입력해야 합니다.",
+  "command.fabrictailor.skin.set.success": "스킨이 성공적으로 설정되었습니다..",
+  "command.fabrictailor.skin.set.error": "이 플레이어는 저장한 스킨이 없는 것 같네요.",
+  "command.fabrictailor.skin.clear.success": "스킨이 성공적으로 초기화 되었습니다.",
+  "command.fabrictailor.skin.clear.error": "스킨을 초기화 하는 중 에러가 발생했습니다.",
+  "command.fabrictailor.skin.please_wait": "스킨을 업로드하는 중입니다. 잠시 기다려주세요.",
+  "command.fabrictailor.skin.timer.please_wait": "최근에 스킨을 바꾸셨습니다. %s초 후에 변경할 수 있습니다.",
+  "command.fabrictailor.skin.upload.failed": "스킨을 업로드 하는 중에 문제가 발생했습니다.",
+  "command.fabrictailor.skin.upload.malformed_url": "잘못된 URL 주소!",
+
+  "command.fabrictailor.config.reloadSuccess": "컨피그 파일을 성공적으로 리로드했습니다!",
+  "command.fabrictailor.config.defaultSkin": "새로운 플레이어들을 위한 기본스킨이 성공적으로 설정되었습니다!"
+}
