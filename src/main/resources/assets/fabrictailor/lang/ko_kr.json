@@ -1,0 +1,25 @@
+{
+  "button.fabrictailor.clear_skin": "스킨 초기화",
+  "button.fabrictailor.open_explorer": "파일 탐색기",
+  "button.fabrictailor.set_skin": "확인",
+  "button.fabrictailor.set_default_skin": "기본 스킨",
+  "button.fabrictailor.use_slim": "슬림",
+
+  "description.fabrictailor.title_local": "스킨 경로:",
+  "description.fabrictailor.title_player": "플레이어 이름:",
+  "description.fabrictailor.title_url": "스킨 url 주소:",
+
+  "gui.fabrictailor.change_skin": "스킨 바꾸기",
+
+  "hint.fabrictailor.dragAndDrop": "여기에 드래그 앤 드롭할 수도 있습니다!",
+  "hint.fabrictailor.server_skin_path": "FabricTailor 모드가 서버 환경에서 돌아가고 있습니다. 서버의 파일 경로와 설정한 경로가 일치하는지 확인하세요.",
+
+  "tab.fabrictailor.title_local": "내 장치의 스킨 업로드하기",
+  "tab.fabrictailor.title_player": "플레이어 스킨 가져오기",
+  "tab.fabrictailor.title_url": "URL 주소에서 가져오기",
+
+
+  "key.fabrictailor.toggle_skin_gui": "스킨 GUI 열기",
+  "category.fabrictailor.skin_category": "FabricTailor",
+  "error.fabrictailor.not_installed": "슬프게도 이 서버에는 FabricTailor 모드가 설치되어 있지 않네요. 자세한 사항은 어드민과 연락하시길 바랍니다."
+}
