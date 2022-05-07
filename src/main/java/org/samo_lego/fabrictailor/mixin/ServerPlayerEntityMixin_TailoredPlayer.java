@@ -156,6 +156,9 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     public void clearSkin() {
         try {
             this.map.removeAll("textures");
+            // Ensure that the skin is completely cleared to prevent the save bug.
+            this.skinValue = null;
+            this.skinSignature = null;
             this.reloadSkin();
         } catch (Exception ignored) {
             // Player has no skin data, no worries
