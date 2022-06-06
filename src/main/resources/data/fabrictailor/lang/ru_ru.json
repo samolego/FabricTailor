@@ -1,0 +1,20 @@
+{
+
+  "command.fabrictailor.skin.set.attempt": "Пытаемся поставить скин... Пожалуйста, подождите.",
+  "command.fabrictailor.skin.404": "При попытке получить скин произошла ошибка.",
+  "command.fabrictailor.skin.set.404": "Вы должны предоставить URL, ник игрока или файл скина который, вы хотите.",
+  "command.fabrictailor.skin.set.404.url": "Вы должны предоставить URL и тип скина, который вы хотите.",
+  "command.fabrictailor.skin.set.404.path": "Вы должны предоставить путь до файла и тип скина, который вы хотите.",
+  "command.fabrictailor.skin.set.404.playername": "Вы должны предоставить никнейм игрока.",
+  "command.fabrictailor.skin.set.success": "Скин установлен успешно.",
+  "command.fabrictailor.skin.set.error": "Похоже, что этот игрок не имеет сохраненных скинов.",
+  "command.fabrictailor.skin.clear.success": "Скин был успешно отчищен.",
+  "command.fabrictailor.skin.clear.error": "При поытке отчстить скин произошла ошибка.",
+  "command.fabrictailor.skin.please_wait": "Загружаем скин. Пожалуйста, подождите.",
+  "command.fabrictailor.skin.timer.please_wait": "Вы уже изменили ваш скин. Вы должны подождать %s секунд что бы изменить его снова.",
+  "command.fabrictailor.skin.upload.failed": "При попытке загрузить ваш скин произашла ошибка.",
+  "command.fabrictailor.skin.upload.malformed_url": "Некорректный URL!",
+
+  "command.fabrictailor.config.reloadSuccess": "Конфи был успешно перезагружен",
+  "command.fabrictailor.config.defaultSkin": "Скин по-умолчанию для новых игроков был успешно установлен!"
+}
