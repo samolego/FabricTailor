@@ -33,17 +33,17 @@ public class SkinCommand {
     private static final boolean TATERZENS_LOADED = FabricLoader.getInstance().isModLoaded("taterzens");;
     private static final MutableComponent SET_SKIN_ATTEMPT = TextTranslations.create("command.fabrictailor.skin.set.attempt");
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("skin")
-            .then(literal("set")
-                    .then(literal("URL")
-                            .then(literal("classic")
-                                    .then(Commands.argument("skin URL", message())
-                                            .executes(context -> setSkinUrl(context, false))
-                                    )
-                            )
-                            .then(literal("slim")
-                                    .then(Commands.argument("skin URL", message())
+                .then(literal("set")
+                        .then(literal("URL")
+                                .then(literal("classic")
+                                        .then(Commands.argument("skin URL", message())
+                                                .executes(context -> setSkinUrl(context, false))
+                                        )
+                                )
+                                .then(literal("slim")
+                                        .then(Commands.argument("skin URL", message())
                                             .executes(context -> setSkinUrl(context, true))
                                     )
                             )

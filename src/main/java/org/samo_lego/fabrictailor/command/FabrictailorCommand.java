@@ -15,7 +15,7 @@ import static net.minecraft.commands.Commands.literal;
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 
 public class FabrictailorCommand {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralCommandNode<CommandSourceStack> root = dispatcher.register(literal("fabrictailor")
                 .requires(src -> src.hasPermission(2))
                 .then(literal("setDefaultSkin").executes(FabrictailorCommand::setDefaultSkin))
