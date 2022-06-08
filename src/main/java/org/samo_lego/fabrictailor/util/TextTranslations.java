@@ -4,7 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.samo_lego.fabrictailor.FabricTailor;
 
 import java.io.BufferedReader;
@@ -15,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
-public class TranslatedText extends TranslatableComponent {
+public class TextTranslations {
     private static final boolean SERVER_TRANSLATIONS_LOADED = FabricLoader.getInstance().isModLoaded("server_translations_api");
     private static final JsonObject LANG;
 
@@ -25,8 +26,8 @@ public class TranslatedText extends TranslatableComponent {
             .disableHtmlEscaping()
             .create();
 
-    public TranslatedText(String key, Object... args) {
-        super(SERVER_TRANSLATIONS_LOADED ? key : (LANG.has(key) ? LANG.get(key).getAsString() : key), args);
+    public static MutableComponent create(String key, Object... args) {
+        return Component.translatable(SERVER_TRANSLATIONS_LOADED ? key : (LANG.has(key) ? LANG.get(key).getAsString() : key), args);
     }
 
     static {

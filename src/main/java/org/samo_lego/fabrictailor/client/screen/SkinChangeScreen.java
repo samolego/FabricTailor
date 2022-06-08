@@ -12,14 +12,13 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.network.protocol.game.ServerboundChatPacket;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
 import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
-import org.samo_lego.fabrictailor.util.TranslatedText;
+import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -54,7 +53,7 @@ public class SkinChangeScreen extends Screen {
     private Button openExplorerButton;
 
     public SkinChangeScreen() {
-        super(new TranslatedText("gui.fabrictailor.change_skin"));
+        super(TextTranslations.create("gui.fabrictailor.change_skin"));
     }
 
     /**
@@ -72,12 +71,12 @@ public class SkinChangeScreen extends Screen {
                 height / 2 + 10,
                 BUTTON_WIDTH,
                 BUTTON_HEIGHT,
-                new TranslatedText("button.fabrictailor.open_explorer"),
+                TextTranslations.create("button.fabrictailor.open_explorer"),
                 (buttonWidget) -> {
                     Util.getPlatform().openFile(new File(""));
                 },
                 (buttonWidget, matrixStack, i, j) -> {
-                    this.renderTooltip(matrixStack, new TranslatedText("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
+                    this.renderTooltip(matrixStack, TextTranslations.create("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
                 }
         );
         this.addRenderableWidget(openExplorerButton);
@@ -88,7 +87,7 @@ public class SkinChangeScreen extends Screen {
                 height / 2 - 12,
                 150,
                 20,
-                new TranslatedText("button.fabrictailor.use_slim"),
+                TextTranslations.create("button.fabrictailor.use_slim"),
                 false
         );
         this.addRenderableWidget(skinModelCheckbox);
@@ -98,7 +97,7 @@ public class SkinChangeScreen extends Screen {
         this.skinModelCheckbox.visible = false;
 
         // Text field input
-        skinInput = new EditBox(this.font, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, new TranslatableComponent("itemGroup.search").withStyle(ChatFormatting.WHITE));
+        skinInput = new EditBox(this.font, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, Component.translatable("itemGroup.search").withStyle(ChatFormatting.WHITE));
         skinInput.setMaxLength(256);
         skinInput.setVisible(true);
         skinInput.setBordered(true);
@@ -113,7 +112,7 @@ public class SkinChangeScreen extends Screen {
                         height / 2 + 30,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
-                        new TranslatedText("button.fabrictailor.set_skin"),
+                        TextTranslations.create("button.fabrictailor.set_skin"),
                         onClick -> {
                             new CompletableFuture<>().completeAsync(() -> {
                                 ServerboundCustomPayloadPacket skinChangePacket = this.selectedTab.getSkinChangePacket(skinInput.getValue(), this.skinModelCheckbox.selected());
@@ -134,9 +133,9 @@ public class SkinChangeScreen extends Screen {
                         width / 2 - BUTTON_WIDTH - (allowDefaultSkinButton ? BUTTON_WIDTH / 2 : 0) - 2, buttonY,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
-                        new TranslatedText("button.fabrictailor.clear_skin"),
+                        TextTranslations.create("button.fabrictailor.clear_skin"),
                         onClick -> {
-                            minecraft.player.connection.send(new ServerboundChatPacket("/skin clear"));
+                            minecraft.player.chat("/skin clear");
                             this.onClose();
                         }
                 )
@@ -161,9 +160,9 @@ public class SkinChangeScreen extends Screen {
                             width / 2 - BUTTON_WIDTH / 2 - 1, buttonY,
                             BUTTON_WIDTH,
                             BUTTON_HEIGHT,
-                            new TranslatedText("button.fabrictailor.set_default_skin"),
+                            TextTranslations.create("button.fabrictailor.set_default_skin"),
                             onClick -> {
-                                minecraft.player.connection.send(new ServerboundChatPacket("/fabrictailor setDefaultSkin"));
+                                minecraft.player.chat("/fabrictailor setDefaultSkin");
                                 this.onClose();
                             }
 

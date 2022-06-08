@@ -8,15 +8,15 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.compatibility.TaterzensCompatibility;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
-import org.samo_lego.fabrictailor.util.TranslatedText;
+import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
@@ -29,9 +29,9 @@ import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByUrl;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.setSkinFromFile;
 
 public class SkinCommand {
-    private static final MutableComponent SKIN_SET_ERROR = new TranslatedText("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED);
+    private static final MutableComponent SKIN_SET_ERROR = TextTranslations.create("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED);
     private static final boolean TATERZENS_LOADED = FabricLoader.getInstance().isModLoaded("taterzens");;
-    private static final TranslatedText SET_SKIN_ATTEMPT = new TranslatedText("command.fabrictailor.skin.set.attempt");
+    private static final MutableComponent SET_SKIN_ATTEMPT = TextTranslations.create("command.fabrictailor.skin.set.attempt");
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
         dispatcher.register(literal("skin")
@@ -49,7 +49,7 @@ public class SkinCommand {
                             )
                             .executes(ctx -> {
                                 ctx.getSource().sendFailure(
-                                        new TranslatedText("command.fabrictailor.skin.set.404.url").withStyle(ChatFormatting.RED)
+                                        TextTranslations.create("command.fabrictailor.skin.set.404.url").withStyle(ChatFormatting.RED)
                                 );
                                 return 1;
                             })
@@ -67,7 +67,7 @@ public class SkinCommand {
                             )
                             .executes(ctx -> {
                                 ctx.getSource().sendFailure(
-                                        new TranslatedText("command.fabrictailor.skin.set.404.path").withStyle(ChatFormatting.RED)
+                                        TextTranslations.create("command.fabrictailor.skin.set.404.path").withStyle(ChatFormatting.RED)
                                 );
                                 return 1;
                             })
@@ -78,14 +78,14 @@ public class SkinCommand {
                             )
                             .executes(ctx -> {
                                 ctx.getSource().sendFailure(
-                                        new TranslatedText("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
+                                        TextTranslations.create("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
                                 );
                                 return 1;
                             })
                     )
                     .executes(ctx -> {
                         ctx.getSource().sendFailure(
-                                new TranslatedText("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED)
+                                TextTranslations.create("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED)
                         );
                         return 1;
                     })
@@ -102,7 +102,7 @@ public class SkinCommand {
         THREADPOOL.submit(() -> {
             Property skinData = fetchSkinByUrl(skinUrl, useSlim);
             if(skinData == null) {
-                player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.upload.failed").withStyle(ChatFormatting.RED), false);
+                player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.upload.failed").withStyle(ChatFormatting.RED), false);
             } else {
                 setSkin(player, skinData);
             }
@@ -119,12 +119,12 @@ public class SkinCommand {
         MinecraftServer server = player.getServer();
         if(server != null && server.isDedicatedServer()) {
             player.displayClientMessage(
-                    new TranslatedText("hint.fabrictailor.server_skin_path").withStyle(ChatFormatting.GOLD),
+                    TextTranslations.create("hint.fabrictailor.server_skin_path").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
 
-        player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
+        player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
                 false
         );
 
@@ -166,14 +166,14 @@ public class SkinCommand {
                 ((TailoredPlayer) player).setSkin(skinData, true);
             }
 
-            player.displayClientMessage(new TranslatedText("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
+            player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
 
         } else {
             // Prevent skin change spamming
-            MutableComponent timeLeft = new TextComponent(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+            MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                     .withStyle(ChatFormatting.LIGHT_PURPLE);
             player.displayClientMessage(
-                    new TranslatedText("command.fabrictailor.skin.timer.please_wait", timeLeft)
+                    TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                             .withStyle(ChatFormatting.RED),
                     false
             );
@@ -189,17 +189,17 @@ public class SkinCommand {
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             ((TailoredPlayer) player).clearSkin();
             player.displayClientMessage(
-                    new TranslatedText("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
+                    TextTranslations.create("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
                     false
             );
             return true;
         }
 
         // Prevent skin change spamming
-        MutableComponent timeLeft = new TextComponent(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+        MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                 .withStyle(ChatFormatting.LIGHT_PURPLE);
         player.displayClientMessage(
-                new TranslatedText("command.fabrictailor.skin.timer.please_wait", timeLeft)
+                TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                         .withStyle(ChatFormatting.RED),
                 false
         );

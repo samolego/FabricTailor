@@ -10,7 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
-import org.samo_lego.fabrictailor.util.TranslatedText;
+import org.samo_lego.fabrictailor.util.TextTranslations;
 
 /**
  * This doesn't work in server environment,
@@ -44,7 +44,7 @@ public class ClientTailor implements ClientModInitializer {
                 if (TAILORED_SERVER || forceOpen) {
                     client.setScreen(SKIN_CHANGE_SCREEN);
                 } else {
-                    client.player.sendMessage(new TranslatedText("error.fabrictailor.not_installed").withStyle(ChatFormatting.RED), client.player.getUUID());
+                    client.player.sendSystemMessage(TextTranslations.create("error.fabrictailor.not_installed").withStyle(ChatFormatting.RED));
                     forceOpen = true;
                 }
             }

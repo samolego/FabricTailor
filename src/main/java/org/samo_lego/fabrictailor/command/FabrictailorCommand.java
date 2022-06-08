@@ -9,7 +9,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import org.samo_lego.fabrictailor.FabricTailor;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.util.TranslatedText;
+import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import static net.minecraft.commands.Commands.literal;
 import static org.samo_lego.fabrictailor.FabricTailor.config;
@@ -41,7 +41,7 @@ public class FabrictailorCommand {
         FabricTailor.reloadConfig();
 
         context.getSource().sendSuccess(
-                new TranslatedText("command.fabrictailor.config.reloadSuccess").withStyle(ChatFormatting.GREEN),
+                TextTranslations.create("command.fabrictailor.config.reloadSuccess").withStyle(ChatFormatting.GREEN),
                 false
         );
         return 1;
@@ -56,7 +56,7 @@ public class FabrictailorCommand {
         config.save();
 
         context.getSource().sendSuccess(
-                new TranslatedText("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN),
+                TextTranslations.create("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN),
                 false
         );
 

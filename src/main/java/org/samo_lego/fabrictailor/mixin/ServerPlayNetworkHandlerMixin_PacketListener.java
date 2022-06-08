@@ -2,8 +2,8 @@ package org.samo_lego.fabrictailor.mixin;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.util.TranslatedText;
+import org.samo_lego.fabrictailor.util.TextTranslations;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,10 +45,10 @@ public abstract class ServerPlayNetworkHandlerMixin_PacketListener {
                 ((TailoredPlayer) this.player).setSkin(value, signature, true);
             } else {
                 // Prevent skin change spamming
-                MutableComponent timeLeft = new TextComponent(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+                MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                         .withStyle(ChatFormatting.LIGHT_PURPLE);
                 player.displayClientMessage(
-                        new TranslatedText("command.fabrictailor.skin.timer.please_wait", timeLeft)
+                        TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                         .withStyle(ChatFormatting.RED),
                         false
                 );
@@ -64,10 +64,8 @@ public abstract class ServerPlayNetworkHandlerMixin_PacketListener {
                 config.save();
 
 
-                player.sendMessage(
-                        new TranslatedText("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN),
-                        player.getUUID()
-                );
+                player.sendSystemMessage(
+                        TextTranslations.create("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN));
             }
         } else if (channel.equals(BRAND)) {
             // Brand packet - let's send info that server is using FabricTailor

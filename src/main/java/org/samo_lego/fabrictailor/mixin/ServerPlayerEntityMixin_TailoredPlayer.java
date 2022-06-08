@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
@@ -69,7 +68,16 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
 
         // need to change the player entity on the client
         ServerLevel targetWorld = player.getLevel();
-        player.connection.send(new ClientboundRespawnPacket(Holder.direct(targetWorld.dimensionType()), targetWorld.dimension(), BiomeManager.obfuscateSeed(targetWorld.getSeed()), player.gameMode.getGameModeForPlayer(), player.gameMode.getPreviousGameModeForPlayer(), targetWorld.isDebug(), targetWorld.isFlat(), true));
+        player.connection.send(new ClientboundRespawnPacket(
+                targetWorld.dimensionTypeId(),
+                targetWorld.dimension(),
+                BiomeManager.obfuscateSeed(targetWorld.getSeed()),
+                player.gameMode.getGameModeForPlayer(),
+                player.gameMode.getPreviousGameModeForPlayer(),
+                targetWorld.isDebug(),
+                targetWorld.isFlat(),
+                true,
+                this.player.getLastDeathLocation()));
         player.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         player.server.getPlayerList().sendPlayerPermissionLevel(player);
         player.connection.send(new ClientboundSetExperiencePacket(player.experienceProgress, player.totalExperience, player.experienceLevel));

@@ -2,32 +2,33 @@ package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.samo_lego.fabrictailor.network.SkinPackets;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
-import org.samo_lego.fabrictailor.util.TranslatedText;
+import org.samo_lego.fabrictailor.util.TextTranslations;
 
 public class PlayerSkinTab extends GuiComponent implements SkinTabType {
 
-    private final TranslatedText TITLE;
-    private final TranslatedText DESCRIPTION;
+    private final MutableComponent TITLE;
+    private final MutableComponent DESCRIPTION;
     private final ItemStack ICON;
 
     public PlayerSkinTab() {
         this.ICON = new ItemStack(Items.PLAYER_HEAD);
-        this.DESCRIPTION = new TranslatedText("description.fabrictailor.title_player");
-        this.TITLE = new TranslatedText("tab.fabrictailor.title_player");
+        this.DESCRIPTION = TextTranslations.create("description.fabrictailor.title_player");
+        this.TITLE = TextTranslations.create("tab.fabrictailor.title_player");
     }
 
     @Override
-    public TranslatedText getTitle() {
+    public MutableComponent getTitle() {
         return this.TITLE;
     }
 
     @Override
-    public TranslatedText getDescription() {
+    public MutableComponent getDescription() {
         return this.DESCRIPTION;
     }
 
