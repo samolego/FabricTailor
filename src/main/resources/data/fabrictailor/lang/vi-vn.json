@@ -1,0 +1,20 @@
+{
+
+  "command.fabrictailor.skin.set.attempt": "Đang thay đổi skin ... Vui lòng chờ.",
+  "command.fabrictailor.skin.404": "Có lỗi xảy ra khi đang lấy skin.",
+  "command.fabrictailor.skin.set.404": "Bạn phải cung cấp URL, tên của người chơi hoặc tập tin của skin bạn muốn.",
+  "command.fabrictailor.skin.set.404.url": "Bạn phải cung cấp URL và loại skin bạn muốn.",
+  "command.fabrictailor.skin.set.404.path": "Bạn phải cung cấp đường dẫn của tập tin và loại skin bạn muốn.",
+  "command.fabrictailor.skin.set.404.playername": "Bạn phải cung cấp tên của người chơi.",
+  "command.fabrictailor.skin.set.success": "Skin đã thay đổi thành công.",
+  "command.fabrictailor.skin.set.error": "Người chơi này hình như không lưu skins nào.",
+  "command.fabrictailor.skin.clear.success": "Skin đã xoá thành công.",
+  "command.fabrictailor.skin.clear.error": "Có lỗi xảy ra khi đang xoá skin.",
+  "command.fabrictailor.skin.please_wait": "Đang tải skin lên. Vui lòng chờ.",
+  "command.fabrictailor.skin.timer.please_wait": "Bạn đã thay đổi skin của bạn gần đây. Bạn phải chờ %s giây để thay đổi lần nữa.",
+  "command.fabrictailor.skin.upload.failed": "Có lỗi xảy ra khi đang tải skin lên.",
+  "command.fabrictailor.skin.upload.malformed_url": "URL không đúng định dạng!",
+
+  "command.fabrictailor.config.reloadSuccess": "Cài đặt đã tải lại thành công!",
+  "command.fabrictailor.config.defaultSkin": "Skin mặc định cho người chơi mới đã thay đổi thành công!"
+}
