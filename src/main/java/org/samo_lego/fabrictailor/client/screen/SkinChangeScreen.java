@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
@@ -14,7 +15,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ServerboundChatPacket;
-import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
@@ -29,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getTABS_LOCATION;
 import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getWINDOW_LOCATION;
+import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_SKIN_CHANGE;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
@@ -116,9 +117,8 @@ public class SkinChangeScreen extends Screen {
                         new TranslatedText("button.fabrictailor.set_skin"),
                         onClick -> {
                             new CompletableFuture<>().completeAsync(() -> {
-                                ServerboundCustomPayloadPacket skinChangePacket = this.selectedTab.getSkinChangePacket(skinInput.getValue(), this.skinModelCheckbox.selected());
-                                if (skinChangePacket != null)
-                                    minecraft.player.connection.send(skinChangePacket);
+                                var byteBuf = this.selectedTab.getSkinChangePacket(skinInput.getValue(), this.skinModelCheckbox.selected());
+                                byteBuf.ifPresent(friendlyByteBuf -> ClientPlayNetworking.send(FABRICTAILOR_SKIN_CHANGE, friendlyByteBuf));
                                 return null;
                             });
                             this.onClose();

@@ -4,14 +4,10 @@
   "package": "org.samo_lego.fabrictailor.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "accessors.client.AdvancementsScreenAccessor",
-    "client.ClientLoginNetworkHandler_ServerJoin",
-    "client.ClientPlayNetworkHandlerMixin_FTChecker"
+    "accessors.client.AdvancementsScreenAccessor"
   ],
   "mixins": [
-    "MixinPlayerManager",
     "ServerPlayerEntityMixin_TailoredPlayer",
-    "ServerPlayNetworkHandlerMixin_PacketListener",
     "accessors.ChunkMapAccessor",
     "accessors.PlayerEntityAccessor",
     "accessors.TrackedEntityAccessor"
