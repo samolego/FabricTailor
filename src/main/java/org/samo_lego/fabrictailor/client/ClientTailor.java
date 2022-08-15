@@ -12,6 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
+import org.samo_lego.fabrictailor.network.NetworkHandler;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
 /**

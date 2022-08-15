@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor.client.screen.tabs;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
