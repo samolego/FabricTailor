@@ -135,7 +135,7 @@ public class SkinChangeScreen extends Screen {
                         BUTTON_HEIGHT,
                         TextTranslations.create("button.fabrictailor.clear_skin"),
                         onClick -> {
-                            minecraft.player.command("skin clear");
+                            minecraft.player.commandUnsigned("skin clear");
                             this.onClose();
                         }
                 )
@@ -162,7 +162,7 @@ public class SkinChangeScreen extends Screen {
                             BUTTON_HEIGHT,
                             TextTranslations.create("button.fabrictailor.set_default_skin"),
                             onClick -> {
-                                minecraft.player.command("fabrictailor setDefaultSkin");
+                                minecraft.player.commandUnsigned("fabrictailor setDefaultSkin");
                                 this.onClose();
                             }
 
