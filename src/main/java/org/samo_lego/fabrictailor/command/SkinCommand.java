@@ -14,7 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.compatibility.TaterzensCompatibility;
+import org.samo_lego.fabrictailor.compatibility.TaterzenSkins;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TranslatedText;
 
@@ -162,7 +162,7 @@ public class SkinCommand {
 
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
 
-            if(!TATERZENS_LOADED || !TaterzensCompatibility.setTaterzenSkin(player, skinData)) {
+            if (!TATERZENS_LOADED || !TaterzenSkins.setTaterzenSkin(player, skinData)) {
                 ((TailoredPlayer) player).setSkin(skinData, true);
             }
 
