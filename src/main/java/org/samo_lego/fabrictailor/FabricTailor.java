@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.samo_lego.fabrictailor.command.FabrictailorCommand;
 import org.samo_lego.fabrictailor.command.SkinCommand;
+import org.samo_lego.fabrictailor.compatibility.CarpetFunctions;
 import org.samo_lego.fabrictailor.config.TailorConfig;
 
 import java.io.File;
@@ -33,6 +34,10 @@ public class FabricTailor implements ModInitializer {
 		// Ugly trick for server detection
 		config = TailorConfig.loadConfigFile(configFile, new File("./server.properties").exists());
 		config.save();
+
+		if (FabricLoader.getInstance().isModLoaded("carpet")) {
+			CarpetFunctions.init();
+		}
 	}
 
 	public static void errorLog(String error) {

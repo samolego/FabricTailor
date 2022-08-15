@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor.mixin;
 
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
@@ -26,6 +27,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Base64;
+
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 import static org.samo_lego.fabrictailor.mixin.accessors.PlayerEntityAccessor.getPLAYER_MODEL_PARTS;
@@ -33,6 +36,7 @@ import static org.samo_lego.fabrictailor.mixin.accessors.PlayerEntityAccessor.ge
 @Mixin(ServerPlayer.class)
 public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
 
+    private static final String STEVE = "MHF_STEVE";
     private final ServerPlayer player = (ServerPlayer) (Object) this;
     private final GameProfile gameProfile = player.getGameProfile();
 
@@ -174,13 +178,42 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     }
 
     @Override
+    public String getSkinId() {
+        String skin = this.skinValue;
+        if (skin == null) {
+            // Fallback to default skin
+            var textures = player.getGameProfile().getProperties().get("textures").stream().findAny();
+
+            if (textures.isPresent()) {
+                skin = textures.get().getValue();
+            } else {
+                return STEVE;
+            }
+        }
+
+        // Parse base64 skin
+        String decoded = new String(Base64.getDecoder().decode(skin));
+
+        // Parse as json, then get textures -> SKIN -> url value
+        String url = JsonParser.parseString(decoded)
+                .getAsJsonObject()
+                .getAsJsonObject("textures")
+                .getAsJsonObject("SKIN")
+                .getAsJsonPrimitive("url")
+                .getAsString();
+
+        // Extract id from url
+        return url.substring(url.lastIndexOf('/') + 1);
+    }
+
+    @Override
     public void resetLastSkinChange() {
         this.lastSkinChangeTime = 0;
     }
 
     @Inject(method = "updateOptions", at = @At("TAIL"))
     private void disableCapeIfNeeded(ServerboundClientInformationPacket packet, CallbackInfo ci) {
-        if(!config.allowCapes) {
+        if (!config.allowCapes) {
             byte playerModel = (byte) packet.modelCustomisation();
 
             // Fake cape rule to be off

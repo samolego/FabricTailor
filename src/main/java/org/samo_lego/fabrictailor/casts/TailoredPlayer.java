@@ -61,4 +61,17 @@ public interface TailoredPlayer {
      * Clears player's skin.
      */
     void clearSkin();
+
+
+    /**
+     * Helper function to get texture hash from skin
+     * that was set with the mod.
+     * <p>
+     * Can be used with <a href="https://mc-heads.net/avatar/{textureid}">https://mc-heads.net/avatar/%7Btextureid%7D</a>
+     * to get the head texture.
+     * </p>
+     *
+     * @return player's skin id (hash)
+     */
+    String getSkinId();
 }

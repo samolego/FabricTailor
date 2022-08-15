@@ -6,12 +6,12 @@ import net.minecraft.server.level.ServerPlayer;
 import org.samo_lego.taterzens.interfaces.ITaterzenEditor;
 import org.samo_lego.taterzens.npc.TaterzenNPC;
 
-public class TaterzensCompatibility {
+public class TaterzenSkins {
 
     public static boolean setTaterzenSkin(ServerPlayer executor, Property skinData) {
         TaterzenNPC taterzen = ((ITaterzenEditor) executor).getNpc();
 
-        if(taterzen != null) {
+        if (taterzen != null) {
             CompoundTag skinTag = new CompoundTag();
             skinTag.putString("value", skinData.getValue());
             skinTag.putString("signature", skinData.getSignature());
