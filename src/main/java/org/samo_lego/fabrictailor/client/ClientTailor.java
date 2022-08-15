@@ -6,10 +6,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
+import org.samo_lego.fabrictailor.network.NetworkHandler;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 /**
@@ -40,7 +43,7 @@ public class ClientTailor implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if(keyBinding.consumeClick()) {
+            if (keyBinding.consumeClick()) {
                 if (TAILORED_SERVER || forceOpen) {
                     client.setScreen(SKIN_CHANGE_SCREEN);
                 } else {
@@ -48,6 +51,21 @@ public class ClientTailor implements ClientModInitializer {
                     forceOpen = true;
                 }
             }
+        });
+
+
+        // Reset values
+        ClientLoginConnectionEvents.DISCONNECT.register((handler, server) -> {
+            System.out.println("Disconnected from server");
+            TAILORED_SERVER = false;
+            ALLOW_DEFAULT_SKIN = true;
+            forceOpen = false;
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.FT_HELLO, (client, handler, buf, responseSender) -> {
+            TAILORED_SERVER = true;
+            ALLOW_DEFAULT_SKIN = buf.readBoolean();
+
         });
     }
 }

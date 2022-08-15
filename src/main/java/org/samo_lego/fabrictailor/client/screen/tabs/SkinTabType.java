@@ -1,8 +1,10 @@
 package org.samo_lego.fabrictailor.client.screen.tabs;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Optional;
 
 public interface SkinTabType {
     int width = 27;
@@ -18,7 +20,7 @@ public interface SkinTabType {
         return mouseX > startX && mouseX < startX + this.width && mouseY > startY && mouseY < startY + this.height;
     }
 
-    ServerboundCustomPayloadPacket getSkinChangePacket(String param, boolean useSlim);
+    Optional<FriendlyByteBuf> getSkinChangePacket(String param, boolean useSlim);
 
     default boolean hasSkinModels() {
         return true;

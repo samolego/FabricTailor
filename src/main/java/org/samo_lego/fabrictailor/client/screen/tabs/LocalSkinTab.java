@@ -2,13 +2,15 @@ package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.samo_lego.fabrictailor.network.SkinPackets;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TextTranslations;
+
+import java.util.Optional;
 
 public class LocalSkinTab extends GuiComponent implements SkinTabType {
     private final MutableComponent TITLE;
@@ -37,12 +39,12 @@ public class LocalSkinTab extends GuiComponent implements SkinTabType {
     }
 
     @Override
-    public ServerboundCustomPayloadPacket getSkinChangePacket(String filePath, boolean useSlim) {
+    public Optional<FriendlyByteBuf> getSkinChangePacket(String filePath, boolean useSlim) {
         Property skinData = SkinFetcher.setSkinFromFile(filePath, useSlim);
 
-        if(skinData == null)
-            return null;
-        return SkinPackets.createSkinChangePacket(skinData);
+        if (skinData == null)
+            return Optional.empty();
+        return Optional.of(SkinPackets.skin2ByteBuf(skinData));
     }
 
     @Override
