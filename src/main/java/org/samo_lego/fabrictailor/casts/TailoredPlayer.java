@@ -67,7 +67,7 @@ public interface TailoredPlayer {
      * Helper function to get texture hash from skin
      * that was set with the mod.
      * <p>
-     * Can be used with <a href="https://mc-heads.net/avatar/{textureid}">https://mc-heads.net/avatar/%7Btextureid%7D</a>
+     * Can be used with <a href="https://mc-heads.net/avatar/">https://mc-heads.net/avatar/%7Btextureid%7D</a>
      * to get the head texture.
      * </p>
      *
