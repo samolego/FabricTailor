@@ -87,7 +87,7 @@ public class SkinCommand {
                             )
                             .executes(ctx -> {
                                 ctx.getSource().sendFailure(
-                                        new TranslatedText("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
+                                        TextTranslations.create("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
                                 );
                                 return 1;
                             })
@@ -128,7 +128,6 @@ public class SkinCommand {
         ServerPlayer player = context.getSource().getPlayerOrException();
         String skinUrl = getMessage(context, "skin URL").getString();
 
-        player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
         setSkin(player, () -> fetchSkinByUrl(skinUrl, useSlim));
         return 1;
     }
