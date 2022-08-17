@@ -71,7 +71,10 @@ public class UrlSkinTab extends GuiComponent implements SkinTabType {
                 channel = FABRICTAILOR_VANILLA_CHANGE;
             } else {
                 // HD skin (not vanilla compatible)
-                skinData = this.getExtendedProperty(player, MinecraftProfileTexture.Type.SKIN, url);
+                String metadata = null;
+                if (useSlim) metadata = "\"metadata\": {\"model\" : \"slim\"}";
+
+                skinData = this.getExtendedProperty(player, MinecraftProfileTexture.Type.SKIN, url, metadata);
                 channel = FABRICTAILOR_HD_CHANGE;
             }
 

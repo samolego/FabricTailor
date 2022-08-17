@@ -45,7 +45,7 @@ public interface SkinTabType {
         return false;
     }
 
-    default Property getExtendedProperty(Player player, MinecraftProfileTexture.Type type, String textureUrl) {
+    default Property getExtendedProperty(Player player, MinecraftProfileTexture.Type type, String textureUrl, String metadata) {
         var current = player.getGameProfile().getProperties().get(SkinManager.PROPERTY_TEXTURES).stream().findFirst();
         String json;
         if (current.isEmpty()) {
@@ -58,15 +58,24 @@ public interface SkinTabType {
         JsonObject textures = jsonPayload.get("textures").getAsJsonObject();
 
         if (textures.has(type.toString())) {
-            JsonObject cape = textures.get(type.toString()).getAsJsonObject();
-            if (cape.has("url")) {
-                cape.remove("url");
+            JsonObject texture = textures.get(type.toString()).getAsJsonObject();
+            if (texture.has("url")) {
+                texture.remove("url");
             }
-            cape.addProperty("url", textureUrl);
+            texture.addProperty("url", textureUrl);
         } else {
             JsonObject cape = new JsonObject();
             cape.addProperty("url", textureUrl);
             textures.add(type.toString(), cape);
+        }
+
+        JsonObject texture = textures.get(type.toString()).getAsJsonObject();
+        if (texture.has("metadata")) {
+            texture.remove("metadata");
+        }
+
+        if (metadata != null) {
+            texture.addProperty("metadata", metadata);
         }
 
         String value = new String(Base64.getEncoder().encode(jsonPayload.toString().getBytes()));

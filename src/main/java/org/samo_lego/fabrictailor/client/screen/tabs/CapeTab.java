@@ -39,7 +39,7 @@ public class CapeTab implements SkinTabType {
 
     @Override
     public Optional<Pair<ResourceLocation, FriendlyByteBuf>> getSkinChangePacket(LocalPlayer player, String capeUrl, boolean useSlim) {
-        var skinData = this.getExtendedProperty(player, MinecraftProfileTexture.Type.CAPE, capeUrl);
+        var skinData = this.getExtendedProperty(player, MinecraftProfileTexture.Type.CAPE, capeUrl, null);
         return Optional.of(new Pair<>(FABRICTAILOR_HD_CHANGE, SkinPackets.skin2ByteBuf(skinData)));
     }
 

@@ -37,8 +37,6 @@ import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
 import static org.samo_lego.fabrictailor.mixin.accessors.client.AAdvancementsScreen.getTABS_LOCATION;
 import static org.samo_lego.fabrictailor.mixin.accessors.client.AAdvancementsScreen.getWINDOW_LOCATION;
-import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_HD_CHANGE;
-import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILLA_CHANGE;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
@@ -180,11 +178,9 @@ public class SkinChangeScreen extends Screen {
 
     private void applyNewSkin() {
         if (TAILORED_SERVER) {
-            var channel = this.selectedTab instanceof CapeTab ? FABRICTAILOR_HD_CHANGE : FABRICTAILOR_VANILLA_CHANGE;
             new CompletableFuture<>().completeAsync(() -> {
                 var packetInfo = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
                 packetInfo.ifPresent(packet -> ClientPlayNetworking.send(packet.getFirst(), packet.getSecond()));
-                System.out.println("Skin change packet sent to " + channel + ": " + packetInfo.isPresent());
                 return null;
             });
         } else {
