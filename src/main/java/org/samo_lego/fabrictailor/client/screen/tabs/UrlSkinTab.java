@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor.client.screen.tabs;
 
+import com.google.gson.JsonObject;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
@@ -71,8 +72,11 @@ public class UrlSkinTab extends GuiComponent implements SkinTabType {
                 channel = FABRICTAILOR_VANILLA_CHANGE;
             } else {
                 // HD skin (not vanilla compatible)
-                String metadata = null;
-                if (useSlim) metadata = "\"metadata\": {\"model\" : \"slim\"}";
+                JsonObject metadata = null;
+                if (useSlim) {
+                    metadata = new JsonObject();
+                    metadata.addProperty("model", "slim");
+                }
 
                 skinData = this.getExtendedProperty(player, MinecraftProfileTexture.Type.SKIN, url, metadata);
                 channel = FABRICTAILOR_HD_CHANGE;

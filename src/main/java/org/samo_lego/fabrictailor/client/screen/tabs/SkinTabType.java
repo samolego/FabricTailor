@@ -45,7 +45,7 @@ public interface SkinTabType {
         return false;
     }
 
-    default Property getExtendedProperty(Player player, MinecraftProfileTexture.Type type, String textureUrl, String metadata) {
+    default Property getExtendedProperty(Player player, MinecraftProfileTexture.Type type, String textureUrl, JsonObject metadata) {
         var current = player.getGameProfile().getProperties().get(SkinManager.PROPERTY_TEXTURES).stream().findFirst();
         String json;
         if (current.isEmpty()) {
@@ -75,7 +75,7 @@ public interface SkinTabType {
         }
 
         if (metadata != null) {
-            texture.addProperty("metadata", metadata);
+            texture.add("metadata", metadata);
         }
 
         String value = new String(Base64.getEncoder().encode(jsonPayload.toString().getBytes()));
