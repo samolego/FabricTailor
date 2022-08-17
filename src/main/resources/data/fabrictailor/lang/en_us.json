@@ -16,5 +16,7 @@
   "command.fabrictailor.skin.upload.malformed_url": "Malformed url!",
 
   "command.fabrictailor.config.reloadSuccess": "Config was reloaded successfully!",
-  "command.fabrictailor.config.defaultSkin": "Default skin for new players was set successfully!"
+  "command.fabrictailor.config.defaultSkin": "Default skin for new players was set successfully!",
+
+  "hint.fabrictailor.server_skin_path": "FabricTailor mod is running in server environment. Make sure the path points to the skin file on the SERVER."
 }

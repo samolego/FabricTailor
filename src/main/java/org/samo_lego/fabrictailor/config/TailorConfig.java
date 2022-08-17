@@ -42,6 +42,16 @@ public class TailorConfig implements IBrigadierConfigurator {
     @SerializedName("skin_change_timer")
     public long skinChangeTimer = -1;
 
+    @SerializedName("// Custom skin server URL (takes priority over default minecraft usernames).")
+    public final String _comment_customSkinServer0 = "";
+    @SerializedName("// Leave empty to use default minecraft usernames (and ely.by fallback).")
+    public final String _comment_customSkinServer1 = "";
+    @SerializedName("// Available parameters: {player}.")
+    public final String _comment_customSkinServer2 = "";
+    @BrigadierDescription(defaultOption = "")
+    @SerializedName("custom_skin_server")
+    public String customSkinServer = "";
+
     @Override
     public void save() {
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8)) {

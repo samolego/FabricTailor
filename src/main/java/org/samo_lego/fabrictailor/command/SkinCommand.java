@@ -12,11 +12,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.NotNull;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.compatibility.TaterzenSkins;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TextTranslations;
+
+import java.util.function.Supplier;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
@@ -72,6 +73,25 @@ public class SkinCommand {
                                 return 1;
                             })
                     )
+                    .then(literal("custom")
+                            .requires(ctx -> !config.customSkinServer.isEmpty())
+                            .then(literal("classic")
+                                    .then(Commands.argument("name", greedyString())
+                                            .executes(context -> setSkinCustom(context, false))
+                                    )
+                            )
+                            .then(literal("slim")
+                                    .then(Commands.argument("name", greedyString())
+                                            .executes(context -> setSkinCustom(context, true))
+                                    )
+                            )
+                            .executes(ctx -> {
+                                ctx.getSource().sendFailure(
+                                        new TranslatedText("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
+                                );
+                                return 1;
+                            })
+                    )
                     .then(literal("player")
                             .then(Commands.argument("playername", greedyString())
                                     .executes(SkinCommand::setSkinPlayer)
@@ -94,20 +114,22 @@ public class SkinCommand {
         );
     }
 
+    private static int setSkinCustom(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
+        final ServerPlayer player = context.getSource().getPlayerOrException();
+        final String playername = getString(context, "playername");
+
+        final String skinUrl = config.customSkinServer.replace("{player}", playername);
+
+        setSkin(player, () -> fetchSkinByUrl(skinUrl, useSlim));
+        return 1;
+    }
+
     private static int setSkinUrl(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         String skinUrl = getMessage(context, "skin URL").getString();
 
         player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
-        THREADPOOL.submit(() -> {
-            Property skinData = fetchSkinByUrl(skinUrl, useSlim);
-            if(skinData == null) {
-                player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.upload.failed").withStyle(ChatFormatting.RED), false);
-            } else {
-                setSkin(player, skinData);
-            }
-        });
-
+        setSkin(player, () -> fetchSkinByUrl(skinUrl, useSlim));
         return 1;
     }
 
@@ -124,19 +146,10 @@ public class SkinCommand {
             );
         }
 
+        setSkin(player, () -> setSkinFromFile(skinFilePath, useSlim));
         player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
                 false
         );
-
-        THREADPOOL.submit(() -> {
-            Property skinData = setSkinFromFile(skinFilePath, useSlim);
-            if(skinData == null) {
-                player.displayClientMessage(SKIN_SET_ERROR, false);
-            } else {
-                setSkin(player, skinData);
-            }
-        });
-
         return 1;
     }
 
@@ -144,30 +157,28 @@ public class SkinCommand {
         ServerPlayer player = context.getSource().getPlayerOrException();
         String playername = getString(context, "playername");
 
-        THREADPOOL.submit(() -> {
-            Property skinData = SkinFetcher.fetchSkinByName(playername);
-
-            if(skinData == null) {
-                player.displayClientMessage(SKIN_SET_ERROR, false);
-            } else {
-                setSkin(player, skinData);
-            }
-        });
+        setSkin(player, () -> SkinFetcher.fetchSkinByName(playername));
         return 1;
     }
 
-    private static void setSkin(ServerPlayer player, @NotNull Property skinData) {
+    private static void setSkin(ServerPlayer player, Supplier<Property> skinProvider) {
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
         long now = System.currentTimeMillis();
 
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
+            player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
+            THREADPOOL.submit(() -> {
+                Property skinData = skinProvider.get();
 
-            if (!TATERZENS_LOADED || !TaterzenSkins.setTaterzenSkin(player, skinData)) {
-                ((TailoredPlayer) player).setSkin(skinData, true);
-            }
-
-            player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
-
+                if(skinData == null) {
+                    player.displayClientMessage(SKIN_SET_ERROR, false);
+                } else {
+                    if (!TATERZENS_LOADED || !TaterzenSkins.setTaterzenSkin(player, skinData)) {
+                        ((TailoredPlayer) player).setSkin(skinData, true);
+                    }
+                    player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
+                }
+            });
         } else {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
