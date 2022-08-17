@@ -116,7 +116,7 @@ public class SkinCommand {
 
     private static int setSkinCustom(CommandContext<CommandSourceStack> context, boolean useSlim) throws CommandSyntaxException {
         final ServerPlayer player = context.getSource().getPlayerOrException();
-        final String playername = getString(context, "playername");
+        final String playername = getString(context, "name");
 
         final String skinUrl = config.customSkinServer.replace("{player}", playername);
 

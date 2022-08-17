@@ -19,7 +19,6 @@ public class FabrictailorCommand {
         LiteralCommandNode<CommandSourceStack> root = dispatcher.register(literal("fabrictailor")
                 .requires(src -> src.hasPermission(2))
                 .then(literal("setDefaultSkin").executes(FabrictailorCommand::setDefaultSkin))
-                .then(literal("reloadConfig").executes(FabrictailorCommand::reloadConfig))
         );
 
         LiteralCommandNode<CommandSourceStack> configNode = literal("config")

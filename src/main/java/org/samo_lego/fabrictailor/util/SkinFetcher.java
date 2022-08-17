@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.util.Scanner;
 import java.util.UUID;
 
-import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
 
@@ -80,14 +79,6 @@ public class SkinFetcher {
     @Nullable
     public static Property fetchSkinByName(String playername) {
         try {
-            // Check if custom skin server is set
-            if (!config.customSkinServer.isEmpty()) {
-                // Use custom skin server
-                String url = config.customSkinServer.replace("{player}", playername);
-
-                return fetchSkinByUrl(url, false);
-            }
-
             String reply = urlRequest(new URL("https://api.mojang.com/users/profiles/minecraft/" + playername), true, null);
 
             if(reply == null || !reply.contains("id")) {
