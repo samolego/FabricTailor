@@ -1,16 +1,13 @@
 {
   "button.fabrictailor.clear_skin": "스킨 초기화",
   "button.fabrictailor.open_explorer": "파일 탐색기",
-  "button.fabrictailor.set_skin": "확인",
+  "button.fabrictailor.apply": "확인",
   "button.fabrictailor.set_default_skin": "기본 스킨",
   "button.fabrictailor.use_slim": "슬림",
-
   "description.fabrictailor.title_local": "스킨 경로:",
   "description.fabrictailor.title_player": "플레이어 이름:",
   "description.fabrictailor.title_url": "스킨 url 주소:",
-
   "gui.fabrictailor.change_skin": "스킨 바꾸기",
-
   "hint.fabrictailor.dragAndDrop": "여기에 드래그 앤 드롭할 수도 있습니다!",
   "hint.fabrictailor.server_skin_path": "FabricTailor 모드가 서버 환경에서 돌아가고 있습니다. 서버의 파일 경로와 설정한 경로가 일치하는지 확인하세요.",
 

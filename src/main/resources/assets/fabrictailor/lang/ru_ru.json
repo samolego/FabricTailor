@@ -1,16 +1,13 @@
 {
   "button.fabrictailor.clear_skin": "Отчистить скин",
   "button.fabrictailor.open_explorer": "Открыть проводник",
-  "button.fabrictailor.set_skin": "Установить скин",
+  "button.fabrictailor.apply": "Установить скин",
   "button.fabrictailor.set_default_skin": "Устатовить стандартный скин",
   "button.fabrictailor.use_slim": "Тонкая модель",
-
   "description.fabrictailor.title_local": "Путь до скина:",
   "description.fabrictailor.title_player": "Никнейм игрока:",
   "description.fabrictailor.title_url": "URL до скина:",
-
   "gui.fabrictailor.change_skin": "Изменить скин",
-
   "hint.fabrictailor.dragAndDrop": "Вы так же можете перетащить сюда скин",
   "hint.fabrictailor.server_skin_path": "FabricTailor запущен на серверном окружении. Убедитесь что пути указывают на скины на СЕРВЕРЕ",
 

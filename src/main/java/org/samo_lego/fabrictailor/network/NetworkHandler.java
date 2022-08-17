@@ -108,12 +108,11 @@ public class NetworkHandler {
 
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             String value = buf.readUtf();
-            String signature = buf.readUtf();
 
             player.displayClientMessage(TextTranslations.create("hint.fabrictailor.client_only")
                     .withStyle(ChatFormatting.DARK_PURPLE), false);
 
-            ((TailoredPlayer) player).setSkin(value, signature, true);
+            ((TailoredPlayer) player).setSkin(value, null, true);
         } else {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))

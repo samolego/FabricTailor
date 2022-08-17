@@ -1,9 +1,11 @@
 package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.google.gson.Gson;
-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.yggdrasil.response.MinecraftTexturesPayload;
+import com.mojang.util.UUIDTypeAdapter;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
@@ -12,11 +14,13 @@ import net.minecraft.world.item.Items;
 import org.samo_lego.fabrictailor.network.SkinPackets;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CapeTab implements SkinTabType {
-    private static final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
 
     @Override
     public MutableComponent getTitle() {
@@ -36,21 +40,29 @@ public class CapeTab implements SkinTabType {
     @Override
     public Optional<FriendlyByteBuf> getSkinChangePacket(LocalPlayer player, String capeUrl, boolean useSlim) {
         var current = player.getGameProfile().getProperties().get("textures").stream().findFirst();
-        String skinUrl = null;
+        String json;
+        if (current.isEmpty()) {
+            json = "{\"textures\":{}}";
+        } else {
+            json = new String(Base64.getDecoder().decode(current.get().getValue()), StandardCharsets.UTF_8);
+        }
+        JsonObject jsonPayload = JsonParser.parseString(json).getAsJsonObject();
 
-        if (current.isPresent()) {
-            String json = new String(Base64.getDecoder().decode(current.get().getValue()));
-            skinUrl = gson.fromJson(json, MinecraftTexturesPayload.class).getTextures().get(MinecraftProfileTexture.Type.CAPE).getUrl();
+        JsonObject textures = jsonPayload.get("textures").getAsJsonObject();
+
+        if (textures.has("CAPE")) {
+            JsonObject cape = textures.get("CAPE").getAsJsonObject();
+            if (cape.has("url")) {
+                cape.remove("url");
+            }
+            cape.addProperty("url", capeUrl);
+        } else {
+            JsonObject cape = new JsonObject();
+            cape.addProperty("url", capeUrl);
+            textures.add("CAPE", cape);
         }
 
-        var payload = new MinecraftTexturesPayload();
-        payload.getTextures().put(MinecraftProfileTexture.Type.CAPE, new MinecraftProfileTexture(capeUrl, null));
-
-        // Leave default skin
-        payload.getTextures().put(MinecraftProfileTexture.Type.SKIN, new MinecraftProfileTexture(skinUrl, null));
-
-        String json = gson.toJson(payload);
-        String value = new String(Base64.getEncoder().encode(json.getBytes()));
+        String value = new String(Base64.getEncoder().encode(jsonPayload.toString().getBytes()));
 
         return Optional.of(SkinPackets.skin2ByteBuf(new Property("textures", value)));
     }

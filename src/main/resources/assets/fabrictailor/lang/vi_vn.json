@@ -1,16 +1,13 @@
 {
   "button.fabrictailor.clear_skin": "Xoá skin",
   "button.fabrictailor.open_explorer": "Mở trình quản lý thư mục",
-  "button.fabrictailor.set_skin": "Thay đổi skin",
+  "button.fabrictailor.apply": "Thay đổi skin",
   "button.fabrictailor.set_default_skin": "Thay đổi skin mặc định",
   "button.fabrictailor.use_slim": "Kiểu mẫu thon",
-
   "description.fabrictailor.title_local": "Đường dẫn skin:",
   "description.fabrictailor.title_player": "Tên người chơi:",
   "description.fabrictailor.title_url": "URL skin:",
-
   "gui.fabrictailor.change_skin": "Thay đổi skin",
-
   "hint.fabrictailor.dragAndDrop": "Bạn cũng có thể kéo & thả skin ở đây!",
   "hint.fabrictailor.server_skin_path": "Mod FabricTailor đang chạy trong môi trường máy chủ. Đảm bảo đường dẫn chỉ tới tập tin của skin trên MÁY CHỦ.",
 

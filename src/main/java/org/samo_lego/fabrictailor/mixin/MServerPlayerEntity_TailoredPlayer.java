@@ -59,8 +59,9 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
     @Override
     public void reloadSkin() {
         // Refreshing tablist for each player
-        if(player.getServer() == null)
+        if (player.getServer() == null)
             return;
+
         PlayerList playerManager = player.getServer().getPlayerList();
         playerManager.broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, player));
         playerManager.broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, player));
@@ -83,13 +84,16 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
                 targetWorld.isFlat(),
                 true,
                 this.player.getLastDeathLocation()));
+
         player.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         player.server.getPlayerList().sendPlayerPermissionLevel(player);
         player.connection.send(new ClientboundSetExperiencePacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
         player.connection.send(new ClientboundSetHealthPacket(player.getHealth(), player.getFoodData().getFoodLevel(), player.getFoodData().getSaturationLevel()));
+
         for (MobEffectInstance statusEffect : player.getActiveEffects()) {
             player.connection.send(new ClientboundUpdateMobEffectPacket(player.getId(), statusEffect));
         }
+
         player.onUpdateAbilities();
         playerManager.sendLevelInfo(player, targetWorld);
         playerManager.sendAllPlayerInfo(player);

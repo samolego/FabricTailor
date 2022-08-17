@@ -1,16 +1,13 @@
 {
   "button.fabrictailor.clear_skin": "Počisti izgled",
   "button.fabrictailor.open_explorer": "Odpri raziskovalca",
-  "button.fabrictailor.set_skin": "Nastavi izgled",
+  "button.fabrictailor.apply": "Nastavi izgled",
   "button.fabrictailor.set_default_skin": "Nastavi privzeti izgled",
   "button.fabrictailor.use_slim": "Ozek model",
-
   "description.fabrictailor.title_local": "Pot datoteke za izgled:",
   "description.fabrictailor.title_player": "Igralčevo ime:",
   "description.fabrictailor.title_url": "Url izgleda:",
-
   "gui.fabrictailor.change_skin": "Spremeni izgled",
-
   "hint.fabrictailor.dragAndDrop": "Sliko lahko tudi povlečeš semle notri!",
   "hint.fabrictailor.server_skin_path": "FabricTailor mod teče v strežniškem okolju. Pot do slike izgleda mora tako kazati na datoteko na STREŽNIKU.",
 

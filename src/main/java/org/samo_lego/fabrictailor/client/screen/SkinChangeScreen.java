@@ -124,7 +124,7 @@ public class SkinChangeScreen extends Screen {
                         height / 2 + 30,
                         BUTTON_WIDTH,
                         BUTTON_HEIGHT,
-                        TextTranslations.create("button.fabrictailor.set_skin"),
+                        TextTranslations.create("button.fabrictailor.apply"),
                         onClick -> {
                             this.applyNewSkin();
                             this.onClose();

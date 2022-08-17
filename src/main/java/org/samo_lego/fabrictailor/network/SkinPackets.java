@@ -6,6 +6,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
 
 public class SkinPackets {
@@ -21,7 +23,8 @@ public class SkinPackets {
     private static FriendlyByteBuf generateSkinData(String value, String signature) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeUtf(value);
-        buf.writeUtf(signature);
+
+        buf.writeUtf(Objects.requireNonNullElse(signature, ""));
 
         return buf;
     }
