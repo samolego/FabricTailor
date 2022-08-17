@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.client.resources.SkinManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
@@ -135,7 +136,7 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
 
     @Override
     public void setSkin(String value, String signature, boolean reload) {
-        this.setSkin(new Property("textures", value, signature), reload);
+        this.setSkin(new Property(SkinManager.PROPERTY_TEXTURES, value, signature), reload);
     }
 
     @Override

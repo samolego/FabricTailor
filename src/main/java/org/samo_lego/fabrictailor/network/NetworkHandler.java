@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -44,12 +45,12 @@ public class NetworkHandler {
                     signature = config.defaultSkin.signature;
 
                     if (!value.isEmpty() && !signature.isEmpty())
-                        skinData = new Property("textures", value, signature);
+                        skinData = new Property(SkinManager.PROPERTY_TEXTURES, value, signature);
                 }
 
 
             } else {
-                skinData = new Property("textures", value, signature);
+                skinData = new Property(SkinManager.PROPERTY_TEXTURES, value, signature);
             }
             // Try to set skin now
             if (skinData != null)
@@ -72,10 +73,8 @@ public class NetworkHandler {
 
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             // This is our skin change packet
-            String value = buf.readUtf();
-            String signature = buf.readUtf();
 
-            ((TailoredPlayer) player).setSkin(value, signature, true);
+            ((TailoredPlayer) player).setSkin(buf.readProperty(), true);
         } else {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
@@ -107,12 +106,11 @@ public class NetworkHandler {
         long now = System.currentTimeMillis();
 
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
-            String value = buf.readUtf();
 
             player.displayClientMessage(TextTranslations.create("hint.fabrictailor.client_only")
                     .withStyle(ChatFormatting.DARK_PURPLE), false);
 
-            ((TailoredPlayer) player).setSkin(value, null, true);
+            ((TailoredPlayer) player).setSkin(buf.readProperty(), true);
         } else {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))

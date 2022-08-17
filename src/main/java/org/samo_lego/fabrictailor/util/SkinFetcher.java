@@ -2,6 +2,7 @@ package org.samo_lego.fabrictailor.util;
 
 import com.google.gson.JsonParser;
 import com.mojang.authlib.properties.Property;
+import net.minecraft.client.resources.SkinManager;
 import org.jetbrains.annotations.Nullable;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -110,7 +111,7 @@ public class SkinFetcher {
         String value = reply.split("\"value\":\"")[1].split("\"")[0];
         String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
-        return new Property("textures", value, signature);
+        return new Property(SkinManager.PROPERTY_TEXTURES, value, signature);
     }
 
     /**

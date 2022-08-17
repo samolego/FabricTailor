@@ -182,9 +182,9 @@ public class SkinChangeScreen extends Screen {
         if (TAILORED_SERVER) {
             var channel = this.selectedTab instanceof CapeTab ? FABRICTAILOR_HD_CHANGE : FABRICTAILOR_VANILLA_CHANGE;
             new CompletableFuture<>().completeAsync(() -> {
-                var byteBuf = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
-                byteBuf.ifPresent(friendlyByteBuf -> ClientPlayNetworking.send(channel, friendlyByteBuf));
-                System.out.println("Skin change packet sent to " + channel + ": " + byteBuf.isPresent());
+                var packetInfo = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
+                packetInfo.ifPresent(packet -> ClientPlayNetworking.send(packet.getFirst(), packet.getSecond()));
+                System.out.println("Skin change packet sent to " + channel + ": " + packetInfo.isPresent());
                 return null;
             });
         } else {
