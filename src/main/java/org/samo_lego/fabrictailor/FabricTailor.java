@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -18,7 +19,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_DEFAULT_SKIN;
-import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_SKIN_CHANGE;
+import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_HD_CHANGE;
+import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILLA_CHANGE;
 
 public class FabricTailor implements ModInitializer {
 
@@ -38,7 +40,7 @@ public class FabricTailor implements ModInitializer {
 
 		configFile = new File(FabricLoader.getInstance().getConfigDir() + "/fabrictailor.json");
 		// Ugly trick for server detection
-		config = TailorConfig.loadConfigFile(configFile, new File("./server.properties").exists());
+		config = TailorConfig.loadConfigFile(configFile, FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER);
 		config.save();
 
 		if (FabricLoader.getInstance().isModLoaded("carpet")) {
@@ -46,7 +48,8 @@ public class FabricTailor implements ModInitializer {
 		}
 
 		ServerPlayConnectionEvents.JOIN.register(NetworkHandler::onJoin);
-		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_SKIN_CHANGE, NetworkHandler::changeSkinPacket);
+		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_VANILLA_CHANGE, NetworkHandler::changeVanillaSkinPacket);
+		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_HD_CHANGE, NetworkHandler::changeHDSkinPacket);
 		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_DEFAULT_SKIN, NetworkHandler::defaultSkinPacket);
 	}
 

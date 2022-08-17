@@ -14,9 +14,8 @@
   "command.fabrictailor.skin.timer.please_wait": "You've changed your skin recently. You must wait %s seconds to change it again.",
   "command.fabrictailor.skin.upload.failed": "A problem occurred when trying to upload the skin.",
   "command.fabrictailor.skin.upload.malformed_url": "Malformed url!",
-
   "command.fabrictailor.config.reloadSuccess": "Config was reloaded successfully!",
   "command.fabrictailor.config.defaultSkin": "Default skin for new players was set successfully!",
-
-  "hint.fabrictailor.server_skin_path": "FabricTailor mod is running in server environment. Make sure the path points to the skin file on the SERVER."
+  "hint.fabrictailor.server_skin_path": "FabricTailor mod is running in server environment. Make sure the path points to the skin file on the SERVER.",
+  "hint.fabrictailor.client_only": "Capes & HD skins will only be visible to other players that use FabricTailor mod."
 }

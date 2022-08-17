@@ -65,7 +65,6 @@ public class ClientTailor implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.FT_HELLO, (client, handler, buf, responseSender) -> {
             TAILORED_SERVER = true;
             ALLOW_DEFAULT_SKIN = buf.readBoolean();
-
         });
     }
 }

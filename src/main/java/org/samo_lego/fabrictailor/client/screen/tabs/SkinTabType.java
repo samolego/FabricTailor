@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor.client.screen.tabs;
 
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
@@ -20,13 +21,17 @@ public interface SkinTabType {
         return mouseX > startX && mouseX < startX + this.width && mouseY > startY && mouseY < startY + this.height;
     }
 
-    Optional<FriendlyByteBuf> getSkinChangePacket(String param, boolean useSlim);
+    Optional<FriendlyByteBuf> getSkinChangePacket(LocalPlayer player, String param, boolean useSlim);
 
     default boolean hasSkinModels() {
         return true;
     }
 
     default boolean showExplorerButton() {
+        return false;
+    }
+
+    default boolean showModelBackwards() {
         return false;
     }
 }

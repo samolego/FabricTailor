@@ -2,6 +2,7 @@ package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +40,7 @@ public class LocalSkinTab extends GuiComponent implements SkinTabType {
     }
 
     @Override
-    public Optional<FriendlyByteBuf> getSkinChangePacket(String filePath, boolean useSlim) {
+    public Optional<FriendlyByteBuf> getSkinChangePacket(LocalPlayer player, String filePath, boolean useSlim) {
         Property skinData = SkinFetcher.setSkinFromFile(filePath, useSlim);
 
         if (skinData == null)

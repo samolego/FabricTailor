@@ -20,8 +20,8 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.level.biome.BiomeManager;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.mixin.accessors.ChunkMapAccessor;
-import org.samo_lego.fabrictailor.mixin.accessors.TrackedEntityAccessor;
+import org.samo_lego.fabrictailor.mixin.accessors.AChunkMap;
+import org.samo_lego.fabrictailor.mixin.accessors.ATrackedEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,10 +31,10 @@ import java.util.Base64;
 
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
-import static org.samo_lego.fabrictailor.mixin.accessors.PlayerEntityAccessor.getPLAYER_MODEL_PARTS;
+import static org.samo_lego.fabrictailor.mixin.accessors.APlayer.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayer.class)
-public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
+public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
 
     private static final String STEVE = "MHF_STEVE";
     private final ServerPlayer player = (ServerPlayer) (Object) this;
@@ -50,8 +50,9 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
      * <p>
      * This method has been adapted from the Impersonate mod's <a href="https://github.com/Ladysnake/Impersonate/blob/1.16/src/main/java/io/github/ladysnake/impersonate/impl/ServerPlayerSkins.java">source code</a>
      * under GNU Lesser General Public License.
-     *
+     * <p>
      * Reloads player's skin for all the players (including the one that has changed the skin)
+     * </p>
      *
      * @author Pyrofab
      */
@@ -66,7 +67,7 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
 
         ServerChunkCache manager = player.getLevel().getChunkSource();
         ChunkMap storage = manager.chunkMap;
-        TrackedEntityAccessor trackerEntry = ((ChunkMapAccessor) storage).getEntityTrackers().get(player.getId());
+        ATrackedEntity trackerEntry = ((AChunkMap) storage).getEntityTrackers().get(player.getId());
 
         trackerEntry.getSeenBy().forEach(tracking -> trackerEntry.getServerEntity().addPairing(tracking.getPlayer()));
 
@@ -95,10 +96,10 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
     }
 
     /**
-     * Sets the skin to the specified player and reloads it with {@link ServerPlayerEntityMixin_TailoredPlayer#reloadSkin()} reloadSkin().
+     * Sets the skin to the specified player and reloads it with {@link MServerPlayerEntity_TailoredPlayer#reloadSkin()} reloadSkin().
      *
      * @param skinData skin texture data
-     * @param reload whether to send packets around for skin reload
+     * @param reload   whether to send packets around for skin reload
      */
     public void setSkin(Property skinData, boolean reload) {
         try {
@@ -225,10 +226,12 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void writeCustomDataToNbt(CompoundTag tag, CallbackInfo ci) {
-        if(this.getSkinValue() != null && this.getSkinSignature() != null) {
+        if (this.getSkinValue() != null) {
             CompoundTag skinDataTag = new CompoundTag();
             skinDataTag.putString("value", this.getSkinValue());
-            skinDataTag.putString("signature", this.getSkinSignature());
+            if (this.getSkinSignature() != null) {
+                skinDataTag.putString("signature", this.getSkinSignature());
+            }
 
             tag.put("fabrictailor:skin_data", skinDataTag);
         }
@@ -241,7 +244,7 @@ public class ServerPlayerEntityMixin_TailoredPlayer implements TailoredPlayer  {
             this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
             this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;
 
-            if(this.skinValue != null && this.skinSignature != null) {
+            if (this.skinValue != null) {
                 this.setSkin(this.skinValue, this.skinSignature, false);
             }
         }

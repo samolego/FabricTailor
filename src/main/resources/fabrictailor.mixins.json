@@ -4,13 +4,15 @@
   "package": "org.samo_lego.fabrictailor.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "accessors.client.AdvancementsScreenAccessor"
+    "accessors.client.AAdvancementsScreen",
+    "client.MHttpTexture_HDEnabler",
+    "client.MYggDrasilMinecraftSessionService_AllSkinsAcceptor"
   ],
   "mixins": [
-    "ServerPlayerEntityMixin_TailoredPlayer",
-    "accessors.ChunkMapAccessor",
-    "accessors.PlayerEntityAccessor",
-    "accessors.TrackedEntityAccessor"
+    "MServerPlayerEntity_TailoredPlayer",
+    "accessors.AChunkMap",
+    "accessors.APlayer",
+    "accessors.ATrackedEntity"
   ],
   "injectors": {
     "defaultRequire": 1

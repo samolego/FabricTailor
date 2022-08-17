@@ -1,19 +1,25 @@
 package org.samo_lego.fabrictailor.client.screen;
 
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import org.samo_lego.fabrictailor.client.screen.tabs.CapeTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
@@ -22,13 +28,17 @@ import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
-import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getTABS_LOCATION;
-import static org.samo_lego.fabrictailor.mixin.accessors.client.AdvancementsScreenAccessor.getWINDOW_LOCATION;
-import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_SKIN_CHANGE;
+import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
+import static org.samo_lego.fabrictailor.mixin.accessors.client.AAdvancementsScreen.getTABS_LOCATION;
+import static org.samo_lego.fabrictailor.mixin.accessors.client.AAdvancementsScreen.getWINDOW_LOCATION;
+import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_HD_CHANGE;
+import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILLA_CHANGE;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
@@ -40,11 +50,12 @@ public class SkinChangeScreen extends Screen {
      * Skin tabs:
      * local, url, player
      */
-    private static final SkinTabType[] TABS = new SkinTabType[] {
+    private static final List<SkinTabType> TABS = new ArrayList<>(Arrays.asList(
             new PlayerSkinTab(),
             new UrlSkinTab(),
-            new LocalSkinTab()
-    };
+            new LocalSkinTab(),
+            new CapeTab()
+    ));
 
     private EditBox skinInput;
     private int startX;
@@ -54,7 +65,7 @@ public class SkinChangeScreen extends Screen {
     private Button openExplorerButton;
 
     public SkinChangeScreen() {
-        super(TextTranslations.create("gui.fabrictailor.change_skin"));
+        super(TextTranslations.create("options.skinCustomisation.title"));
     }
 
     /**
@@ -115,11 +126,7 @@ public class SkinChangeScreen extends Screen {
                         BUTTON_HEIGHT,
                         TextTranslations.create("button.fabrictailor.set_skin"),
                         onClick -> {
-                            new CompletableFuture<>().completeAsync(() -> {
-                                var byteBuf = this.selectedTab.getSkinChangePacket(skinInput.getValue(), this.skinModelCheckbox.selected());
-                                byteBuf.ifPresent(friendlyByteBuf -> ClientPlayNetworking.send(FABRICTAILOR_SKIN_CHANGE, friendlyByteBuf));
-                                return null;
-                            });
+                            this.applyNewSkin();
                             this.onClose();
                         }
                 )
@@ -171,6 +178,21 @@ public class SkinChangeScreen extends Screen {
         }
     }
 
+    private void applyNewSkin() {
+        if (TAILORED_SERVER) {
+            var channel = this.selectedTab instanceof CapeTab ? FABRICTAILOR_HD_CHANGE : FABRICTAILOR_VANILLA_CHANGE;
+            new CompletableFuture<>().completeAsync(() -> {
+                var byteBuf = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
+                byteBuf.ifPresent(friendlyByteBuf -> ClientPlayNetworking.send(channel, friendlyByteBuf));
+                System.out.println("Skin change packet sent to " + channel + ": " + byteBuf.isPresent());
+                return null;
+            });
+        } else {
+            // Change skin clientside only
+            // todo
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -179,6 +201,7 @@ public class SkinChangeScreen extends Screen {
         }
 
     }
+
     /**
      * Renders the skin changing screen.
      *
@@ -204,9 +227,6 @@ public class SkinChangeScreen extends Screen {
         RenderSystem.setShaderTexture(0, getWINDOW_LOCATION());
         this.blit(matrixStack, startX, startY, 0, 0, 252, 140);
 
-        // Drawing Player
-        // Luckily vanilla code is available
-        InventoryScreen.renderEntityInInventory(startX + 50, startY + 120, 50, (float)width / 2 - 75 - mouseX, (float)height / 2 - mouseY, minecraft.player);
 
         // Render input field
         skinInput.render(matrixStack, startX, startY, delta);
@@ -215,6 +235,87 @@ public class SkinChangeScreen extends Screen {
         this.drawTabs(matrixStack, startX, startY, mouseX, mouseY);
         this.drawIcons(startX, startY);
         this.drawWidgetTooltip(matrixStack, startX, startY, mouseX, mouseY);
+
+
+        if (this.selectedTab.showModelBackwards()) {
+            int x = startX + 50;
+            int y = startY + 120;
+            int size = 50;
+            float mousex = -(((float) width / 2) - 75 - mouseX);
+            float mousey = ((float) height / 2) - mouseY;
+            var entity = minecraft.player;
+            float f = (float) Math.atan(mousex / 40.0f);
+            float g = (float) Math.atan(mousey / 40.0f);
+            PoseStack poseStack = RenderSystem.getModelViewStack();
+            poseStack.pushPose();
+            poseStack.translate(x, y, 1050.0);
+            poseStack.scale(1.0f, 1.0f, -1.0f);
+            RenderSystem.applyModelViewMatrix();
+            PoseStack poseStack2 = new PoseStack();
+            poseStack2.translate(0.0, 0.0, 1000.0);
+            poseStack2.scale(size, size, size);
+            Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0f);
+            Quaternion quaternion2 = Vector3f.XP.rotationDegrees(g * 20.0f);
+            quaternion.mul(quaternion2);
+            poseStack2.mulPose(quaternion);
+            float h = entity.yBodyRot;
+            float i = entity.getYRot();
+            float j = entity.getXRot();
+            float k = entity.yHeadRotO;
+            float l = entity.yHeadRot;
+            entity.yBodyRot = f * 20.0f;
+            entity.setYRot(f * 40.0f);
+            entity.setXRot(-g * 20.0f);
+            entity.yHeadRot = entity.getYRot();
+            entity.yHeadRotO = entity.getYRot();
+            Lighting.setupForEntityInInventory();
+            EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+            quaternion2.conj();
+            entityRenderDispatcher.overrideCameraOrientation(quaternion2);
+            entityRenderDispatcher.setRenderShadow(false);
+            var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+            RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, 1.0f, poseStack2, bufferSource, 0xF000F0));
+            bufferSource.endBatch();
+            entityRenderDispatcher.setRenderShadow(true);
+            entity.yBodyRot = h;
+            entity.setYRot(i);
+            entity.setXRot(j);
+            entity.yHeadRotO = k;
+            entity.yHeadRot = l;
+            poseStack.popPose();
+            RenderSystem.applyModelViewMatrix();
+            Lighting.setupFor3DItems();
+
+        } else {
+            // Drawing Player
+            // Luckily vanilla code is available
+
+            float mousex = (float) width / 2 - 75 - mouseX;
+            float mousey = ((float) height / 2 - mouseY);
+            var player = minecraft.player;
+
+            /*float f = (float)Math.atan(mousex / 40.0f);
+            float g = (float)Math.atan(mousey / 40.0f);
+
+            float h = player.yBodyRot;
+            float i = player.getYRot();
+            float j = player.getXRot();
+            float k = player.yHeadRotO;
+            float l = player.yHeadRot;
+            player.yBodyRot = f * 20.0f;
+            player.setYRot(f * 40.0f);
+            player.setXRot(-g * 20.0f);
+            player.yHeadRot = player.getYRot();
+            player.yHeadRotO = player.getYRot();*/
+
+            InventoryScreen.renderEntityInInventory(startX + 50, startY + 120, 50, mousex, mousey, player);
+
+            /*player.yBodyRot = h;
+            player.setYRot(i);
+            player.setXRot(j);
+            player.yHeadRotO = k;
+            player.yHeadRot = l;*/
+        }
     }
 
     /**
@@ -231,13 +332,12 @@ public class SkinChangeScreen extends Screen {
         RenderSystem.setShaderTexture(0, getTABS_LOCATION());
 
         // Tabs
-        for(int i = 0; i < TABS.length; ++i) {
-            SkinTabType tab = TABS[i];
+        for (int i = 0; i < TABS.size(); ++i) {
+            SkinTabType tab = TABS.get(i);
 
-            if(selectedTab == null) {
+            if (selectedTab == null) {
                 this.selectedTab = tab;
-            }
-            else if(selectedTab == tab) {
+            } else if (selectedTab == tab) {
                 // Rendering "selected" tab
                 this.blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
 
@@ -269,8 +369,8 @@ public class SkinChangeScreen extends Screen {
      */
     private void drawIcons(int startX, int startY) {
         // Icons
-        for(int i = 0; i < TABS.length; ++i) {
-            SkinTabType tab = TABS[i];
+        for (int i = 0; i < TABS.size(); ++i) {
+            SkinTabType tab = TABS.get(i);
             itemRenderer.renderAndDecorateFakeItem(tab.getIcon(), startX + 231 - i * 27, startY - 18);
         }
         RenderSystem.disableBlend();
@@ -287,9 +387,9 @@ public class SkinChangeScreen extends Screen {
      * @param mouseY mouse y
      */
     private void drawWidgetTooltip(PoseStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
-        for(int i = 0; i < TABS.length; ++i) {
-            SkinTabType tab = TABS[i];
-            if(tab.isSelected(startX + 225 - i * 27, startY - 28, mouseX, mouseY)) {
+        for (int i = 0; i < TABS.size(); ++i) {
+            SkinTabType tab = TABS.get(i);
+            if (tab.isSelected(startX + 225 - i * 27, startY - 28, mouseX, mouseY)) {
                 this.renderTooltip(matrixStack, tab.getTitle(), mouseX, mouseY);
             }
         }
@@ -312,9 +412,9 @@ public class SkinChangeScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            for(int i = 0; i < TABS.length; ++i) {
-                SkinTabType tab = TABS[i];
-                if(tab.isSelected(startX + 225 - i * 27, startY - 28, (int) mouseX, (int) mouseY)) {
+            for (int i = 0; i < TABS.size(); ++i) {
+                SkinTabType tab = TABS.get(i);
+                if (tab.isSelected(startX + 225 - i * 27, startY - 28, (int) mouseX, (int) mouseY)) {
                     this.selectedTab = tab;
                     break;
                 }

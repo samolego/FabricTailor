@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ChunkMap.class)
-public interface ChunkMapAccessor {
+public interface AChunkMap {
     @Accessor("entityMap")
-    Int2ObjectMap<TrackedEntityAccessor> getEntityTrackers();
+    Int2ObjectMap<ATrackedEntity> getEntityTrackers();
 }

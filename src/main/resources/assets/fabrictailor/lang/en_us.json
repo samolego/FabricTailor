@@ -2,22 +2,19 @@
   "button.fabrictailor.clear_skin": "Clear skin",
   "button.fabrictailor.open_explorer": "Open explorer",
   "button.fabrictailor.set_skin": "Set skin",
+  "button.fabrictailor.set_cape": "Set cape",
   "button.fabrictailor.set_default_skin": "Set default skin",
   "button.fabrictailor.use_slim": "Slim model",
-
+  "description.fabrictailor.title_cape": "Cape url:",
   "description.fabrictailor.title_local": "Skin path:",
   "description.fabrictailor.title_player": "Player name:",
   "description.fabrictailor.title_url": "Skin url:",
-
   "gui.fabrictailor.change_skin": "Change skin",
-
   "hint.fabrictailor.dragAndDrop": "You can also drag & drop skin in here!",
-
+  "tab.fabrictailor.title_cape": "Cape fetch",
   "tab.fabrictailor.title_local": "Local skin upload",
   "tab.fabrictailor.title_player": "Fetch from player",
   "tab.fabrictailor.title_url": "Fetch from URL",
-
-
   "key.fabrictailor.toggle_skin_gui": "Open skin GUI",
   "category.fabrictailor.skin_category": "FabricTailor",
   "error.fabrictailor.not_installed": "FabricTailor mod is sadly not installed on this server. Please contact admin for more info."

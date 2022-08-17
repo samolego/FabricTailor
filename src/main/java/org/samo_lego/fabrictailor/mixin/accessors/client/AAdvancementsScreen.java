@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Environment(EnvType.CLIENT)
 @Mixin(AdvancementsScreen.class)
-public interface AdvancementsScreenAccessor {
+public interface AAdvancementsScreen {
     @Accessor("WINDOW_LOCATION")
     static ResourceLocation getWINDOW_LOCATION() {
         throw new AssertionError();

@@ -2,6 +2,7 @@ package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +46,7 @@ public class PlayerSkinTab extends GuiComponent implements SkinTabType {
     }
 
     @Override
-    public Optional<FriendlyByteBuf> getSkinChangePacket(String playername, boolean _ignored) {
+    public Optional<FriendlyByteBuf> getSkinChangePacket(LocalPlayer player, String playername, boolean _ignored) {
         Property skinData = SkinFetcher.fetchSkinByName(playername);
 
         if (skinData == null)

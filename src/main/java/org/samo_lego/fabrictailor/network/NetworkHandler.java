@@ -34,7 +34,7 @@ public class NetworkHandler {
             String signature = ((TailoredPlayer) player).getSkinSignature();
 
             Property skinData = null;
-            if (value == null || signature == null) {
+            if (value == null) {
 
                 if (!config.defaultSkin.applyToAll)
                     skinData = fetchSkinByName(player.getGameProfile().getName());
@@ -66,7 +66,7 @@ public class NetworkHandler {
         return buf;
     }
 
-    public static void changeSkinPacket(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl listener, FriendlyByteBuf buf, PacketSender sender) {
+    public static void changeVanillaSkinPacket(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl listener, FriendlyByteBuf buf, PacketSender sender) {
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
         long now = System.currentTimeMillis();
 
@@ -99,6 +99,30 @@ public class NetworkHandler {
 
             player.sendSystemMessage(
                     TextTranslations.create("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN));
+        }
+    }
+
+    public static void changeHDSkinPacket(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl listener, FriendlyByteBuf buf, PacketSender sender) {
+        long lastChange = ((TailoredPlayer) player).getLastSkinChange();
+        long now = System.currentTimeMillis();
+
+        if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
+            String value = buf.readUtf();
+            String signature = buf.readUtf();
+
+            player.displayClientMessage(TextTranslations.create("hint.fabrictailor.client_only")
+                    .withStyle(ChatFormatting.DARK_PURPLE), false);
+
+            ((TailoredPlayer) player).setSkin(value, signature, true);
+        } else {
+            // Prevent skin change spamming
+            MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
+                    .withStyle(ChatFormatting.LIGHT_PURPLE);
+            player.displayClientMessage(
+                    TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
+                            .withStyle(ChatFormatting.RED),
+                    false
+            );
         }
     }
 }
