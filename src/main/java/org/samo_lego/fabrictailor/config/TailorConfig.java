@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
 import static org.samo_lego.fabrictailor.FabricTailor.configFile;
@@ -51,6 +52,22 @@ public class TailorConfig implements IBrigadierConfigurator {
     @BrigadierDescription(defaultOption = "")
     @SerializedName("custom_skin_server")
     public String customSkinServer = "";
+
+    @SerializedName("allowed_texture_domains")
+    public Set<String> allowedTextureDomains = Set.of(
+            "minecraft.net",
+            "mojang.com",
+            "crafatar.com",
+            "imgur.com",
+            "githubusercontent.com",
+            "minecraftskins.com",
+            "mc-heads.net",
+            "ely.by",
+            "namemc.com",
+            "planetminecraft.com",
+            "googleusercontent.com",
+            "nocookie.net"
+    );
 
     @Override
     public void save() {

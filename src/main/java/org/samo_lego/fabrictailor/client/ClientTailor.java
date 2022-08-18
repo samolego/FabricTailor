@@ -56,7 +56,6 @@ public class ClientTailor implements ClientModInitializer {
 
         // Reset values
         ClientLoginConnectionEvents.DISCONNECT.register((handler, server) -> {
-            System.out.println("Disconnected from server");
             TAILORED_SERVER = false;
             ALLOW_DEFAULT_SKIN = true;
             forceOpen = false;
