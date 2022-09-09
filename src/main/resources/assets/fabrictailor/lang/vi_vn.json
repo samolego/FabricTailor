@@ -2,20 +2,19 @@
   "button.fabrictailor.clear_skin": "Xoá skin",
   "button.fabrictailor.open_explorer": "Mở trình quản lý thư mục",
   "button.fabrictailor.apply": "Thay đổi skin",
+  "button.fabrictailor.set_cape": "Thay đổi áo choàng",
   "button.fabrictailor.set_default_skin": "Thay đổi skin mặc định",
   "button.fabrictailor.use_slim": "Kiểu mẫu thon",
+  "description.fabrictailor.title_cape": "URL áo choàng:",
   "description.fabrictailor.title_local": "Đường dẫn skin:",
   "description.fabrictailor.title_player": "Tên người chơi:",
   "description.fabrictailor.title_url": "URL skin:",
   "gui.fabrictailor.change_skin": "Thay đổi skin",
   "hint.fabrictailor.dragAndDrop": "Bạn cũng có thể kéo & thả skin ở đây!",
-  "hint.fabrictailor.server_skin_path": "Mod FabricTailor đang chạy trong môi trường máy chủ. Đảm bảo đường dẫn chỉ tới tập tin của skin trên MÁY CHỦ.",
-
+  "tab.fabrictailor.title_cape": "Lấy áo choàng",
   "tab.fabrictailor.title_local": "Tải lên skin từ máy",
   "tab.fabrictailor.title_player": "Lấy từ người chơi",
   "tab.fabrictailor.title_url": "Lấy từ URL",
-
-
   "key.fabrictailor.toggle_skin_gui": "Mở GUI skin",
   "category.fabrictailor.skin_category": "FabricTailor",
   "error.fabrictailor.not_installed": "Rất tiếc, mod FabricTailor không được cài đặt trên máy chủ này. Vui lòng liên hệ quản trị viên để biết thêm thông tin."

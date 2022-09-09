@@ -14,7 +14,8 @@
   "command.fabrictailor.skin.timer.please_wait": "Bạn đã thay đổi skin của bạn gần đây. Bạn phải chờ %s giây để thay đổi lần nữa.",
   "command.fabrictailor.skin.upload.failed": "Có lỗi xảy ra khi đang tải skin lên.",
   "command.fabrictailor.skin.upload.malformed_url": "URL không đúng định dạng!",
-
   "command.fabrictailor.config.reloadSuccess": "Cài đặt đã tải lại thành công!",
-  "command.fabrictailor.config.defaultSkin": "Skin mặc định cho người chơi mới đã thay đổi thành công!"
+  "command.fabrictailor.config.defaultSkin": "Skin mặc định cho người chơi mới đã thay đổi thành công!",
+  "hint.fabrictailor.server_skin_path": "Mod FabricTailor đang chạy trong môi trường máy chủ. Hãy đảm bảo đường dẫn chỉ tới tập tin của skin trên MÁY CHỦ.",
+  "hint.fabrictailor.client_only": "Các áo choàng & skin HD chỉ được hiển thị cho những người chơi sử dụng mod FabricTailor."
 }
