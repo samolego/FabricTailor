@@ -9,7 +9,7 @@
 
 A server-side or singleplayer skin changing / restoring mod.
 Download it on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabrictailor)
-or [Modrinth]().
+or [Modrinth](https://modrinth.com/mod/fabrictailor).
 
 ## In game
 
