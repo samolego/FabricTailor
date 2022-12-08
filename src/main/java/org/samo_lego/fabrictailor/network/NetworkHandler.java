@@ -16,9 +16,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
-import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
-import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
-import static org.samo_lego.fabrictailor.FabricTailor.config;
+import static org.samo_lego.fabrictailor.FabricTailor.*;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByName;
 
 public class NetworkHandler {

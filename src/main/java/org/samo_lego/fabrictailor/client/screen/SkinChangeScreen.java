@@ -3,8 +3,7 @@ package org.samo_lego.fabrictailor.client.screen;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -14,16 +13,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.samo_lego.fabrictailor.client.screen.tabs.CapeTab;
-import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
-import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
-import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
-import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
+import org.joml.Quaternionf;
+import org.samo_lego.fabrictailor.client.screen.tabs.*;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.io.File;
@@ -72,23 +69,21 @@ public class SkinChangeScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
         int verticalSpacing = 8;
 
         // Button for opening file manager
-        this.openExplorerButton = new Button(
-                width / 2,
-                height / 2 + 10,
-                BUTTON_WIDTH,
-                BUTTON_HEIGHT,
-                TextTranslations.create("button.fabrictailor.open_explorer"),
-                (buttonWidget) -> {
-                    Util.getPlatform().openFile(new File(""));
-                },
-                (buttonWidget, matrixStack, i, j) -> {
+        this.openExplorerButton = Button.builder(TextTranslations.create("button.fabrictailor.open_explorer"),
+                        (buttonWidget) -> {
+                            Util.getPlatform().openFile(new File(""));
+                        })
+                .pos(this.width / 2, this.height / 2 + 10)
+                .tooltip(Tooltip.create(TextTranslations.create("hint.fabrictailor.dragAndDrop")))
+                .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build();
+
+                /*(buttonWidget, matrixStack, i, j) -> {
                     this.renderTooltip(matrixStack, TextTranslations.create("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
-                }
-        );
+                }*/
         this.addRenderableWidget(openExplorerButton);
 
         // Checkbox for slim skin model
@@ -117,63 +112,52 @@ public class SkinChangeScreen extends Screen {
 
         // "Set skin" button
         this.addRenderableWidget(
-                new Button(
-                        width / 2,
-                        height / 2 + 30,
-                        BUTTON_WIDTH,
-                        BUTTON_HEIGHT,
-                        TextTranslations.create("button.fabrictailor.apply"),
-                        onClick -> {
-                            this.applyNewSkin();
-                            this.onClose();
-                        }
-                )
+                Button.builder(TextTranslations.create("button.fabrictailor.apply"),
+                                onClick -> {
+                                    this.applyNewSkin();
+                                    this.onClose();
+                                }).pos(width / 2, height / 2 + 30)
+                        .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                        .build()
         );
 
         int buttonY = height - BUTTON_HEIGHT - verticalSpacing;
         boolean allowDefaultSkinButton = ALLOW_DEFAULT_SKIN || this.minecraft.hasSingleplayerServer();
 
         this.addRenderableWidget(
-                new Button(
-                        width / 2 - BUTTON_WIDTH - (allowDefaultSkinButton ? BUTTON_WIDTH / 2 : 0) - 2, buttonY,
-                        BUTTON_WIDTH,
-                        BUTTON_HEIGHT,
-                        TextTranslations.create("button.fabrictailor.clear_skin"),
-                        onClick -> {
-                            minecraft.player.commandUnsigned("skin clear");
-                            this.onClose();
-                        }
-                )
+                Button.builder(TextTranslations.create("button.fabrictailor.clear_skin"),
+                                onClick -> {
+                                    this.clearSkin();
+                                    this.onClose();
+                                }).pos(width / 2 - BUTTON_WIDTH - (allowDefaultSkinButton ? BUTTON_WIDTH / 2 : 0) - 2, buttonY)
+                        .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                        .build()
         );
 
         this.addRenderableWidget(
-                new Button(
-                        width / 2 + (allowDefaultSkinButton ? BUTTON_WIDTH / 2 : 0) + 2, buttonY,
-                        BUTTON_WIDTH,
-                        BUTTON_HEIGHT,
-                        CommonComponents.GUI_CANCEL,
-                        onClick -> {
-                            this.onClose();
-                        }
-                )
+                Button.builder(CommonComponents.GUI_CANCEL,
+                                onClick -> this.onClose())
+                        .pos(width / 2 + (allowDefaultSkinButton ? BUTTON_WIDTH / 2 : 0) + 2, buttonY)
+                        .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                        .build()
         );
 
         if (allowDefaultSkinButton) {
             // Default skin button
             this.addRenderableWidget(
-                    new Button(
-                            width / 2 - BUTTON_WIDTH / 2 - 1, buttonY,
-                            BUTTON_WIDTH,
-                            BUTTON_HEIGHT,
-                            TextTranslations.create("button.fabrictailor.set_default_skin"),
-                            onClick -> {
-                                minecraft.player.commandUnsigned("fabrictailor setDefaultSkin");
-                                this.onClose();
-                            }
-
-                    )
-            );
+                    Button.builder(TextTranslations.create("button.fabrictailor.set_default_skin"),
+                                    onClick -> {
+                                        minecraft.player.connection.sendUnsignedCommand("skin default");
+                                        this.onClose();
+                                    })
+                            .pos(width / 2 - BUTTON_WIDTH / 2 - 1, buttonY)
+                            .size(BUTTON_WIDTH, BUTTON_HEIGHT)
+                            .build());
         }
+    }
+
+    private void clearSkin() {
+        this.minecraft.player.connection.sendUnsignedCommand("skin clear");
     }
 
     private void applyNewSkin() {
@@ -195,7 +179,6 @@ public class SkinChangeScreen extends Screen {
         if (this.skinInput != null) {
             this.skinInput.tick();
         }
-
     }
 
     /**
@@ -250,8 +233,8 @@ public class SkinChangeScreen extends Screen {
             PoseStack poseStack2 = new PoseStack();
             poseStack2.translate(0.0, 0.0, 1000.0);
             poseStack2.scale(size, size, size);
-            Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0f);
-            Quaternion quaternion2 = Vector3f.XP.rotationDegrees(g * 20.0f);
+            Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0f);
+            Quaternionf quaternion2 = Axis.XP.rotationDegrees(g * 20.0f);
             quaternion.mul(quaternion2);
             poseStack2.mulPose(quaternion);
             float h = entity.yBodyRot;
@@ -266,7 +249,7 @@ public class SkinChangeScreen extends Screen {
             entity.yHeadRotO = entity.getYRot();
             Lighting.setupForEntityInInventory();
             EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-            quaternion2.conj();
+            quaternion2.conjugate();
             entityRenderDispatcher.overrideCameraOrientation(quaternion2);
             entityRenderDispatcher.setRenderShadow(false);
             var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -421,7 +404,6 @@ public class SkinChangeScreen extends Screen {
 
     @Override
     public void removed() {
-        minecraft.keyboardHandler.setSendRepeatsToGui(false);
     }
 
     /**

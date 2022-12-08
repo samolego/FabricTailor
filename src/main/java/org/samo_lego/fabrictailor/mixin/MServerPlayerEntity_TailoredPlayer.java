@@ -7,12 +7,7 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
-import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
-import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
-import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
-import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
-import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +23,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
@@ -64,8 +61,8 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
             return;
 
         PlayerList playerManager = player.getServer().getPlayerList();
-        playerManager.broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, player));
-        playerManager.broadcastAll(new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, player));
+        playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(player.getUUID()))));
+        playerManager.broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, player));
 
         ServerChunkCache manager = player.getLevel().getChunkSource();
         ChunkMap storage = manager.chunkMap;
@@ -75,16 +72,13 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
 
         // need to change the player entity on the client
         ServerLevel targetWorld = player.getLevel();
-        player.connection.send(new ClientboundRespawnPacket(
-                targetWorld.dimensionTypeId(),
+        player.connection.send(new ClientboundRespawnPacket(targetWorld.dimensionTypeId(),
                 targetWorld.dimension(),
                 BiomeManager.obfuscateSeed(targetWorld.getSeed()),
                 player.gameMode.getGameModeForPlayer(),
                 player.gameMode.getPreviousGameModeForPlayer(),
-                targetWorld.isDebug(),
-                targetWorld.isFlat(),
-                true,
-                this.player.getLastDeathLocation()));
+                targetWorld.isDebug(), targetWorld.isFlat(), (byte) 3,
+                player.getLastDeathLocation()));
 
         player.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         player.server.getPlayerList().sendPlayerPermissionLevel(player);
@@ -245,13 +239,11 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readCustomDataFromNbt(CompoundTag tag, CallbackInfo ci) {
         CompoundTag skinDataTag = tag.getCompound("fabrictailor:skin_data");
-        if(skinDataTag != null) {
-            this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
-            this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;
+        this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
+        this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;
 
-            if (this.skinValue != null) {
-                this.setSkin(this.skinValue, this.skinSignature, false);
-            }
+        if (this.skinValue != null) {
+            this.setSkin(this.skinValue, this.skinSignature, false);
         }
     }
 }

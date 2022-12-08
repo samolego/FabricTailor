@@ -18,9 +18,7 @@ import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_DEFAULT_SKIN;
-import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_HD_CHANGE;
-import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILLA_CHANGE;
+import static org.samo_lego.fabrictailor.network.SkinPackets.*;
 
 public class FabricTailor implements ModInitializer {
 

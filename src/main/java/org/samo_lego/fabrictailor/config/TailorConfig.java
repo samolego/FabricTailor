@@ -7,20 +7,11 @@ import org.samo_lego.config2brigadier.IBrigadierConfigurator;
 import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
 import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
-import static org.samo_lego.fabrictailor.FabricTailor.configFile;
-import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
+import static org.samo_lego.fabrictailor.FabricTailor.*;
 
 public class TailorConfig implements IBrigadierConfigurator {
     private static final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
