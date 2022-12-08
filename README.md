@@ -9,7 +9,31 @@
 
 A server-side or singleplayer skin changing / restoring mod.
 Download it on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabrictailor)
-or get the [unstable build](https://samolego.github.io/projects/ci?project=FabricTailor&build=latest)
+or [Modrinth]().
+
+## In game
+
+*HD skins & capes (client only).*
+![image](https://user-images.githubusercontent.com/34912839/206398951-0d1953fe-e0d3-40ff-9f17-e141c6fde1c2.png)
+
+
+
+https://user-images.githubusercontent.com/34912839/206399674-03db7483-f077-444a-a7fc-15d1bb8a82da.mp4
+
+
+
+https://user-images.githubusercontent.com/34912839/206399683-848d6ff1-dcbd-4e68-b381-bd51a2f57f97.mp4
+
+
+
+https://user-images.githubusercontent.com/34912839/206399692-9b412d82-21ed-430d-b5d0-38a18d994966.mp4
+
+
+
+https://user-images.githubusercontent.com/34912839/206399696-057b5246-bc47-4d94-82fd-84d124205028.mp4
+
+
+
 
 ## Setup
 
