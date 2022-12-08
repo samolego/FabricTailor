@@ -12,7 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
-import org.samo_lego.fabrictailor.network.NetworkHandler;
+import org.samo_lego.fabrictailor.network.SkinPackets;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 /**
@@ -61,7 +61,7 @@ public class ClientTailor implements ClientModInitializer {
             forceOpen = false;
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.FT_HELLO, (client, handler, buf, responseSender) -> {
+        ClientPlayNetworking.registerGlobalReceiver(SkinPackets.FT_HELLO, (client, handler, buf, responseSender) -> {
             TAILORED_SERVER = true;
             ALLOW_DEFAULT_SKIN = buf.readBoolean();
         });

@@ -6,19 +6,25 @@ import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.client.resources.SkinManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeManager;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.mixin.accessors.AChunkMap;
 import org.samo_lego.fabrictailor.mixin.accessors.ATrackedEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -32,66 +38,79 @@ import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 import static org.samo_lego.fabrictailor.mixin.accessors.APlayer.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayer.class)
-public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
+public abstract class MServerPlayerEntity_TailoredPlayer extends Player implements TailoredPlayer {
 
+    @Unique
     private static final String STEVE = "MHF_STEVE";
-    private final ServerPlayer player = (ServerPlayer) (Object) this;
-    private final GameProfile gameProfile = player.getGameProfile();
-
-    private String skinValue;
-    private String skinSignature;
+    @Unique
+    private final ServerPlayer self = (ServerPlayer) (Object) this;
+    @Unique
+    private final GameProfile gameProfile = self.getGameProfile();
+    @Unique
     private final PropertyMap map = this.gameProfile.getProperties();
+    @Shadow
+    public ServerGamePacketListenerImpl connection;
+    @Unique
+    private String skinValue;
+    @Unique
+    private String skinSignature;
+    @Unique
     private long lastSkinChangeTime = 0;
+
+    public MServerPlayerEntity_TailoredPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
+        super(level, blockPos, f, gameProfile);
+    }
 
 
     /**
+     * @author Pyrofab
+     * @see PlayerList#respawn(ServerPlayer, boolean)
      * <p>
      * This method has been adapted from the Impersonate mod's <a href="https://github.com/Ladysnake/Impersonate/blob/1.16/src/main/java/io/github/ladysnake/impersonate/impl/ServerPlayerSkins.java">source code</a>
      * under GNU Lesser General Public License.
      * <p>
      * Reloads player's skin for all the players (including the one that has changed the skin)
      * </p>
-     *
-     * @author Pyrofab
      */
     @Override
     public void reloadSkin() {
-        // Refreshing tablist for each player
-        if (player.getServer() == null)
-            return;
+        // Refreshing in tablist for each player
+        PlayerList playerManager = self.getServer().getPlayerList();
+        playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(self.getUUID()))));
+        playerManager.broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, self));
 
-        PlayerList playerManager = player.getServer().getPlayerList();
-        playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(player.getUUID()))));
-        playerManager.broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, player));
-
-        ServerChunkCache manager = player.getLevel().getChunkSource();
+        ServerChunkCache manager = self.getLevel().getChunkSource();
         ChunkMap storage = manager.chunkMap;
-        ATrackedEntity trackerEntry = ((AChunkMap) storage).getEntityTrackers().get(player.getId());
+        ATrackedEntity trackerEntry = ((AChunkMap) storage).getEntityTrackers().get(self.getId());
 
+        // Refreshing skin in world for all that see the player
         trackerEntry.getSeenBy().forEach(tracking -> trackerEntry.getServerEntity().addPairing(tracking.getPlayer()));
 
         // need to change the player entity on the client
-        ServerLevel targetWorld = player.getLevel();
-        player.connection.send(new ClientboundRespawnPacket(targetWorld.dimensionTypeId(),
-                targetWorld.dimension(),
-                BiomeManager.obfuscateSeed(targetWorld.getSeed()),
-                player.gameMode.getGameModeForPlayer(),
-                player.gameMode.getPreviousGameModeForPlayer(),
-                targetWorld.isDebug(), targetWorld.isFlat(), (byte) 3,
-                player.getLastDeathLocation()));
+        ServerLevel level = self.getLevel();
+        this.connection.send(new ClientboundRespawnPacket(level.dimensionTypeId(),
+                level.dimension(),
+                BiomeManager.obfuscateSeed(level.getSeed()),
+                self.gameMode.getGameModeForPlayer(),
+                self.gameMode.getPreviousGameModeForPlayer(),
+                level.isDebug(), level.isFlat(), (byte) 3,
+                self.getLastDeathLocation()));
 
-        player.connection.teleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
-        player.server.getPlayerList().sendPlayerPermissionLevel(player);
-        player.connection.send(new ClientboundSetExperiencePacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
-        player.connection.send(new ClientboundSetHealthPacket(player.getHealth(), player.getFoodData().getFoodLevel(), player.getFoodData().getSaturationLevel()));
+        this.connection.teleport(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
 
-        for (MobEffectInstance statusEffect : player.getActiveEffects()) {
-            player.connection.send(new ClientboundUpdateMobEffectPacket(player.getId(), statusEffect));
+        this.connection.send(new ClientboundChangeDifficultyPacket(level.getDifficulty(), level.getLevelData().isDifficultyLocked()));
+        this.connection.send(new ClientboundSetExperiencePacket(this.experienceProgress, this.totalExperience, this.experienceLevel));
+        playerManager.sendLevelInfo(self, level);
+        playerManager.sendPlayerPermissionLevel(self);
+
+        this.connection.send(new ClientboundSetHealthPacket(this.getHealth(), this.getFoodData().getFoodLevel(), this.getFoodData().getSaturationLevel()));
+        for (MobEffectInstance statusEffect : this.getActiveEffects()) {
+            this.connection.send(new ClientboundUpdateMobEffectPacket(self.getId(), statusEffect));
         }
 
-        player.onUpdateAbilities();
-        playerManager.sendLevelInfo(player, targetWorld);
-        playerManager.sendAllPlayerInfo(player);
+        this.onUpdateAbilities();
+        playerManager.sendAllPlayerInfo(self);
+
     }
 
     /**
@@ -115,8 +134,9 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
             this.skinSignature = skinData.getSignature();
 
             // Reloading skin
-            if(reload)
+            if(reload) {
                 this.reloadSkin();
+            }
 
             this.lastSkinChangeTime = System.currentTimeMillis();
 
@@ -182,7 +202,7 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
         String skin = this.skinValue;
         if (skin == null) {
             // Fallback to default skin
-            var textures = player.getGameProfile().getProperties().get("textures").stream().findAny();
+            var textures = self.getGameProfile().getProperties().get("textures").stream().findAny();
 
             if (textures.isPresent()) {
                 skin = textures.get().getValue();
@@ -218,7 +238,7 @@ public class MServerPlayerEntity_TailoredPlayer implements TailoredPlayer {
 
             // Fake cape rule to be off
             playerModel = (byte) (playerModel & ~(1));
-            this.player.getEntityData().set(getPLAYER_MODEL_PARTS(), playerModel);
+            this.self.getEntityData().set(getPLAYER_MODEL_PARTS(), playerModel);
         }
     }
 

@@ -9,6 +9,7 @@ import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.samo_lego.fabrictailor.FabricTailor.*;
@@ -45,7 +46,7 @@ public class TailorConfig implements IBrigadierConfigurator {
     public String customSkinServer = "";
 
     @SerializedName("allowed_texture_domains")
-    public Set<String> allowedTextureDomains = Set.of(
+    public Set<String> allowedTextureDomains = new HashSet<>(Set.of(
             "minecraft.net",
             "mojang.com",
             "crafatar.com",
@@ -58,7 +59,7 @@ public class TailorConfig implements IBrigadierConfigurator {
             "planetminecraft.com",
             "googleusercontent.com",
             "nocookie.net"
-    );
+    ));
 
     @Override
     public void save() {
