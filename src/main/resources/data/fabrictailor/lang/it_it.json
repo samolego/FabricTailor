@@ -1,0 +1,21 @@
+{
+  "button.fabrictailor.clear_skin": "Svuota skin",
+  "button.fabrictailor.open_explorer": "Apri browser",
+  "button.fabrictailor.apply": "Applica",
+  "button.fabrictailor.set_cape": "Metti mantello",
+  "button.fabrictailor.set_default_skin": "Metti skin di default",
+  "button.fabrictailor.use_slim": "Modello slim",
+  "description.fabrictailor.title_cape": "URL mantello:",
+  "description.fabrictailor.title_local": "Percorso della skin:",
+  "description.fabrictailor.title_player": "Nome del player:",
+  "description.fabrictailor.title_url": "URL skin:",
+  "gui.fabrictailor.change_skin": "Cambia skin",
+  "hint.fabrictailor.dragAndDrop": "Puoi anche trascinare il file qui!",
+  "tab.fabrictailor.title_cape": "Fetch mantello",
+  "tab.fabrictailor.title_local": "Carica skin dal pc",
+  "tab.fabrictailor.title_player": "Prendi da un player",
+  "tab.fabrictailor.title_url": "Prendi da un URL",
+  "key.fabrictailor.toggle_skin_gui": "Apri GUI Skin",
+  "category.fabrictailor.skin_category": "FabricTailor",
+  "error.fabrictailor.not_installed": "FabricTailor non è installata nel server. Per favore contatta gli admin del server."
+}
