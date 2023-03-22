@@ -31,7 +31,7 @@ import static org.samo_lego.fabrictailor.util.SkinFetcher.setSkinFromFile;
 
 public class SkinCommand {
     private static final MutableComponent SKIN_SET_ERROR = TextTranslations.create("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED);
-    private static final boolean TATERZENS_LOADED = FabricLoader.getInstance().isModLoaded("taterzens");;
+    private static final boolean TATERZENS_LOADED = FabricLoader.getInstance().isModLoaded("taterzens");
     private static final MutableComponent SET_SKIN_ATTEMPT = TextTranslations.create("command.fabrictailor.skin.set.attempt");
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -213,7 +213,6 @@ public class SkinCommand {
                         .withStyle(ChatFormatting.RED),
                 false
         );
-        ;
         return false;
     }
 }

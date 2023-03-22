@@ -47,13 +47,8 @@ public interface SkinTabType {
 
     default Property getExtendedProperty(Player player, MinecraftProfileTexture.Type type, String textureUrl, JsonObject metadata) {
         var current = player.getGameProfile().getProperties().get(SkinManager.PROPERTY_TEXTURES).stream().findFirst();
-        String json;
-        if (current.isEmpty()) {
-            // No skin is set
-            json = "{\"textures\":{}}";
-        } else {
-            json = new String(Base64.getDecoder().decode(current.get().getValue()), StandardCharsets.UTF_8);
-        }
+        String json = current.map(property -> new String(Base64.getDecoder().decode(property.getValue()), StandardCharsets.UTF_8))
+                .orElse("{\"textures\":{}}");
         JsonObject jsonPayload = JsonParser.parseString(json).getAsJsonObject();
         JsonObject textures = jsonPayload.get("textures").getAsJsonObject();
 

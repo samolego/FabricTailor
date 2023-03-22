@@ -1,5 +1,7 @@
 package org.samo_lego.fabrictailor.client.screen;
 
+import com.mojang.authlib.minecraft.InsecureTextureException;
+import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -157,20 +159,51 @@ public class SkinChangeScreen extends Screen {
     }
 
     private void clearSkin() {
-        this.minecraft.player.connection.sendUnsignedCommand("skin clear");
+        if (TAILORED_SERVER) {
+            this.minecraft.player.connection.sendUnsignedCommand("skin clear");
+        } else {
+            this.minecraft.player.getGameProfile().getProperties().removeAll("textures");
+        }
     }
 
     private void applyNewSkin() {
-        if (TAILORED_SERVER) {
-            new CompletableFuture<>().completeAsync(() -> {
-                var packetInfo = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
-                packetInfo.ifPresent(packet -> ClientPlayNetworking.send(packet.getFirst(), packet.getSecond()));
-                return null;
+        new CompletableFuture<>().completeAsync(() -> {
+            final var packetInfo = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
+            packetInfo.ifPresent(packet -> {
+                if (TAILORED_SERVER) {
+                    ClientPlayNetworking.send(packet.getFirst(), packet.getSecond());
+                } else {
+                    // Change skin clientside only  todo test
+                    PropertyMap map = this.minecraft.player.getGameProfile().getProperties();
+
+                    try {
+                        map.removeAll("textures");
+                    } catch (Exception ignored) {
+                        // Player has no skin data, no worries
+                    }
+
+                    try {
+                        var skinData = packet.getSecond().readProperty();
+                        map.put("textures", skinData);
+                    } catch (InsecureTextureException ignored) {
+                        // No skin data
+                    }
+                    System.out.println("Client skin set");
+
+                    // Reload skin
+                    //HttpTexture.
+                    Minecraft.getInstance().getSkinManager().registerSkins(this.minecraft.player.getGameProfile(), (type, resourceLocation, minecraftProfileTexture) -> {
+                    }, true);
+                    //this.minecraft.getEntityRenderDispatcher().onResourceManagerReload(ResourceManager.Empty.INSTANCE);
+
+                    //var skinInfo = this.minecraft.getSkinManager().getInsecureSkinInformation(this.minecraft.player.getGameProfile());
+                    //MinecraftProfileTexture skinTexture = skinInfo.get(MinecraftProfileTexture.Type.SKIN);
+                    //ResourceLocation resourceLocation = this.minecraft.getSkinManager().registerTexture(skinTexture, MinecraftProfileTexture.Type.SKIN);
+                    // todo
+                }
             });
-        } else {
-            // Change skin clientside only
-            // todo
-        }
+            return null;
+        });
     }
 
     @Override
