@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
@@ -188,7 +189,6 @@ public class SkinChangeScreen extends Screen {
                     } catch (InsecureTextureException ignored) {
                         // No skin data
                     }
-                    System.out.println("Client skin set");
 
                     // Reload skin
                     //HttpTexture.
@@ -225,7 +225,7 @@ public class SkinChangeScreen extends Screen {
     @Override
     public void render(PoseStack matrixStack, int mouseX, int mouseY, float delta) {
         // Darkens background
-        this.renderBackground(matrixStack, 0);
+        this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, delta);
 
         // Screen title
@@ -237,7 +237,7 @@ public class SkinChangeScreen extends Screen {
 
         // Window texture
         RenderSystem.setShaderTexture(0, getWINDOW_LOCATION());
-        this.blit(matrixStack, startX, startY, 0, 0, 252, 140);
+        blit(matrixStack, startX, startY, 0, 0, 252, 140);
 
 
         // Render input field
@@ -245,7 +245,7 @@ public class SkinChangeScreen extends Screen {
 
         // Other renders
         this.drawTabs(matrixStack, startX, startY, mouseX, mouseY);
-        this.drawIcons(startX, startY);
+        this.drawIcons(matrixStack, startX, startY);
         this.drawWidgetTooltip(matrixStack, startX, startY, mouseX, mouseY);
 
 
@@ -320,7 +320,11 @@ public class SkinChangeScreen extends Screen {
             player.yHeadRot = player.getYRot();
             player.yHeadRotO = player.getYRot();*/
 
-            InventoryScreen.renderEntityInInventory(startX + 50, startY + 120, 50, mousex, mousey, player);
+
+            float l = (float)Math.atan(mousey / 40.0f);
+            final var quaternionf = new Quaternionf().rotateZ((float)Math.PI);
+            final var quaternionf2 = new Quaternionf().rotateX(l * 20.0f * ((float)Math.PI / 180));
+            InventoryScreen.renderEntityInInventory(matrixStack, startX + 50, startY + 120, 50, quaternionf, quaternionf2, player);
 
             /*player.yBodyRot = h;
             player.setYRot(i);
@@ -379,11 +383,11 @@ public class SkinChangeScreen extends Screen {
      * @param startX x where skin window starts
      * @param startY y where skin window starts
      */
-    private void drawIcons(int startX, int startY) {
+    private void drawIcons(PoseStack poseStack, int startX, int startY) {
         // Icons
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
-            itemRenderer.renderAndDecorateFakeItem(tab.getIcon(), startX + 231 - i * 27, startY - 18);
+            itemRenderer.renderAndDecorateFakeItem(poseStack, tab.getIcon(), startX + 231 - i * 27, startY - 18);
         }
         RenderSystem.disableBlend();
     }
@@ -405,11 +409,6 @@ public class SkinChangeScreen extends Screen {
                 this.renderTooltip(matrixStack, tab.getTitle(), mouseX, mouseY);
             }
         }
-    }
-
-    @Override
-    public void renderBackground(PoseStack matrices) {
-        this.renderBackground(matrices, 0);
     }
 
     /**

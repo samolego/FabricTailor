@@ -60,7 +60,7 @@ dependencies {
 
 	// LuckPerms
 	modImplementation(include('me.lucko:fabric-permissions-api:0.1-SNAPSHOT'))
-	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.3.0')
+	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.4-beta')
 
 	// Carpet
 	modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")

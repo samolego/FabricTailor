@@ -50,6 +50,9 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     private final PropertyMap map = this.gameProfile.getProperties();
     @Shadow
     public ServerGamePacketListenerImpl connection;
+
+    @Shadow protected abstract void completeUsingItem();
+
     @Unique
     private String skinValue;
     @Unique
@@ -77,7 +80,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         // Refreshing in tablist for each player
         PlayerList playerManager = self.getServer().getPlayerList();
         playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(self.getUUID()))));
-        playerManager.broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, self));
+        playerManager.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(Collections.singleton(self)));
 
         ServerChunkCache manager = self.getLevel().getChunkSource();
         ChunkMap storage = manager.chunkMap;
@@ -96,7 +99,8 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
                 level.isDebug(), level.isFlat(), (byte) 3,
                 self.getLastDeathLocation()));
 
-        this.connection.teleport(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+        this.connection.send(new ClientboundPlayerPositionPacket(self.getX(), self.getY(), self.getZ(), self.getYRot(), self.getXRot(), Collections.emptySet(), 0));
+        this.connection.send(new ClientboundSetCarriedItemPacket(this.getInventory().selected));
 
         this.connection.send(new ClientboundChangeDifficultyPacket(level.getDifficulty(), level.getLevelData().isDifficultyLocked()));
         this.connection.send(new ClientboundSetExperiencePacket(this.experienceProgress, this.totalExperience, this.experienceLevel));
@@ -104,13 +108,13 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         playerManager.sendPlayerPermissionLevel(self);
 
         this.connection.send(new ClientboundSetHealthPacket(this.getHealth(), this.getFoodData().getFoodLevel(), this.getFoodData().getSaturationLevel()));
+
         for (MobEffectInstance statusEffect : this.getActiveEffects()) {
             this.connection.send(new ClientboundUpdateMobEffectPacket(self.getId(), statusEffect));
         }
 
         this.onUpdateAbilities();
         playerManager.sendAllPlayerInfo(self);
-
     }
 
     /**

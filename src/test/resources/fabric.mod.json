@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "fabrictailortest",
+  "version": "${version}",
+
+  "name": "Fabric Tailor Testmod",
+  "description": "For those needing to quickly change their skin! Works in singleplayer as well as server-side!",
+  "authors": [
+    "samo_lego"
+  ],
+  "contact": {
+    "homepage": "https://samolego.github.io",
+    "sources": "https://github.com/samolego/FabricTailor",
+    "issues": "https://github.com/samolego/FabricTailor/issues"
+  },
+
+  "license": "LGPLv3",
+  "icon": "assets/fabrictailor/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.samo_lego.fabrictailor.testmod.TailorTest"
+    ]
+  },
+  "mixins": [ ],
+
+  "depends": {
+    "fabricloader": ">=0.8.8",
+    "fabric": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/9PAesuHFnp"
+      }
+    }
+  }
+
+}

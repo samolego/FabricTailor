@@ -22,24 +22,6 @@ public class MYggDrasilMinecraftSessionService_AllSkinsAcceptor {
         cir.setReturnValue(property.getValue());
     }
 
-    @Inject(method = "isAllowedTextureDomain",
-            at = @At(value = "INVOKE_ASSIGN",
-                    target = "Ljava/net/URI;getHost()Ljava/lang/String;"),
-            locals = LocalCapture.CAPTURE_FAILHARD,
-            cancellable = true)
-    private static void ft_allowAllTextureDomains(String url, CallbackInfoReturnable<Boolean> cir, URI uri, String domain) {
-        if (url.startsWith("file://")) {
-            cir.setReturnValue(false);  // todo, allow files
-            return;
-        }
-
-        String topDomain = InternetDomainName.from(domain)
-                .topDomainUnderRegistrySuffix()
-                .toString()
-                .toLowerCase();
-        cir.setReturnValue(config.allowedTextureDomains.contains(topDomain));
-    }
-
     /**
      * Disables "requireSecure" boolean in order to allow skins from all
      * domains, specified in config.

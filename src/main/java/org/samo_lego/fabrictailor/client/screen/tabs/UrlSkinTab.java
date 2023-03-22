@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor.client.screen.tabs;
 
+import com.google.common.net.InternetDomainName;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.properties.Property;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_HD_CHANGE;
 import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILLA_CHANGE;
 
@@ -76,6 +78,14 @@ public class UrlSkinTab extends GuiComponent implements SkinTabType {
                 if (useSlim) {
                     metadata = new JsonObject();
                     metadata.addProperty("model", "slim");
+                }
+
+                // Check if tld is allowed
+                String tld = InternetDomainName.from(skinUrl.getHost()).topPrivateDomain().toString();
+                if (!config.allowedTextureDomains.contains(tld)) {
+                    // Redirect to duckduckgo
+                    // e.g. convert https://image.com/image.png to https://external-content.duckduckgo.com/iu/?u=https://image.com/image.png
+                    url = "https://external-content.duckduckgo.com/iu/?u=" + url;
                 }
 
                 skinData = this.getExtendedProperty(player, MinecraftProfileTexture.Type.SKIN, url, metadata);

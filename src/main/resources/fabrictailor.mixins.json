@@ -6,7 +6,8 @@
   "client": [
     "accessors.client.AAdvancementsScreen",
     "client.MHttpTexture_HDEnabler",
-    "client.MYggDrasilMinecraftSessionService_AllSkinsAcceptor"
+    "client.MYggDrasilMinecraftSessionService_AllSkinsAcceptor",
+    "client.MTextureUrlChecker_AllDomains"
   ],
   "mixins": [
     "MServerPlayerEntity_TailoredPlayer",

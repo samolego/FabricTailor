@@ -160,7 +160,7 @@ public class SkinCommand {
         return 1;
     }
 
-    private static void setSkin(ServerPlayer player, Supplier<Property> skinProvider) {
+    public static void setSkin(ServerPlayer player, Supplier<Property> skinProvider) {
         long lastChange = ((TailoredPlayer) player).getLastSkinChange();
         long now = System.currentTimeMillis();
 
