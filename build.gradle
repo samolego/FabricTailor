@@ -13,15 +13,10 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven {
-		url 'https://oss.sonatype.org/content/repositories/snapshots'
-	}
-	maven {
-		url 'https://jitpack.io'
-	}
-	maven {
-		url 'https://masa.dy.fi/maven'
-	}
+	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+	maven { url 'https://maven.nucleoid.xyz' }
+	maven { url 'https://jitpack.io' }
+	maven { url 'https://masa.dy.fi/maven' }
 }
 
 def ENV = System.getenv()
@@ -42,28 +37,16 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	// Make a collection of all api modules we wish to use
-	Set<String> apiModules = [
-			"fabric-api-base",
-			"fabric-command-api-v2",
-			"fabric-lifecycle-events-v1",
-			"fabric-networking-api-v1",
-			"fabric-registry-sync-v0"
-	]
 
-	// Add each module as a dependency
-	apiModules.forEach {
-		modImplementation(fabricApi.module(it, project.fabric_version))
-	}
-
+	// Config2Brigadier
 	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
 
 	// LuckPerms
-	modImplementation(include('me.lucko:fabric-permissions-api:0.1-SNAPSHOT'))
-	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.4-beta')
+	modImplementation(include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
 
 	// Carpet
 	modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
+	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.4-beta3')
 }
 
 processResources {

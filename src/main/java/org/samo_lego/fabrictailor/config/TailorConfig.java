@@ -45,7 +45,7 @@ public class TailorConfig implements IBrigadierConfigurator {
     @SerializedName("custom_skin_server")
     public String customSkinServer = "";
 
-    @SerializedName("allowed_texture_domains")
+    @SerializedName("texture_allowed_domains")
     public Set<String> allowedTextureDomains = new HashSet<>(Set.of(
             "minecraft.net",
             "mojang.com",
@@ -59,7 +59,8 @@ public class TailorConfig implements IBrigadierConfigurator {
             "planetminecraft.com",
             "googleusercontent.com",
             "nocookie.net",
-            "discord.com"
+            "discord.com",
+            "duckduckgo.com"
     ));
 
     @Override

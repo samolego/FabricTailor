@@ -45,7 +45,7 @@ public class FabricTailor implements ModInitializer {
 			CarpetFunctions.init();
 		}
 
-		ServerPlayConnectionEvents.JOIN.register(NetworkHandler::onJoin);
+		ServerPlayConnectionEvents.INIT.register(NetworkHandler::onInit);
 		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_VANILLA_CHANGE, NetworkHandler::changeVanillaSkinPacket);
 		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_HD_CHANGE, NetworkHandler::changeHDSkinPacket);
 		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_DEFAULT_SKIN, NetworkHandler::defaultSkinPacket);

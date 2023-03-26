@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
@@ -301,36 +300,10 @@ public class SkinChangeScreen extends Screen {
         } else {
             // Drawing Player
             // Luckily vanilla code is available
-
             float mousex = (float) width / 2 - 75 - mouseX;
             float mousey = ((float) height / 2 - mouseY);
-            var player = minecraft.player;
 
-            /*float f = (float)Math.atan(mousex / 40.0f);
-            float g = (float)Math.atan(mousey / 40.0f);
-
-            float h = player.yBodyRot;
-            float i = player.getYRot();
-            float j = player.getXRot();
-            float k = player.yHeadRotO;
-            float l = player.yHeadRot;
-            player.yBodyRot = f * 20.0f;
-            player.setYRot(f * 40.0f);
-            player.setXRot(-g * 20.0f);
-            player.yHeadRot = player.getYRot();
-            player.yHeadRotO = player.getYRot();*/
-
-
-            float l = (float)Math.atan(mousey / 40.0f);
-            final var quaternionf = new Quaternionf().rotateZ((float)Math.PI);
-            final var quaternionf2 = new Quaternionf().rotateX(l * 20.0f * ((float)Math.PI / 180));
-            InventoryScreen.renderEntityInInventory(matrixStack, startX + 50, startY + 120, 50, quaternionf, quaternionf2, player);
-
-            /*player.yBodyRot = h;
-            player.setYRot(i);
-            player.setXRot(j);
-            player.yHeadRotO = k;
-            player.yHeadRot = l;*/
+            InventoryScreen.renderEntityInInventoryFollowsMouse(matrixStack, startX + 51, startY + 120, 50, mousex, mousey, this.minecraft.player);
         }
     }
 
@@ -355,7 +328,7 @@ public class SkinChangeScreen extends Screen {
                 this.selectedTab = tab;
             } else if (selectedTab == tab) {
                 // Rendering "selected" tab
-                this.blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
+                blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
 
                 // Showing or hiding additional buttons
                 this.skinModelCheckbox.visible = tab.hasSkinModels();
@@ -364,7 +337,7 @@ public class SkinChangeScreen extends Screen {
             }
             else {
                 // rendering other tabs
-                this.blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
+                blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
             }
         }
         // Rendering title

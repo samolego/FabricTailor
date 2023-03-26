@@ -85,7 +85,7 @@ public class UrlSkinTab extends GuiComponent implements SkinTabType {
                 if (!config.allowedTextureDomains.contains(tld)) {
                     // Redirect to duckduckgo
                     // e.g. convert https://image.com/image.png to https://external-content.duckduckgo.com/iu/?u=https://image.com/image.png
-                    url = "https://external-content.duckduckgo.com/iu/?u=" + url;
+                    url = "https://external-content.duckduckgo.com/iu/?u=" + skinUrl;
                 }
 
                 skinData = this.getExtendedProperty(player, MinecraftProfileTexture.Type.SKIN, url, metadata);

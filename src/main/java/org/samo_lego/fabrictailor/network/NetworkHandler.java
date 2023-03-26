@@ -21,7 +21,7 @@ import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByName;
 
 public class NetworkHandler {
 
-    public static void onJoin(ServerGamePacketListenerImpl listener, PacketSender _sender, MinecraftServer _server) {
+    public static void onInit(ServerGamePacketListenerImpl listener, MinecraftServer _server) {
         var player = listener.getPlayer();
         if (ServerPlayNetworking.canSend(listener, SkinPackets.FT_HELLO)) {
             ServerPlayNetworking.send(player, SkinPackets.FT_HELLO, createHelloPacket(player.hasPermissions(2)));

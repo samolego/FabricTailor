@@ -3,7 +3,7 @@ package org.samo_lego.fabrictailor.testmod;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import org.samo_lego.fabrictailor.command.SkinCommand;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
@@ -14,7 +14,7 @@ public class TailorTest implements ModInitializer {
     @Override
     public void onInitialize() {
         // Add command for "/hdskin"
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             this.hdSkinCmd(dispatcher);
             this.capeCmd(dispatcher);
             this.serversideSkinCmd(dispatcher);
