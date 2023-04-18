@@ -30,7 +30,7 @@ public class ClientTailor implements ClientModInitializer {
     public static boolean TAILORED_SERVER = false;
     public static boolean ALLOW_DEFAULT_SKIN = true;
 
-    protected static final SkinChangeScreen SKIN_CHANGE_SCREEN = new SkinChangeScreen();
+    public static final SkinChangeScreen SKIN_CHANGE_SCREEN = new SkinChangeScreen();
     public static boolean forceOpen = false;
 
     @Override

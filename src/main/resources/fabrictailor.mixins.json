@@ -7,6 +7,7 @@
     "accessors.client.AAdvancementsScreen",
     "client.AAbstractClientPlayer",
     "client.MHttpTexture_HDEnabler",
+    "client.MSkinCustomizationScreen",
     "client.MTextureUrlChecker_AllDomains",
     "client.MYggDrasilMinecraftSessionService_AllSkinsAcceptor"
   ],

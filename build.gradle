@@ -137,17 +137,12 @@ tasks.modrinth {
 }
 
 modrinth {
-
-	onlyIf {
-		ENV.MODRINTH_TOKEN
-	}
-
 	token = ENV.MODRINTH_TOKEN
 	projectId = "g8w1NapE"
 	changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
 	versionNumber = version
 	versionName = "[${project.minecraft_version}] FabricTailor ${version}"
-	releaseType = "release"
+	versionType = "release"
 
 	uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
 
