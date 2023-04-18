@@ -10,8 +10,8 @@ import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -45,12 +45,12 @@ public interface SkinTabType {
         return false;
     }
 
-    default Property getExtendedProperty(Player player, MinecraftProfileTexture.Type type, String textureUrl, JsonObject metadata) {
-        var current = player.getGameProfile().getProperties().get(SkinManager.PROPERTY_TEXTURES).stream().findFirst();
+    default Property getExtendedProperty(LocalPlayer player, MinecraftProfileTexture.Type type, String textureUrl, JsonObject metadata) {
+        var current = ((AAbstractClientPlayer) player).ft_getPlayerInfo().getProfile().getProperties().get(SkinManager.PROPERTY_TEXTURES).stream().findFirst();
         String json = current.map(property -> new String(Base64.getDecoder().decode(property.getValue()), StandardCharsets.UTF_8))
-                .orElse("{\"textures\":{}}");
+                .orElse("{\"" + SkinManager.PROPERTY_TEXTURES + "\":{}}");
         JsonObject jsonPayload = JsonParser.parseString(json).getAsJsonObject();
-        JsonObject textures = jsonPayload.get("textures").getAsJsonObject();
+        JsonObject textures = jsonPayload.get(SkinManager.PROPERTY_TEXTURES).getAsJsonObject();
 
         if (textures.has(type.toString())) {
             JsonObject texture = textures.get(type.toString()).getAsJsonObject();

@@ -37,7 +37,6 @@ public class FabricTailor implements ModInitializer {
 		});
 
 		configFile = new File(FabricLoader.getInstance().getConfigDir() + "/fabrictailor.json");
-		// Ugly trick for server detection
 		config = TailorConfig.loadConfigFile(configFile, FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER);
 		config.save();
 

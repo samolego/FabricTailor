@@ -19,10 +19,12 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.joml.Quaternionf;
 import org.samo_lego.fabrictailor.client.screen.tabs.*;
+import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.io.File;
@@ -162,7 +164,7 @@ public class SkinChangeScreen extends Screen {
         if (TAILORED_SERVER) {
             this.minecraft.player.connection.sendUnsignedCommand("skin clear");
         } else {
-            this.minecraft.player.getGameProfile().getProperties().removeAll("textures");
+            this.minecraft.player.getGameProfile().getProperties().removeAll(SkinManager.PROPERTY_TEXTURES);
         }
     }
 
@@ -173,8 +175,8 @@ public class SkinChangeScreen extends Screen {
                 if (TAILORED_SERVER) {
                     ClientPlayNetworking.send(packet.getFirst(), packet.getSecond());
                 } else {
-                    // Change skin clientside only  todo test
-                    PropertyMap map = this.minecraft.player.getGameProfile().getProperties();
+                    // Change skin clientside only todo test
+                    PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
 
                     try {
                         map.removeAll("textures");
@@ -184,7 +186,7 @@ public class SkinChangeScreen extends Screen {
 
                     try {
                         var skinData = packet.getSecond().readProperty();
-                        map.put("textures", skinData);
+                        map.put(SkinManager.PROPERTY_TEXTURES, skinData);
                     } catch (InsecureTextureException ignored) {
                         // No skin data
                     }
@@ -418,7 +420,7 @@ public class SkinChangeScreen extends Screen {
      */
     @Override
     public void onFilesDrop(List<Path> paths) {
-        if(this.selectedTab instanceof LocalSkinTab) {
+        if (!(this.selectedTab instanceof PlayerSkinTab)) {
             this.skinInput.setValue(paths.iterator().next().toString());
         }
     }
