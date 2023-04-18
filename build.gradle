@@ -1,11 +1,9 @@
-import com.modrinth.minotaur.TaskModrinthUpload
-
 plugins {
 	id 'fabric-loom' version '1.1-SNAPSHOT'
 	id "org.quiltmc.quilt-mappings-on-loom" version "4.2.0"
 	id 'maven-publish'
 	id "com.matthewprenger.cursegradle" version "1.4.0"
-	id "com.modrinth.minotaur" version "1.1.0"
+	id "com.modrinth.minotaur" version "2.+"
 }
 
 archivesBaseName = project.archives_base_name
@@ -131,20 +129,29 @@ curseforge {
 	}
 }
 
-task modrinth(type: TaskModrinthUpload, dependsOn: remapJar) {
+
+tasks.modrinth {
+	onlyIf {
+		ENV.MODRINTH_TOKEN
+	}
+}
+
+modrinth {
+
 	onlyIf {
 		ENV.MODRINTH_TOKEN
 	}
 
 	token = ENV.MODRINTH_TOKEN
 	projectId = "g8w1NapE"
-	changelog = "A changelog can be found at https://github.com/samolego/FabricTailor/releases/latest"
+	changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
 	versionNumber = version
 	versionName = "[${project.minecraft_version}] FabricTailor ${version}"
 	releaseType = "release"
 
 	uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
 
-	addGameVersion("${project.minecraft_version}")
-	addLoader('fabric')
+	gameVersions = [project.minecraft_version]
+	loaders = ['fabric', 'quilt']
+
 }

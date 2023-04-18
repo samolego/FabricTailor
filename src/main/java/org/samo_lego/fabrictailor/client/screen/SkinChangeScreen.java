@@ -164,7 +164,7 @@ public class SkinChangeScreen extends Screen {
         if (TAILORED_SERVER) {
             this.minecraft.player.connection.sendUnsignedCommand("skin clear");
         } else {
-            this.minecraft.player.getGameProfile().getProperties().removeAll(SkinManager.PROPERTY_TEXTURES);
+            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(SkinManager.PROPERTY_TEXTURES);
         }
     }
 
@@ -175,11 +175,11 @@ public class SkinChangeScreen extends Screen {
                 if (TAILORED_SERVER) {
                     ClientPlayNetworking.send(packet.getFirst(), packet.getSecond());
                 } else {
-                    // Change skin clientside only todo test
+                    // Change skin clientside only todo: reload skin
                     PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
 
                     try {
-                        map.removeAll("textures");
+                        map.removeAll(SkinManager.PROPERTY_TEXTURES);
                     } catch (Exception ignored) {
                         // Player has no skin data, no worries
                     }
@@ -193,7 +193,7 @@ public class SkinChangeScreen extends Screen {
 
                     // Reload skin
                     //HttpTexture.
-                    Minecraft.getInstance().getSkinManager().registerSkins(this.minecraft.player.getGameProfile(), (type, resourceLocation, minecraftProfileTexture) -> {
+                    Minecraft.getInstance().getSkinManager().registerSkins(((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile(), (type, resourceLocation, minecraftProfileTexture) -> {
                     }, true);
                     //this.minecraft.getEntityRenderDispatcher().onResourceManagerReload(ResourceManager.Empty.INSTANCE);
 
