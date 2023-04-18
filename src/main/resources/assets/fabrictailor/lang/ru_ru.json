@@ -1,22 +1,21 @@
 {
-  "button.fabrictailor.clear_skin": "Отчистить скин",
+  "button.fabrictailor.clear_skin": "Очистить скин",
   "button.fabrictailor.open_explorer": "Открыть проводник",
-  "button.fabrictailor.apply": "Установить скин",
-  "button.fabrictailor.set_default_skin": "Устатовить стандартный скин",
+  "button.fabrictailor.apply": "Применить",
+  "button.fabrictailor.set_cape": "Установить плащ",
+  "button.fabrictailor.set_default_skin": "Установить стандартный скин",
   "button.fabrictailor.use_slim": "Тонкая модель",
-  "description.fabrictailor.title_local": "Путь до скина:",
-  "description.fabrictailor.title_player": "Никнейм игрока:",
-  "description.fabrictailor.title_url": "URL до скина:",
+  "description.fabrictailor.title_cape": "URL плаща:",
+  "description.fabrictailor.title_local": "Путь сохранения скина:",
+  "description.fabrictailor.title_player": "Имя игрока:",
+  "description.fabrictailor.title_url": "URL скина:",
   "gui.fabrictailor.change_skin": "Изменить скин",
-  "hint.fabrictailor.dragAndDrop": "Вы так же можете перетащить сюда скин",
-  "hint.fabrictailor.server_skin_path": "FabricTailor запущен на серверном окружении. Убедитесь что пути указывают на скины на СЕРВЕРЕ",
-
-  "tab.fabrictailor.title_local": "Загрузка локального скина",
+  "hint.fabrictailor.dragAndDrop": "Вы также можете перетащить и скинуть сюда скин!",
+  "tab.fabrictailor.title_cape": "Получить плащ",
+  "tab.fabrictailor.title_local": "Загрузить локальный скин",
   "tab.fabrictailor.title_player": "Получить с игрока",
   "tab.fabrictailor.title_url": "Получить с URL",
-
-
-  "key.fabrictailor.toggle_skin_gui": "Открыть GUI скинов",
+  "key.fabrictailor.toggle_skin_gui": "Открыть граф. интерфейс скина",
   "category.fabrictailor.skin_category": "FabricTailor",
-  "error.fabrictailor.not_installed": "FabricTailor, к сожалению, не установлен на этом сервере. Пожалуйста, свяжитесь с админом для боьшей информации."
+  "error.fabrictailor.not_installed": "К сожалению, FabricTailor не установлен на этом сервере. За подробной информацией свяжитесь с администратором."
 }
