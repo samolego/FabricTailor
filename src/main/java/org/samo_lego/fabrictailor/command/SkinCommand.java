@@ -8,12 +8,15 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.compatibility.TaterzenSkins;
+import org.samo_lego.fabrictailor.mixin.accessors.AEntitySelector;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
@@ -93,7 +96,7 @@ public class SkinCommand {
                             })
                     )
                     .then(literal("player")
-                            .then(Commands.argument("playername", greedyString())
+                            .then(Commands.argument("target", EntityArgument.player())
                                     .executes(SkinCommand::setSkinPlayer)
                             )
                             .executes(ctx -> {
@@ -154,9 +157,17 @@ public class SkinCommand {
 
     private static int setSkinPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        String playername = getString(context, "playername");
+        EntitySelector selector = context.getArgument("target", EntitySelector.class);
+        String input = ((AEntitySelector) selector).getPlayerName();
 
-        setSkin(player, () -> SkinFetcher.fetchSkinByName(playername));
+        try {
+            String name = selector.findSinglePlayer(context.getSource()).getScoreboardName();
+            setSkin(player, () -> SkinFetcher.fetchSkinByName(name));
+        } catch (CommandSyntaxException e) {
+            if (input == null) throw e;
+            setSkin(player, () -> SkinFetcher.fetchSkinByName(input));
+        }
+
         return 1;
     }
 
