@@ -165,6 +165,7 @@ public class SkinChangeScreen extends Screen {
             this.minecraft.player.connection.sendUnsignedCommand("skin clear");
         } else {
             ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(SkinManager.PROPERTY_TEXTURES);
+            // Reload skin - todo
         }
     }
 
