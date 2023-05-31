@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 
 @Mixin(SkinCustomizationScreen.class)
-public class MSkinCustomizationScreen extends OptionsSubScreen {
-    public MSkinCustomizationScreen(Screen screen, Options options, Component component) {
+public class MSkinCustomizationScreen_SkinButton extends OptionsSubScreen {
+    public MSkinCustomizationScreen_SkinButton(Screen screen, Options options, Component component) {
         super(screen, options, component);
     }
 

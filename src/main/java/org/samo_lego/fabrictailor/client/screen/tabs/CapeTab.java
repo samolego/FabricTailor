@@ -1,10 +1,7 @@
 package org.samo_lego.fabrictailor.client.screen.tabs;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.util.UUIDTypeAdapter;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
@@ -15,12 +12,10 @@ import org.samo_lego.fabrictailor.network.SkinPackets;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_HD_CHANGE;
 
 public class CapeTab implements SkinTabType {
-    private final Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
 
     @Override
     public MutableComponent getTitle() {

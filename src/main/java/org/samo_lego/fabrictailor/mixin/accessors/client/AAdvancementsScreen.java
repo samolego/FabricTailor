@@ -14,9 +14,4 @@ public interface AAdvancementsScreen {
     static ResourceLocation getWINDOW_LOCATION() {
         throw new AssertionError();
     }
-
-    @Accessor("TABS_LOCATION")
-    static ResourceLocation getTABS_LOCATION() {
-        throw new AssertionError();
-    }
 }

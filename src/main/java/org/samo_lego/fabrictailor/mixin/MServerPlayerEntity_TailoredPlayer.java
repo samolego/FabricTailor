@@ -2,7 +2,6 @@ package org.samo_lego.fabrictailor.mixin;
 
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
@@ -85,7 +84,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(self.getUUID()))));
         playerManager.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(Collections.singleton(self)));
 
-        ServerChunkCache manager = self.getLevel().getChunkSource();
+        ServerChunkCache manager = self.serverLevel().getChunkSource();
         ChunkMap storage = manager.chunkMap;
         ATrackedEntity trackerEntry = ((AChunkMap) storage).getEntityTrackers().get(self.getId());
 
@@ -93,14 +92,15 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         trackerEntry.getSeenBy().forEach(tracking -> trackerEntry.getServerEntity().addPairing(tracking.getPlayer()));
 
         // need to change the player entity on the client
-        ServerLevel level = self.getLevel();
+        ServerLevel level = self.serverLevel();
         this.connection.send(new ClientboundRespawnPacket(level.dimensionTypeId(),
                 level.dimension(),
                 BiomeManager.obfuscateSeed(level.getSeed()),
                 self.gameMode.getGameModeForPlayer(),
                 self.gameMode.getPreviousGameModeForPlayer(),
                 level.isDebug(), level.isFlat(), (byte) 3,
-                self.getLastDeathLocation()));
+                self.getLastDeathLocation(),
+                this.getPortalCooldown()));
 
         this.connection.send(new ClientboundPlayerPositionPacket(self.getX(), self.getY(), self.getZ(), self.getYRot(), self.getXRot(), Collections.emptySet(), 0));
         this.connection.send(new ClientboundSetCarriedItemPacket(this.getInventory().selected));
@@ -161,14 +161,11 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
             this.skinSignature = skinData.getSignature();
 
             // Reloading skin
-            if(reload) {
+            if (reload) {
                 this.reloadSkin();
             }
 
             this.lastSkinChangeTime = System.currentTimeMillis();
-
-        } catch (InsecureTextureException ignored) {
-            // No skin data
         } catch (Error e) {
             // Something went wrong when trying to set the skin
             errorLog(e.getMessage());

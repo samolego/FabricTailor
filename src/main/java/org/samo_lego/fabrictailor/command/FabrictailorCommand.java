@@ -39,8 +39,8 @@ public class FabrictailorCommand {
     private static int reloadConfig(CommandContext<CommandSourceStack> context) {
         FabricTailor.reloadConfig();
 
-        context.getSource().sendSuccess(
-                TextTranslations.create("command.fabrictailor.config.reloadSuccess").withStyle(ChatFormatting.GREEN),
+        context.getSource().sendSuccess(() ->
+                        TextTranslations.create("command.fabrictailor.config.reloadSuccess").withStyle(ChatFormatting.GREEN),
                 false
         );
         return 1;
@@ -54,8 +54,8 @@ public class FabrictailorCommand {
 
         config.save();
 
-        context.getSource().sendSuccess(
-                TextTranslations.create("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN),
+        context.getSource().sendSuccess(() ->
+                        TextTranslations.create("command.fabrictailor.config.defaultSkin").withStyle(ChatFormatting.GREEN),
                 false
         );
 

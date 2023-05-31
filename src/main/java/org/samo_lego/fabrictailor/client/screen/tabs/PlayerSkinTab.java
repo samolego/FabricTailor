@@ -2,7 +2,6 @@ package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
@@ -17,7 +16,7 @@ import java.util.Optional;
 
 import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILLA_CHANGE;
 
-public class PlayerSkinTab extends GuiComponent implements SkinTabType {
+public class PlayerSkinTab implements SkinTabType {
 
     private final MutableComponent TITLE;
     private final MutableComponent DESCRIPTION;

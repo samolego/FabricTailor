@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
@@ -26,7 +25,7 @@ import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_HD_CHANGE;
 import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILLA_CHANGE;
 
-public class UrlSkinTab extends GuiComponent implements SkinTabType {
+public class UrlSkinTab implements SkinTabType {
 
     private final MutableComponent TITLE;
     private final MutableComponent DESCRIPTION;

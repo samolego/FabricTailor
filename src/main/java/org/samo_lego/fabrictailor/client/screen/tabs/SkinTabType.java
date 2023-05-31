@@ -8,7 +8,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
@@ -21,9 +21,9 @@ public interface SkinTabType {
     int width = 27;
     int height = 28;
 
-    MutableComponent getTitle();
+    Component getTitle();
 
-    MutableComponent getDescription();
+    Component getDescription();
 
     ItemStack getIcon();
 

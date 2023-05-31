@@ -1,6 +1,5 @@
 package org.samo_lego.fabrictailor.client.screen;
 
-import com.mojang.authlib.minecraft.InsecureTextureException;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -12,11 +11,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.resources.SkinManager;
@@ -36,7 +37,6 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
-import static org.samo_lego.fabrictailor.mixin.accessors.client.AAdvancementsScreen.getTABS_LOCATION;
 import static org.samo_lego.fabrictailor.mixin.accessors.client.AAdvancementsScreen.getWINDOW_LOCATION;
 
 @Environment(EnvType.CLIENT)
@@ -185,12 +185,8 @@ public class SkinChangeScreen extends Screen {
                         // Player has no skin data, no worries
                     }
 
-                    try {
-                        var skinData = packet.getSecond().readProperty();
-                        map.put(SkinManager.PROPERTY_TEXTURES, skinData);
-                    } catch (InsecureTextureException ignored) {
-                        // No skin data
-                    }
+                    var skinData = packet.getSecond().readProperty();
+                    map.put(SkinManager.PROPERTY_TEXTURES, skinData);
 
                     // Reload skin
                     //HttpTexture.
@@ -218,37 +214,32 @@ public class SkinChangeScreen extends Screen {
 
     /**
      * Renders the skin changing screen.
-     *
-     * @param matrixStack
-     * @param mouseX
-     * @param mouseY
-     * @param delta
      */
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         // Darkens background
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, delta);
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, delta);
 
         // Screen title
-        drawCenteredString(matrixStack, font, title, width / 2, 15, 0xffffff);
+        guiGraphics.drawCenteredString(font, title, width / 2, 15, 0xffffff);
 
         // Starting position of the window texture
         this.startX = (this.width - 252) / 2;
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        RenderSystem.setShaderTexture(0, getWINDOW_LOCATION());
-        blit(matrixStack, startX, startY, 0, 0, 252, 140);
+        RenderSystem.enableBlend();
+        guiGraphics.blit(getWINDOW_LOCATION(), startX, startY, 0, 0, 252, 140);
 
 
         // Render input field
-        skinInput.render(matrixStack, startX, startY, delta);
+        skinInput.render(guiGraphics, startX, startY, delta);
 
         // Other renders
-        this.drawTabs(matrixStack, startX, startY, mouseX, mouseY);
-        this.drawIcons(matrixStack, startX, startY);
-        this.drawWidgetTooltip(matrixStack, startX, startY, mouseX, mouseY);
+        this.drawTabs(guiGraphics, startX, startY, mouseX, mouseY);
+        this.drawIcons(guiGraphics, startX, startY);
+        this.drawWidgetTooltip(guiGraphics, startX, startY, mouseX, mouseY, delta);
 
 
         if (this.selectedTab.showModelBackwards()) {
@@ -306,22 +297,22 @@ public class SkinChangeScreen extends Screen {
             float mousex = (float) width / 2 - 75 - mouseX;
             float mousey = ((float) height / 2 - mouseY);
 
-            InventoryScreen.renderEntityInInventoryFollowsMouse(matrixStack, startX + 51, startY + 120, 50, mousex, mousey, this.minecraft.player);
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, startX + 51, startY + 120, 50, mousex, mousey, this.minecraft.player);
         }
     }
 
     /**
      * Draws tabs.
      *
-     * @param matrixStack
-     * @param startX x where skin window starts
-     * @param startY y where skin window starts
-     * @param mouseX mouse x
-     * @param mouseY mouse y
+     * @param guiGraphics
+     * @param startX      x where skin window starts
+     * @param startY      y where skin window starts
+     * @param mouseX      mouse x
+     * @param mouseY      mouse y
      */
-    private void drawTabs(PoseStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
+    private void drawTabs(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
         // Setting texture
-        RenderSystem.setShaderTexture(0, getTABS_LOCATION());
+        RenderSystem.enableBlend();
 
         // Tabs
         for (int i = 0; i < TABS.size(); ++i) {
@@ -331,23 +322,22 @@ public class SkinChangeScreen extends Screen {
                 this.selectedTab = tab;
             } else if (selectedTab == tab) {
                 // Rendering "selected" tab
-                blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
+                guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
 
                 // Showing or hiding additional buttons
                 this.skinModelCheckbox.visible = tab.hasSkinModels();
                 // Making sure we are in singleplayer to show open explorer button
                 this.openExplorerButton.visible = tab.showExplorerButton();
-            }
-            else {
+            } else {
                 // rendering other tabs
-                blit(matrixStack, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
+                guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
             }
         }
         // Rendering title
-        this.font.drawShadow(matrixStack, this.selectedTab.getTitle(), startX + 10, startY + 5, 16777215);
+        guiGraphics.drawString(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFF);
 
         // Rendering description above input field
-        this.font.drawShadow(matrixStack, this.selectedTab.getDescription(), (float) width / 2, (float) height / 2 - 40, 16777215);
+        guiGraphics.drawString(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFF);
 
         RenderSystem.defaultBlendFunc();
     }
@@ -359,11 +349,11 @@ public class SkinChangeScreen extends Screen {
      * @param startX x where skin window starts
      * @param startY y where skin window starts
      */
-    private void drawIcons(PoseStack poseStack, int startX, int startY) {
+    private void drawIcons(GuiGraphics guiGraphics, int startX, int startY) {
         // Icons
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
-            itemRenderer.renderAndDecorateFakeItem(poseStack, tab.getIcon(), startX + 231 - i * 27, startY - 18);
+            guiGraphics.renderItem(tab.getIcon(), startX + 231 - i * 27, startY - 18);
         }
         RenderSystem.disableBlend();
     }
@@ -372,17 +362,17 @@ public class SkinChangeScreen extends Screen {
     /**
      * Draws tooltips when hovering over tabs.
      *
-     * @param matrixStack
-     * @param startX x where skin window starts
-     * @param startY y where skin window starts
-     * @param mouseX mouse x
-     * @param mouseY mouse y
+     * @param guiGraphics
+     * @param startX      x where skin window starts
+     * @param startY      y where skin window starts
+     * @param mouseX      mouse x
+     * @param mouseY      mouse y
      */
-    private void drawWidgetTooltip(PoseStack matrixStack, int startX, int startY, int mouseX, int mouseY) {
+    private void drawWidgetTooltip(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY, float delta) {
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
             if (tab.isSelected(startX + 225 - i * 27, startY - 28, mouseX, mouseY)) {
-                this.renderTooltip(matrixStack, tab.getTitle(), mouseX, mouseY);
+                guiGraphics.renderTooltip(this.font, tab.getTitle(), mouseX, mouseY);
             }
         }
     }
@@ -410,9 +400,6 @@ public class SkinChangeScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    @Override
-    public void removed() {
-    }
 
     /**
      * Used for skin drag and drop.
