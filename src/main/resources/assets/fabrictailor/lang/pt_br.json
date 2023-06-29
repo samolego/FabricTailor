@@ -1,0 +1,21 @@
+{
+  "button.fabrictailor.clear_skin": "Apagar skin",
+  "button.fabrictailor.open_explorer": "Abrir explorer",
+  "button.fabrictailor.apply": "Aplicar",
+  "button.fabrictailor.set_cape": "Definir capa",
+  "button.fabrictailor.set_default_skin": "Definir para skin padrão",
+  "button.fabrictailor.use_slim": "Modelo slim",
+  "description.fabrictailor.title_cape": "URL da capa:",
+  "description.fabrictailor.title_local": "Caminho da skin:",
+  "description.fabrictailor.title_player": "Nome do Jogador:",
+  "description.fabrictailor.title_url": "URL da skin:",
+  "gui.fabrictailor.change_skin": "Definir skin",
+  "hint.fabrictailor.dragAndDrop": "Você pode também arrastar a skin aqui!",
+  "tab.fabrictailor.title_cape": "Buscar capa",
+  "tab.fabrictailor.title_local": "Envio local de skin",
+  "tab.fabrictailor.title_player": "Buscar do jogador",
+  "tab.fabrictailor.title_url": "Buscar na URL",
+  "key.fabrictailor.toggle_skin_gui": "Abrir menu da skin",
+  "category.fabrictailor.skin_category": "FabricTailor",
+  "error.fabrictailor.not_installed": "FabricTailor infelizmente não está instalado no servidor. Favor contactar o administrador para mais informações."
+}
