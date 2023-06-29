@@ -1,0 +1,21 @@
+{
+
+  "command.fabrictailor.skin.set.attempt": "Tentando inserir skin... Por favor aguarde.",
+  "command.fabrictailor.skin.404": "Um erro ocorreu ao tentar buscar a skin.",
+  "command.fabrictailor.skin.set.404": "Você deve preencher com uma URL, nome do jogador ou o arquivo com a skin que deseja.",
+  "command.fabrictailor.skin.set.404.url": "Você deve preencher com a URL e variante da skin que deseja.",
+  "command.fabrictailor.skin.set.404.path": "Você deve preencher com o caminho do arquivo e variante da skin que deseja.",
+  "command.fabrictailor.skin.set.404.playername": "Você deve preencher com o nome do jogador.",
+  "command.fabrictailor.skin.set.success": "A skin foi definida com sucesso.",
+  "command.fabrictailor.skin.set.error": "Esse jogador não aparenta ter alguma skin salva.",
+  "command.fabrictailor.skin.clear.success": "A skin foi removida com sucesso.",
+  "command.fabrictailor.skin.clear.error": "Um erro ocorreu ao tentar remover sua skin.",
+  "command.fabrictailor.skin.please_wait": "Enviando skin. Por favor aguarde.",
+  "command.fabrictailor.skin.timer.please_wait": "Você mudou sua skin recentemente. Você deve aguardar %s segundos pra mudar de novo.",
+  "command.fabrictailor.skin.upload.failed": "Um problema ocorreu na tentativa de enviar a skin.",
+  "command.fabrictailor.skin.upload.malformed_url": "URL inválida!",
+  "command.fabrictailor.config.reloadSuccess": "A configuralção foi recarregada com sucesso!",
+  "command.fabrictailor.config.defaultSkin": "A skin padrão pra novos jogadores foi definida com sucesso!",
+  "hint.fabrictailor.server_skin_path": "FabricTailor está rodando no ambiente do servidor. Tenha certeza de que o caminho aponta para o arquivo da skin no SERVIDOR.",
+  "hint.fabrictailor.client_only": "Capas e skins HD serão vistas apenas para outros jogadores que utilizam o FabricTailor."
+}
