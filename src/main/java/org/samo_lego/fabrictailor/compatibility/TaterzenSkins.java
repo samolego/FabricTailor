@@ -13,8 +13,8 @@ public class TaterzenSkins {
 
         if (taterzen != null) {
             CompoundTag skinTag = new CompoundTag();
-            skinTag.putString("value", skinData.getValue());
-            skinTag.putString("signature", skinData.getSignature());
+            skinTag.putString("value", skinData.value());
+            skinTag.putString("signature", skinData.signature());
 
             taterzen.setSkinFromTag(skinTag);
             taterzen.sendProfileUpdates();

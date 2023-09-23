@@ -1,8 +1,8 @@
 plugins {
-	id 'fabric-loom' version '1.3-SNAPSHOT'
-	id 'maven-publish'
-	id "com.matthewprenger.cursegradle" version "1.4.0"
-	id "com.modrinth.minotaur" version "2.+"
+    id 'fabric-loom' version '1.3-SNAPSHOT'
+    id 'maven-publish'
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.modrinth.minotaur" version "2.+"
 }
 
 archivesBaseName = project.archives_base_name
@@ -10,132 +10,136 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-	maven { url 'https://maven.nucleoid.xyz' }
-	maven { url 'https://jitpack.io' }
-	maven { url 'https://masa.dy.fi/maven' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://maven.nucleoid.xyz' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://masa.dy.fi/maven' }
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/fabrictailor.accesswidener")
 }
 
 def ENV = System.getenv()
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered {
-		it.officialMojangMappings {
-			setNameSyntheticMembers(false)
-		}
-	}
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered {
+        it.officialMojangMappings {
+            setNameSyntheticMembers(false)
+        }
+    }
 
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// Config2Brigadier
-	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
+    // Config2Brigadier
+    modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
 
-	// LuckPerms
-	modImplementation(include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
+    // LuckPerms
+    modImplementation(include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
 
-	// Carpet
-	modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
-	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.4-beta3')
+    // Carpet
+    modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
+    modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.4-beta3')
 }
 
 processResources {
-	inputs.property "version", project.version
+    inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+    it.options.release = 17
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
 }
 
 jar {
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
 }
 
 // configure the maven publication
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
+    publications {
+        mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
 }
 
 // from FAPI https://github.com/FabricMC/fabric/blob/1.16/build.gradle
 curseforge {
-	if (ENV.CURSEFORGE_API_KEY) {
-		apiKey = ENV.CURSEFORGE_API_KEY
-	}
+    if (ENV.CURSEFORGE_API_KEY) {
+        apiKey = ENV.CURSEFORGE_API_KEY
+    }
 
-	project {
-		id = "390114"
-		changelog = "A changelog can be found at https://github.com/samolego/FabricTailor/releases/latest"
-		releaseType = "release"
-		addGameVersion "${project.minecraft_version}"
-		addGameVersion "Fabric"
+    project {
+        id = "390114"
+        changelog = "A changelog can be found at https://github.com/samolego/FabricTailor/releases/latest"
+        releaseType = "release"
+        addGameVersion "${project.minecraft_version}"
+        addGameVersion "Fabric"
 
-		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
-			displayName = "[${project.minecraft_version}] FabricTailor ${version}"
-		}
+        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
+            displayName = "[${project.minecraft_version}] FabricTailor ${version}"
+        }
 
-		afterEvaluate {
-			uploadTask.dependsOn("remapJar")
-		}
-	}
+        afterEvaluate {
+            uploadTask.dependsOn("remapJar")
+        }
+    }
 
-	options {
-		forgeGradleIntegration = false
-	}
+    options {
+        forgeGradleIntegration = false
+    }
 }
 
 
 tasks.modrinth {
-	onlyIf {
-		ENV.MODRINTH_TOKEN
-	}
+    onlyIf {
+        ENV.MODRINTH_TOKEN
+    }
 }
 
 modrinth {
-	token = ENV.MODRINTH_TOKEN
-	projectId = "g8w1NapE"
-	changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
-	versionNumber = version
-	versionName = "[${project.minecraft_version}] FabricTailor ${version}"
-	versionType = "release"
+    token = ENV.MODRINTH_TOKEN
+    projectId = "g8w1NapE"
+    changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
+    versionNumber = version
+    versionName = "[${project.minecraft_version}] FabricTailor ${version}"
+    versionType = "release"
 
-	uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
 
-	gameVersions = [project.minecraft_version]
-	loaders = ['fabric', 'quilt']
+    gameVersions = [project.minecraft_version]
+    loaders = ['fabric', 'quilt']
 
 }

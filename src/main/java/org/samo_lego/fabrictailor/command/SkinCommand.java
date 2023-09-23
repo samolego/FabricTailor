@@ -186,7 +186,7 @@ public class SkinCommand {
     }
 
     public static void setSkin(ServerPlayer player, Supplier<Property> skinProvider) {
-        long lastChange = ((TailoredPlayer) player).getLastSkinChange();
+        long lastChange = ((TailoredPlayer) player).fabrictailor_getLastSkinChange();
         long now = System.currentTimeMillis();
 
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
@@ -198,7 +198,7 @@ public class SkinCommand {
                     player.displayClientMessage(SKIN_SET_ERROR, false);
                 } else {
                     if (!TATERZENS_LOADED || !TaterzenSkins.setTaterzenSkin(player, skinData)) {
-                        ((TailoredPlayer) player).setSkin(skinData, true);
+                        ((TailoredPlayer) player).fabrictailor_setSkin(skinData, true);
                     }
                     player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
                 }
@@ -218,11 +218,11 @@ public class SkinCommand {
 
     public static boolean clearSkin(ServerPlayer player) {
 
-        long lastChange = ((TailoredPlayer) player).getLastSkinChange();
+        long lastChange = ((TailoredPlayer) player).fabrictailor_getLastSkinChange();
         long now = System.currentTimeMillis();
 
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
-            ((TailoredPlayer) player).clearSkin();
+            ((TailoredPlayer) player).fabrictailor_clearSkin();
             player.displayClientMessage(
                     TextTranslations.create("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
                     false

@@ -18,7 +18,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.chat.CommonComponents;
@@ -37,7 +36,6 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
-import static org.samo_lego.fabrictailor.mixin.accessors.client.AAdvancementsScreen.getWINDOW_LOCATION;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
@@ -179,7 +177,7 @@ public class SkinChangeScreen extends Screen {
                     // Change skin clientside only todo: reload skin
                     PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
 
-                    try {
+                    /*try {
                         map.removeAll(SkinManager.PROPERTY_TEXTURES);
                     } catch (Exception ignored) {
                         // Player has no skin data, no worries
@@ -198,19 +196,11 @@ public class SkinChangeScreen extends Screen {
                     //var skinInfo = this.minecraft.getSkinManager().getInsecureSkinInformation(this.minecraft.player.getGameProfile());
                     //MinecraftProfileTexture skinTexture = skinInfo.get(MinecraftProfileTexture.Type.SKIN);
                     //ResourceLocation resourceLocation = this.minecraft.getSkinManager().registerTexture(skinTexture, MinecraftProfileTexture.Type.SKIN);
-                    // todo
+                    // todo*/
                 }
             });
             return null;
         });
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if (this.skinInput != null) {
-            this.skinInput.tick();
-        }
     }
 
     /**
@@ -219,7 +209,7 @@ public class SkinChangeScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         // Darkens background
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, 0, 0, 0.5f);
         super.render(guiGraphics, mouseX, mouseY, delta);
 
         // Screen title
@@ -231,7 +221,7 @@ public class SkinChangeScreen extends Screen {
 
         // Window texture
         RenderSystem.enableBlend();
-        guiGraphics.blit(getWINDOW_LOCATION(), startX, startY, 0, 0, 252, 140);
+        guiGraphics.blit(AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140);
 
 
         // Render input field
@@ -298,7 +288,7 @@ public class SkinChangeScreen extends Screen {
             float mousex = (float) width / 2 - 75 - mouseX;
             float mousey = ((float) height / 2 - mouseY);
 
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, startX + 51, startY + 120, 50, mousex, mousey, this.minecraft.player);
+            //InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, startX + 51, startY + 120, 50, mousex, mousey, this.minecraft.player);
         }
     }
 
@@ -323,7 +313,7 @@ public class SkinChangeScreen extends Screen {
                 this.selectedTab = tab;
             } else if (selectedTab == tab) {
                 // Rendering "selected" tab
-                guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
+                //guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
 
                 // Showing or hiding additional buttons
                 this.skinModelCheckbox.visible = tab.hasSkinModels();
@@ -331,7 +321,7 @@ public class SkinChangeScreen extends Screen {
                 this.openExplorerButton.visible = tab.showExplorerButton();
             } else {
                 // rendering other tabs
-                guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
+                // guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
             }
         }
         // Rendering title

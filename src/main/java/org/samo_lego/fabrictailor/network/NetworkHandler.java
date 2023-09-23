@@ -15,6 +15,8 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
+import java.util.Optional;
+
 import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByName;
@@ -28,32 +30,33 @@ public class NetworkHandler {
         }
 
         THREADPOOL.submit(() -> {
-            String value = ((TailoredPlayer) player).getSkinValue();
-            String signature = ((TailoredPlayer) player).getSkinSignature();
+            Optional<String> value = ((TailoredPlayer) player).fabrictailor_getSkinValue();
+            Optional<String> signature = ((TailoredPlayer) player).fabrictailor_getSkinSignature();
 
             Property skinData = null;
-            if (value == null) {
+            if (value.isEmpty() || signature.isEmpty()) {
 
                 if (!config.defaultSkin.applyToAll)
                     skinData = fetchSkinByName(player.getGameProfile().getName());
 
                 if (skinData == null) {
-                    value = config.defaultSkin.value;
-                    signature = config.defaultSkin.signature;
+                    var defValue = config.defaultSkin.value;
+                    var defSignature = config.defaultSkin.signature;
 
-                    if (!value.isEmpty() && !signature.isEmpty())
-                        skinData = new Property(SkinManager.PROPERTY_TEXTURES, value, signature);
+                    if (!defValue.isEmpty() && !defSignature.isEmpty()) {
+                        skinData = new Property(SkinManager.PROPERTY_TEXTURES, defValue, defSignature);
+                    }
                 }
-
-
             } else {
-                skinData = new Property(SkinManager.PROPERTY_TEXTURES, value, signature);
+                skinData = new Property(SkinManager.PROPERTY_TEXTURES, value.get(), signature.get());
             }
+
+
             // Try to set skin now
             if (skinData != null) {
-                ((TailoredPlayer) player).setSkin(skinData, false);
+                ((TailoredPlayer) player).fabrictailor_setSkin(skinData, false);
             }
-            ((TailoredPlayer) player).resetLastSkinChange();
+            ((TailoredPlayer) player).fabrictailor_resetLastSkinChange();
         });
     }
 
@@ -65,12 +68,12 @@ public class NetworkHandler {
         return buf;
     }
 
-    public static void changeVanillaSkinPacket(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl listener, FriendlyByteBuf buf, PacketSender sender) {
+    public static void changeVanillaSkinPacket(MinecraftServer _server, ServerPlayer player, ServerGamePacketListenerImpl _listener, FriendlyByteBuf buf, PacketSender _sender) {
         NetworkHandler.onSkinChangePacket(player, buf, () -> {
         });
     }
 
-    public static void defaultSkinPacket(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl listener, FriendlyByteBuf buf, PacketSender sender) {
+    public static void defaultSkinPacket(MinecraftServer _server, ServerPlayer player, ServerGamePacketListenerImpl _listener, FriendlyByteBuf buf, PacketSender _sender) {
         if (player.hasPermissions(2)) {
             String value = buf.readUtf();
             String signature = buf.readUtf();
@@ -84,7 +87,7 @@ public class NetworkHandler {
         }
     }
 
-    public static void changeHDSkinPacket(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl listener, FriendlyByteBuf buf, PacketSender sender) {
+    public static void changeHDSkinPacket(MinecraftServer _server, ServerPlayer player, ServerGamePacketListenerImpl _listener, FriendlyByteBuf buf, PacketSender _sender) {
         NetworkHandler.onSkinChangePacket(player, buf, () ->
                 player.displayClientMessage(TextTranslations.create("hint.fabrictailor.client_only")
                         .withStyle(ChatFormatting.DARK_PURPLE), false));
@@ -92,11 +95,11 @@ public class NetworkHandler {
 
 
     public static void onSkinChangePacket(ServerPlayer player, FriendlyByteBuf buf, Runnable callback) {
-        long lastChange = ((TailoredPlayer) player).getLastSkinChange();
+        long lastChange = ((TailoredPlayer) player).fabrictailor_getLastSkinChange();
         long now = System.currentTimeMillis();
 
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
-            ((TailoredPlayer) player).setSkin(buf.readProperty(), true);
+            ((TailoredPlayer) player).fabrictailor_setSkin(buf.readProperty(), true);
             callback.run();
         } else {
             // Prevent skin change spamming

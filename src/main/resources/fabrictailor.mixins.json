@@ -4,7 +4,6 @@
     "package": "org.samo_lego.fabrictailor.mixin",
     "compatibilityLevel": "JAVA_16",
     "client": [
-      "accessors.client.AAdvancementsScreen",
       "client.AAbstractClientPlayer",
       "client.MHttpTexture_HDEnabler",
       "client.MSkinCustomizationScreen_SkinButton",
