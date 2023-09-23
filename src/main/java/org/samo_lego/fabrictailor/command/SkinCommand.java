@@ -4,6 +4,7 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -39,14 +40,19 @@ public class SkinCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("skin")
+                .requires(src -> Permissions.check(src, "fabrictailor.command.skin", true))
                 .then(literal("set")
+                        .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set", true))
                         .then(literal("URL")
+                                .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.url", true))
                                 .then(literal("classic")
+                                        .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.url.classic", true))
                                         .then(Commands.argument("skin URL", message())
                                                 .executes(context -> setSkinUrl(context, false))
                                         )
                                 )
                                 .then(literal("slim")
+                                        .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.url.slim", true))
                                         .then(Commands.argument("skin URL", message())
                                             .executes(context -> setSkinUrl(context, true))
                                     )
@@ -59,12 +65,15 @@ public class SkinCommand {
                             })
                     )
                     .then(literal("upload")
+                            .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.upload", true))
                             .then(literal("classic")
+                                    .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.upload.classic", true))
                                     .then(Commands.argument("skin file path", message())
                                             .executes(context -> setSkinFile(context, false))
                                     )
                             )
                             .then(literal("slim")
+                                    .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.upload.slim", true))
                                     .then(Commands.argument("skin file path", message())
                                             .executes(context -> setSkinFile(context, true))
                                     )
@@ -77,13 +86,15 @@ public class SkinCommand {
                             })
                     )
                     .then(literal("custom")
-                            .requires(ctx -> !config.customSkinServer.isEmpty())
+                            .requires(src -> !config.customSkinServer.isEmpty() && Permissions.check(src, "fabrictailor.command.skin.set.custom", true))
                             .then(literal("classic")
+                                    .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.custom.classic", true))
                                     .then(Commands.argument("name", greedyString())
                                             .executes(context -> setSkinCustom(context, false))
                                     )
                             )
                             .then(literal("slim")
+                                    .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.custom.slim", true))
                                     .then(Commands.argument("name", greedyString())
                                             .executes(context -> setSkinCustom(context, true))
                                     )
@@ -96,6 +107,7 @@ public class SkinCommand {
                             })
                     )
                     .then(literal("player")
+                            .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.player", true))
                             .then(Commands.argument("target", EntityArgument.player())
                                     .executes(SkinCommand::setSkinPlayer)
                             )
@@ -113,7 +125,9 @@ public class SkinCommand {
                         return 1;
                     })
             )
-            .then(literal("clear").executes(context -> clearSkin(context.getSource().getPlayerOrException()) ? 1 : 0))
+                .then(literal("clear")
+                        .requires(src -> Permissions.check(src, "fabrictailor.command.skin.clear", true))
+                        .executes(context -> clearSkin(context.getSource().getPlayerOrException()) ? 1 : 0))
         );
     }
 

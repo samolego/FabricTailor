@@ -30,8 +30,8 @@ public class FabricTailor implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// Registering /skin command
 		CommandRegistrationCallback.EVENT.register((dispatcher, context, selection) -> {
+			// Registering /skin command
 			SkinCommand.register(dispatcher);
 			FabrictailorCommand.register(dispatcher);
 		});

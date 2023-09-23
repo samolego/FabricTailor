@@ -1,6 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.1-SNAPSHOT'
-	id "org.quiltmc.quilt-mappings-on-loom" version "4.2.0"
+	id 'fabric-loom' version '1.3-SNAPSHOT'
 	id 'maven-publish'
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 	id "com.modrinth.minotaur" version "2.+"
@@ -22,10 +21,7 @@ def ENV = System.getenv()
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	//mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	mappings loom.layered {
-		//it.addLayer(quiltMappings.mappings("org.quiltmc:quilt-mappings:${rootProject.minecraft_version}+build.${rootProject.quilt_mappings}:v2"))
-		// https://lambdaurora.dev/tools/import_quilt.html
 		it.officialMojangMappings {
 			setNameSyntheticMembers(false)
 		}
@@ -56,14 +52,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// ensure that the encoding is set to UTF-8, no matter what the system default is
-	// this fixes some edge cases with special characters not displaying correctly
-	// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-	// If Javadoc is generated, this must be specified in that task too.
-	it.options.encoding = "UTF-8"
-
-	// Minecraft 1.17 (21w19a) upwards uses Java 16.
-	it.options.release = 16
+	it.options.release = 17
 }
 
 java {

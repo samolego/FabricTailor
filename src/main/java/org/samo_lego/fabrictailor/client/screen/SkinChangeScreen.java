@@ -47,7 +47,7 @@ public class SkinChangeScreen extends Screen {
 
     /**
      * Skin tabs:
-     * local, url, player
+     * cape, local, url, player
      */
     private static final List<SkinTabType> TABS = new ArrayList<>(Arrays.asList(
             new PlayerSkinTab(),
@@ -187,6 +187,7 @@ public class SkinChangeScreen extends Screen {
 
                     var skinData = packet.getSecond().readProperty();
                     map.put(SkinManager.PROPERTY_TEXTURES, skinData);
+                    var skiloc = ((AAbstractClientPlayer) Minecraft.getInstance().player).ft_getPlayerInfo().getSkinLocation();
 
                     // Reload skin
                     //HttpTexture.
