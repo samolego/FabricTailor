@@ -3,6 +3,7 @@ package org.samo_lego.fabrictailor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
@@ -44,7 +45,9 @@ public class FabricTailor implements ModInitializer {
 			CarpetFunctions.init();
 		}
 
+
 		ServerPlayConnectionEvents.INIT.register(NetworkHandler::onInit);
+		ServerConfigurationConnectionEvents.CONFIGURE.register(NetworkHandler::onConfigured);
 		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_VANILLA_CHANGE, NetworkHandler::changeVanillaSkinPacket);
 		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_HD_CHANGE, NetworkHandler::changeHDSkinPacket);
 		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_DEFAULT_SKIN, NetworkHandler::defaultSkinPacket);

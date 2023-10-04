@@ -18,6 +18,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.chat.CommonComponents;
@@ -288,7 +289,7 @@ public class SkinChangeScreen extends Screen {
             float mousex = (float) width / 2 - 75 - mouseX;
             float mousey = ((float) height / 2 - mouseY);
 
-            //InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, startX + 51, startY + 120, 50, mousex, mousey, this.minecraft.player);
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, startX + 51, startY + 120, startX + 75, startY + 78, 30, 0.0625f, mousex, mousey, this.minecraft.player);
         }
     }
 

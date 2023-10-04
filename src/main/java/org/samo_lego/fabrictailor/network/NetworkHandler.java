@@ -2,8 +2,9 @@ package org.samo_lego.fabrictailor.network;
 
 import com.mojang.authlib.properties.Property;
 import io.netty.buffer.Unpooled;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,23 +12,23 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import static org.samo_lego.fabrictailor.FabricTailor.THREADPOOL;
 import static org.samo_lego.fabrictailor.FabricTailor.config;
+import static org.samo_lego.fabrictailor.network.SkinPackets.FT_HELLO;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByName;
 
 public class NetworkHandler {
 
     public static void onInit(ServerGamePacketListenerImpl listener, MinecraftServer _server) {
         var player = listener.getPlayer();
-        if (ServerPlayNetworking.canSend(listener, SkinPackets.FT_HELLO)) {
-            ServerPlayNetworking.send(player, SkinPackets.FT_HELLO, createHelloPacket(player.hasPermissions(2)));
-        }
 
         THREADPOOL.submit(() -> {
             Optional<String> value = ((TailoredPlayer) player).fabrictailor_getSkinValue();
@@ -112,4 +113,16 @@ public class NetworkHandler {
             );
         }
     }
+
+    public static void onConfigured(ServerConfigurationPacketListenerImpl listener, MinecraftServer server) {
+        if (ServerConfigurationNetworking.canSend(listener, FT_HELLO)) {
+            try {
+                FriendlyByteBuf packetBuf = NetworkHandler.createHelloPacket(Permissions.check(listener.getOwner(), "fabrictailor.set_default_skin", 2, server).get());
+                ServerConfigurationNetworking.send(listener, SkinPackets.FT_HELLO, packetBuf);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
