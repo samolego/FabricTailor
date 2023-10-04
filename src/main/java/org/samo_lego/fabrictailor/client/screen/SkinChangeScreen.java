@@ -79,14 +79,11 @@ public class SkinChangeScreen extends Screen {
                         (buttonWidget) -> {
                             Util.getPlatform().openFile(new File(""));
                         })
+                .tooltip(Tooltip.create(TextTranslations.create("hint.fabrictailor.dragAndDrop")))
                 .pos(this.width / 2, this.height / 2 + 10)
                 .tooltip(Tooltip.create(TextTranslations.create("hint.fabrictailor.dragAndDrop")))
                 .size(BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
-
-                /*(buttonWidget, matrixStack, i, j) -> {
-                    this.renderTooltip(matrixStack, TextTranslations.create("hint.fabrictailor.dragAndDrop"), width / 2 - 100, height / 2 + 10);
-                }*/
         this.addRenderableWidget(openExplorerButton);
 
         // Checkbox for slim skin model
@@ -235,7 +232,7 @@ public class SkinChangeScreen extends Screen {
 
 
         if (this.selectedTab.showModelBackwards()) {
-            int x = startX + 50;
+            int x = startX + 64;
             int y = startY + 120;
             int size = 50;
             float mousex = -(((float) width / 2) - 75 - mouseX);
@@ -286,10 +283,9 @@ public class SkinChangeScreen extends Screen {
         } else {
             // Drawing Player
             // Luckily vanilla code is available
-            float mousex = (float) width / 2 - 75 - mouseX;
-            float mousey = ((float) height / 2 - mouseY);
-
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, startX + 51, startY + 120, startX + 75, startY + 78, 30, 0.0625f, mousex, mousey, this.minecraft.player);
+            int x = this.startX + 24;
+            int y = this.startY - 76;
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
         }
     }
 
