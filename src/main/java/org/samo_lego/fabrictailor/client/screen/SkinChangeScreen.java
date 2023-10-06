@@ -75,9 +75,7 @@ public class SkinChangeScreen extends Screen {
 
         // Button for opening file manager
         this.openExplorerButton = Button.builder(TextTranslations.create("button.fabrictailor.open_explorer"),
-                        (buttonWidget) -> {
-                            Util.getPlatform().openFile(new File(""));
-                        })
+                        (buttonWidget) -> Util.getPlatform().openFile(new File("")))
                 .tooltip(Tooltip.create(TextTranslations.create("hint.fabrictailor.dragAndDrop")))
                 .pos(this.width / 2, this.height / 2 + 10)
                 .tooltip(Tooltip.create(TextTranslations.create("hint.fabrictailor.dragAndDrop")))
@@ -227,7 +225,7 @@ public class SkinChangeScreen extends Screen {
         // Other renders
         this.drawTabs(guiGraphics, startX, startY);
         this.drawIcons(guiGraphics, startX, startY);
-        this.drawWidgetTooltip(guiGraphics, startX, startY, mouseX, mouseY);
+        this.drawWidgetTooltips(guiGraphics, startX, startY, mouseX, mouseY);
 
 
         if (this.selectedTab.showModelBackwards()) {
@@ -310,7 +308,6 @@ public class SkinChangeScreen extends Screen {
 
                 // Showing or hiding additional buttons
                 this.skinModelCheckbox.visible = tab.hasSkinModels();
-                // Making sure we are in singleplayer to show open explorer button
                 this.openExplorerButton.visible = tab.showExplorerButton();
             }
 
@@ -349,7 +346,7 @@ public class SkinChangeScreen extends Screen {
      * @param mouseX      mouse x
      * @param mouseY      mouse y
      */
-    private void drawWidgetTooltip(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
+    private void drawWidgetTooltips(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
 
