@@ -30,7 +30,6 @@ import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -48,12 +47,12 @@ public class SkinChangeScreen extends Screen {
      * Skin tabs:
      * cape, local, url, player
      */
-    private static final List<SkinTabType> TABS = new ArrayList<>(Arrays.asList(
+    private static final List<SkinTabType> TABS = Arrays.asList(
             new PlayerSkinTab(),
             new UrlSkinTab(),
             new LocalSkinTab(),
             new CapeTab()
-    ));
+    );
 
     private EditBox skinInput;
     private int startX;
@@ -226,9 +225,9 @@ public class SkinChangeScreen extends Screen {
         skinInput.render(guiGraphics, startX, startY, delta);
 
         // Other renders
-        this.drawTabs(guiGraphics, startX, startY, mouseX, mouseY);
+        this.drawTabs(guiGraphics, startX, startY);
         this.drawIcons(guiGraphics, startX, startY);
-        this.drawWidgetTooltip(guiGraphics, startX, startY, mouseX, mouseY, delta);
+        this.drawWidgetTooltip(guiGraphics, startX, startY, mouseX, mouseY);
 
 
         if (this.selectedTab.showModelBackwards()) {
@@ -295,39 +294,34 @@ public class SkinChangeScreen extends Screen {
      * @param guiGraphics
      * @param startX      x where skin window starts
      * @param startY      y where skin window starts
-     * @param mouseX      mouse x
-     * @param mouseY      mouse y
      */
-    private void drawTabs(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
-        // Setting texture
-        RenderSystem.enableBlend();
+    private void drawTabs(GuiGraphics guiGraphics, int startX, int startY) {
+        if (this.selectedTab == null) {
+            this.selectedTab = TABS.get(0);
+        }
 
         // Tabs
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
 
-            if (selectedTab == null) {
-                this.selectedTab = tab;
-            } else if (selectedTab == tab) {
+            final var selected = this.selectedTab == tab;
+            if (selected) {
                 // Rendering "selected" tab
-                //guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 32, 28, 32);
 
                 // Showing or hiding additional buttons
                 this.skinModelCheckbox.visible = tab.hasSkinModels();
                 // Making sure we are in singleplayer to show open explorer button
                 this.openExplorerButton.visible = tab.showExplorerButton();
-            } else {
-                // rendering other tabs
-                // guiGraphics.blit(AdvancementsScreen.TABS_LOCATION, startX + 224 - i * 27, startY - 28, i == 0 ? 56 : 28, 0, 28, i == 0 ? 31 : 29);
             }
+
+            tab.getTabType().draw(guiGraphics, startX, startY, selected, tab.getTabType().getMax() - i - 1);
         }
+
         // Rendering title
         guiGraphics.drawString(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFF);
 
         // Rendering description above input field
         guiGraphics.drawString(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFF);
-
-        RenderSystem.defaultBlendFunc();
     }
 
 
@@ -341,9 +335,8 @@ public class SkinChangeScreen extends Screen {
         // Icons
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
-            guiGraphics.renderItem(tab.getIcon(), startX + 231 - i * 27, startY - 18);
+            tab.getTabType().drawIcon(guiGraphics, startX, startY, tab.getTabType().getMax() - i - 1, tab.getIcon());
         }
-        RenderSystem.disableBlend();
     }
 
 
@@ -356,11 +349,13 @@ public class SkinChangeScreen extends Screen {
      * @param mouseX      mouse x
      * @param mouseY      mouse y
      */
-    private void drawWidgetTooltip(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY, float delta) {
+    private void drawWidgetTooltip(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
-            if (tab.isSelected(startX + 225 - i * 27, startY - 28, mouseX, mouseY)) {
+
+            if (tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY)) {
                 guiGraphics.renderTooltip(this.font, tab.getTitle(), mouseX, mouseY);
+                break;
             }
         }
     }
@@ -379,7 +374,10 @@ public class SkinChangeScreen extends Screen {
         if (button == 0) {
             for (int i = 0; i < TABS.size(); ++i) {
                 SkinTabType tab = TABS.get(i);
-                if (tab.isSelected(startX + 225 - i * 27, startY - 28, (int) mouseX, (int) mouseY)) {
+
+                final boolean mouseOver = tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY);
+
+                if (mouseOver) {
                     this.selectedTab = tab;
                     break;
                 }

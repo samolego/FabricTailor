@@ -2,3 +2,4 @@ accessWidener v2 named
 
 accessible field net/minecraft/client/gui/screens/advancements/AdvancementsScreen WINDOW_LOCATION Lnet/minecraft/resources/ResourceLocation;
 accessible field net/minecraft/client/resources/SkinManager PROPERTY_TEXTURES Ljava/lang/String;
+accessible class net/minecraft/client/gui/screens/advancements/AdvancementTabType

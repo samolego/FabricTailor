@@ -2,6 +2,7 @@ package org.samo_lego.fabrictailor.client.screen.tabs;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
@@ -56,5 +57,10 @@ public class PlayerSkinTab implements SkinTabType {
             return Optional.empty();
 
         return Optional.of(new Pair<>(FABRICTAILOR_VANILLA_CHANGE, SkinPackets.skin2ByteBuf(skinData)));
+    }
+
+    @Override
+    public AdvancementTabType getTabType() {
+        return AdvancementTabType.ABOVE;
     }
 }

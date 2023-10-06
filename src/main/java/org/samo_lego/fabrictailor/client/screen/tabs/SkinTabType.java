@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.FriendlyByteBuf;
@@ -76,5 +77,9 @@ public interface SkinTabType {
         String value = new String(Base64.getEncoder().encode(jsonPayload.toString().getBytes()));
 
         return new Property(SkinManager.PROPERTY_TEXTURES, value);
+    }
+
+    default AdvancementTabType getTabType() {
+        return AdvancementTabType.ABOVE;
     }
 }
