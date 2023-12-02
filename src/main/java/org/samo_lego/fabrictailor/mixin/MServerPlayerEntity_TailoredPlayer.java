@@ -5,7 +5,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.resources.SkinManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.*;
@@ -159,13 +158,13 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
      */
     public void fabrictailor_setSkin(Property skinData, boolean reload) {
         try {
-            this.map.removeAll("textures");
+            this.map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
         } catch (Exception ignored) {
             // Player has no skin data, no worries
         }
 
         try {
-            this.map.put("textures", skinData);
+            this.map.put(TailoredPlayer.PROPERTY_TEXTURES, skinData);
 
             // Saving skin data
             this.skinValue = skinData.value();
@@ -185,14 +184,14 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
 
     @Override
     public void fabrictailor_setSkin(String value, String signature, boolean reload) {
-        this.fabrictailor_setSkin(new Property(SkinManager.PROPERTY_TEXTURES, value, signature), reload);
+        this.fabrictailor_setSkin(new Property(TailoredPlayer.PROPERTY_TEXTURES, value, signature), reload);
     }
 
     @Override
     public Optional<String> fabrictailor_getSkinValue() {
         if (this.skinValue == null) {
             try {
-                Property property = map.get("textures").iterator().next();
+                Property property = map.get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next();
                 this.skinValue = property.value();
             } catch (Exception ignored) {
                 // Player has no skin data, no worries
@@ -206,7 +205,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     public Optional<String> fabrictailor_getSkinSignature() {
         if (this.skinSignature == null) {
             try {
-                Property property = map.get("textures").iterator().next();
+                Property property = map.get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next();
                 this.skinSignature = property.signature();
             } catch (Exception ignored) {
                 // Player has no skin data, no worries
@@ -224,7 +223,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     @Override
     public void fabrictailor_clearSkin() {
         try {
-            this.map.removeAll("textures");
+            this.map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
             // Ensure that the skin is completely cleared to prevent the save bug.
             this.skinValue = null;
             this.skinSignature = null;
@@ -239,7 +238,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         String skin = this.skinValue;
         if (skin == null) {
             // Fallback to default skin
-            var textures = self.getGameProfile().getProperties().get("textures").stream().findAny();
+            var textures = self.getGameProfile().getProperties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findAny();
 
             if (textures.isPresent()) {
                 skin = textures.get().value();
@@ -254,7 +253,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         // Parse as json, then get textures -> SKIN -> url value
         String url = JsonParser.parseString(decoded)
                 .getAsJsonObject()
-                .getAsJsonObject("textures")
+                .getAsJsonObject(TailoredPlayer.PROPERTY_TEXTURES)
                 .getAsJsonObject("SKIN")
                 .getAsJsonPrimitive("url")
                 .getAsString();

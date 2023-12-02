@@ -7,11 +7,11 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 
 import java.nio.charset.StandardCharsets;
@@ -47,11 +47,11 @@ public interface SkinTabType {
     }
 
     default Property getExtendedProperty(LocalPlayer player, MinecraftProfileTexture.Type type, String textureUrl, JsonObject metadata) {
-        var current = ((AAbstractClientPlayer) player).ft_getPlayerInfo().getProfile().getProperties().get(SkinManager.PROPERTY_TEXTURES).stream().findFirst();
+        var current = ((AAbstractClientPlayer) player).ft_getPlayerInfo().getProfile().getProperties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findFirst();
         String json = current.map(property -> new String(Base64.getDecoder().decode(property.value()), StandardCharsets.UTF_8))
-                .orElse("{\"" + SkinManager.PROPERTY_TEXTURES + "\":{}}");
+                .orElse("{\"" + TailoredPlayer.PROPERTY_TEXTURES + "\":{}}");
         JsonObject jsonPayload = JsonParser.parseString(json).getAsJsonObject();
-        JsonObject textures = jsonPayload.get(SkinManager.PROPERTY_TEXTURES).getAsJsonObject();
+        JsonObject textures = jsonPayload.get(TailoredPlayer.PROPERTY_TEXTURES).getAsJsonObject();
 
         if (textures.has(type.toString())) {
             JsonObject texture = textures.get(type.toString()).getAsJsonObject();
@@ -76,7 +76,7 @@ public interface SkinTabType {
 
         String value = new String(Base64.getEncoder().encode(jsonPayload.toString().getBytes()));
 
-        return new Property(SkinManager.PROPERTY_TEXTURES, value);
+        return new Property(TailoredPlayer.PROPERTY_TEXTURES, value);
     }
 
     default AdvancementTabType getTabType() {

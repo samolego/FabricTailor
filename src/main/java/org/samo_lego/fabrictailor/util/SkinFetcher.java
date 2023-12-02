@@ -2,8 +2,8 @@ package org.samo_lego.fabrictailor.util;
 
 import com.google.gson.JsonParser;
 import com.mojang.authlib.properties.Property;
-import net.minecraft.client.resources.SkinManager;
 import org.jetbrains.annotations.Nullable;
+import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -97,14 +97,14 @@ public class SkinFetcher {
      */
     @Nullable
     protected static Property getSkinFromReply(String reply) {
-        if(reply == null || reply.contains("error") || reply.isEmpty()) {
+        if (reply == null || reply.contains("error") || reply.isEmpty()) {
             return null;
         }
 
         String value = reply.split("\"value\":\"")[1].split("\"")[0];
         String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
-        return new Property(SkinManager.PROPERTY_TEXTURES, value, signature);
+        return new Property(TailoredPlayer.PROPERTY_TEXTURES, value, signature);
     }
 
     /**

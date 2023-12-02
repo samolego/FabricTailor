@@ -6,7 +6,6 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -45,11 +44,11 @@ public class NetworkHandler {
                     var defSignature = config.defaultSkin.signature;
 
                     if (!defValue.isEmpty() && !defSignature.isEmpty()) {
-                        skinData = new Property(SkinManager.PROPERTY_TEXTURES, defValue, defSignature);
+                        skinData = new Property(TailoredPlayer.PROPERTY_TEXTURES, defValue, defSignature);
                     }
                 }
             } else {
-                skinData = new Property(SkinManager.PROPERTY_TEXTURES, value.get(), signature.get());
+                skinData = new Property(TailoredPlayer.PROPERTY_TEXTURES, value.get(), signature.get());
             }
 
 

@@ -20,10 +20,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.joml.Quaternionf;
+import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.client.screen.tabs.*;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 import org.samo_lego.fabrictailor.util.TextTranslations;
@@ -84,14 +84,11 @@ public class SkinChangeScreen extends Screen {
         this.addRenderableWidget(openExplorerButton);
 
         // Checkbox for slim skin model
-        this.skinModelCheckbox = new Checkbox(
-                width / 2,
-                height / 2 - 12,
-                150,
-                20,
-                TextTranslations.create("button.fabrictailor.use_slim"),
-                false
-        );
+        this.skinModelCheckbox = Checkbox.builder(TextTranslations.create("button.fabrictailor.use_slim"), this.font)
+                .pos(width / 2,
+                        height / 2 - 12)
+                .selected(false)
+                .build();
         this.addRenderableWidget(skinModelCheckbox);
 
         // Both should be hidden at first (default tab is "player")
@@ -157,7 +154,7 @@ public class SkinChangeScreen extends Screen {
         if (TAILORED_SERVER) {
             this.minecraft.player.connection.sendUnsignedCommand("skin clear");
         } else {
-            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(SkinManager.PROPERTY_TEXTURES);
+            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
             // Reload skin - todo
         }
     }
@@ -173,13 +170,13 @@ public class SkinChangeScreen extends Screen {
                     PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
 
                     /*try {
-                        map.removeAll(SkinManager.PROPERTY_TEXTURES);
+                        map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
                     } catch (Exception ignored) {
                         // Player has no skin data, no worries
                     }
 
                     var skinData = packet.getSecond().readProperty();
-                    map.put(SkinManager.PROPERTY_TEXTURES, skinData);
+                    map.put(TailoredPlayer.PROPERTY_TEXTURES, skinData);
                     var skiloc = ((AAbstractClientPlayer) Minecraft.getInstance().player).ft_getPlayerInfo().getSkinLocation();
 
                     // Reload skin
@@ -305,7 +302,6 @@ public class SkinChangeScreen extends Screen {
             final var selected = this.selectedTab == tab;
             if (selected) {
                 // Rendering "selected" tab
-
                 // Showing or hiding additional buttons
                 this.skinModelCheckbox.visible = tab.hasSkinModels();
                 this.openExplorerButton.visible = tab.showExplorerButton();

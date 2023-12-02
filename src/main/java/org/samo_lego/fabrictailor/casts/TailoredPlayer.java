@@ -9,6 +9,7 @@ import java.util.Optional;
  * Includes additional methods for skin changes.
  */
 public interface TailoredPlayer {
+    String PROPERTY_TEXTURES = "textures";
     /**
      * Reloads player's skin.
      */
