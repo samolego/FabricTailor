@@ -17,6 +17,19 @@ tl;dr:
 
 Please see the [wiki](https://github.com/samolego/FabricTailor/wiki) :wink:.
 
+## Permissions
+
+FabricTailor provides permission support for permission manager of your choice. Skin changing is granted by default.
+/skin command
+```
+fabrictailor.command.skin
+```
+You can also diaable skin clearing / setting only
+```
+fabrictailor.command.skin.set
+```
+
+
 ## Setup
 
 1. Clone the repository. Then run `./gradlew genSources`
