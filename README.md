@@ -24,7 +24,7 @@ FabricTailor provides permission support for permission manager of your choice. 
 ```
 fabrictailor.command.skin
 ```
-You can also diaable skin clearing / setting only
+You can also disable skin clearing / setting only
 ```
 fabrictailor.command.skin.set
 ```
