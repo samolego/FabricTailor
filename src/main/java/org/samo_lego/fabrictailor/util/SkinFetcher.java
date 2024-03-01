@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Scanner;
@@ -55,7 +56,7 @@ public class SkinFetcher {
     @Nullable
     public static Property fetchSkinByUrl(String skinUrl, boolean useSlim) {
         try {
-            URL url = new URL(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", skinUrl, useSlim ? "slim" : "steve"));
+            URL url = new URL(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", URLEncoder.encode(skinUrl, StandardCharsets.UTF_8), useSlim ? "slim" : "steve"));
             String reply = urlRequest(url, false, null);
             return getSkinFromReply(reply);
         } catch (IOException e) {
