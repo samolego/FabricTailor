@@ -8,11 +8,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
-import org.samo_lego.fabrictailor.network.SkinPackets;
+import org.samo_lego.fabrictailor.network.payload.FabricTailorHelloPayload;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 /**
@@ -61,9 +62,10 @@ public class ClientTailor implements ClientModInitializer {
             forceOpen = false;
         });
 
-        ClientConfigurationNetworking.registerGlobalReceiver(SkinPackets.FT_HELLO, (client, handler, buf, responseSender) -> {
+        PayloadTypeRegistry.configurationS2C().register(FabricTailorHelloPayload.TYPE, FabricTailorHelloPayload.CODEC);
+        ClientConfigurationNetworking.registerGlobalReceiver(FabricTailorHelloPayload.TYPE, (payload, context) -> {
             TAILORED_SERVER = true;
-            ALLOW_DEFAULT_SKIN = buf.readBoolean();
+            ALLOW_DEFAULT_SKIN = payload.allowSkinButton();
         });
     }
 }

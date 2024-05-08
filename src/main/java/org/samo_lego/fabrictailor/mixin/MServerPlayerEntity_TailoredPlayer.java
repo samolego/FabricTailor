@@ -7,8 +7,23 @@ import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.*;
-import net.minecraft.server.level.*;
+import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
+import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
+import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
+import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -98,7 +113,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         ServerLevel level = self.serverLevel();
         this.connection.send(new ClientboundRespawnPacket(
                         new CommonPlayerSpawnInfo(
-                                level.dimensionTypeId(),
+                                level.dimensionTypeRegistration(),
                                 level.dimension(),
                                 BiomeManager.obfuscateSeed(level.getSeed()),
                                 self.gameMode.getGameModeForPlayer(),
@@ -123,7 +138,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         this.connection.send(new ClientboundSetHealthPacket(this.getHealth(), this.getFoodData().getFoodLevel(), this.getFoodData().getSaturationLevel()));
 
         for (MobEffectInstance statusEffect : this.getActiveEffects()) {
-            this.connection.send(new ClientboundUpdateMobEffectPacket(self.getId(), statusEffect));
+            this.connection.send(new ClientboundUpdateMobEffectPacket(self.getId(), statusEffect, false));
         }
 
         var equipmentList = new ArrayList<Pair<EquipmentSlot, ItemStack>>();

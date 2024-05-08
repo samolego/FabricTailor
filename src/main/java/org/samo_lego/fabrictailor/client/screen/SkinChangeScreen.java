@@ -1,16 +1,12 @@
 package org.samo_lego.fabrictailor.client.screen;
 
 import com.mojang.authlib.properties.PropertyMap;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -19,12 +15,14 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import org.joml.Quaternionf;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.client.screen.tabs.*;
+import org.samo_lego.fabrictailor.client.screen.tabs.CapeTab;
+import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
+import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
+import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
+import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
@@ -164,7 +162,7 @@ public class SkinChangeScreen extends Screen {
             final var packetInfo = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
             packetInfo.ifPresent(packet -> {
                 if (TAILORED_SERVER) {
-                    ClientPlayNetworking.send(packet.getFirst(), packet.getSecond());
+                    ClientPlayNetworking.send(packet);
                 } else {
                     // Change skin clientside only todo: reload skin
                     PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
@@ -226,54 +224,34 @@ public class SkinChangeScreen extends Screen {
 
 
         if (this.selectedTab.showModelBackwards()) {
-            int x = startX + 64;
-            int y = startY + 120;
-            int size = 50;
             float mousex = -(((float) width / 2) - 75 - mouseX);
             float mousey = ((float) height / 2) - mouseY;
-            var entity = minecraft.player;
+            var player = minecraft.player;
             float f = (float) Math.atan(mousex / 40.0f);
             float g = (float) Math.atan(mousey / 40.0f);
-            PoseStack poseStack = RenderSystem.getModelViewStack();
-            poseStack.pushPose();
-            poseStack.translate(x, y, 1050.0);
-            poseStack.scale(1.0f, 1.0f, -1.0f);
-            RenderSystem.applyModelViewMatrix();
-            PoseStack poseStack2 = new PoseStack();
-            poseStack2.translate(0.0, 0.0, 1000.0);
-            poseStack2.scale(size, size, size);
-            Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0f);
-            Quaternionf quaternion2 = Axis.XP.rotationDegrees(g * 20.0f);
-            quaternion.mul(quaternion2);
-            poseStack2.mulPose(quaternion);
-            float h = entity.yBodyRot;
-            float i = entity.getYRot();
-            float j = entity.getXRot();
-            float k = entity.yHeadRotO;
-            float l = entity.yHeadRot;
-            entity.yBodyRot = f * 20.0f;
-            entity.setYRot(f * 40.0f);
-            entity.setXRot(-g * 20.0f);
-            entity.yHeadRot = entity.getYRot();
-            entity.yHeadRotO = entity.getYRot();
-            Lighting.setupForEntityInInventory();
-            EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-            quaternion2.conjugate();
-            entityRenderDispatcher.overrideCameraOrientation(quaternion2);
-            entityRenderDispatcher.setRenderShadow(false);
-            var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-            RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, 1.0f, poseStack2, bufferSource, 0xF000F0));
-            bufferSource.endBatch();
-            entityRenderDispatcher.setRenderShadow(true);
-            entity.yBodyRot = h;
-            entity.setYRot(i);
-            entity.setXRot(j);
-            entity.yHeadRotO = k;
-            entity.yHeadRot = l;
-            poseStack.popPose();
-            RenderSystem.applyModelViewMatrix();
-            Lighting.setupFor3DItems();
 
+            float yBodyRot = player.yBodyRot;
+            float yRot = player.getYRot();
+            float xRot = player.getXRot();
+            float yHeadRotO = player.yHeadRotO;
+            float yHeadRot = player.yHeadRot;
+
+            player.yBodyRot = f * 20.0f;
+            player.setYRot(f * 40.0f);
+            player.setXRot(-g * 20.0f);
+            player.yHeadRot = player.getYRot();
+            player.yHeadRotO = player.getYRot();
+
+
+            int x = this.startX + 24;
+            int y = this.startY - 76;
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
+
+            player.yBodyRot = yBodyRot;
+            player.setYRot(yRot);
+            player.setXRot(xRot);
+            player.yHeadRotO = yHeadRotO;
+            player.yHeadRot = yHeadRot;
         } else {
             // Drawing Player
             // Luckily vanilla code is available

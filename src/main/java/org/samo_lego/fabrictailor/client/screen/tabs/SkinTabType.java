@@ -4,12 +4,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.properties.Property;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gui.screens.advancements.AdvancementTabType;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
@@ -32,7 +30,7 @@ public interface SkinTabType {
         return mouseX > startX && mouseX < startX + this.width && mouseY > startY && mouseY < startY + this.height;
     }
 
-    Optional<Pair<ResourceLocation, FriendlyByteBuf>> getSkinChangePacket(LocalPlayer player, String param, boolean useSlim);
+    Optional<CustomPacketPayload> getSkinChangePacket(LocalPlayer player, String param, boolean useSlim);
 
     default boolean hasSkinModels() {
         return true;

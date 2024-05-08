@@ -3,6 +3,7 @@ package org.samo_lego.fabrictailor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -14,12 +15,13 @@ import org.samo_lego.fabrictailor.command.SkinCommand;
 import org.samo_lego.fabrictailor.compatibility.CarpetFunctions;
 import org.samo_lego.fabrictailor.config.TailorConfig;
 import org.samo_lego.fabrictailor.network.NetworkHandler;
+import org.samo_lego.fabrictailor.network.payload.DefaultSkinPayload;
+import org.samo_lego.fabrictailor.network.payload.HDSkinPayload;
+import org.samo_lego.fabrictailor.network.payload.VanillaSkinPayload;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static org.samo_lego.fabrictailor.network.SkinPackets.*;
 
 public class FabricTailor implements ModInitializer {
 
@@ -28,6 +30,10 @@ public class FabricTailor implements ModInitializer {
 	public static TailorConfig config;
 	public static File configFile;
 	public static final ExecutorService THREADPOOL = Executors.newCachedThreadPool();
+
+	public static void errorLog(String error) {
+		LOGGER.error("[FabricTailor] An error occurred: {}", error);
+	}
 
 	@Override
 	public void onInitialize() {
@@ -47,14 +53,17 @@ public class FabricTailor implements ModInitializer {
 
 
 		ServerPlayConnectionEvents.INIT.register(NetworkHandler::onInit);
-		ServerConfigurationConnectionEvents.CONFIGURE.register(NetworkHandler::onConfigured);
-		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_VANILLA_CHANGE, NetworkHandler::changeVanillaSkinPacket);
-		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_HD_CHANGE, NetworkHandler::changeHDSkinPacket);
-		ServerPlayNetworking.registerGlobalReceiver(FABRICTAILOR_DEFAULT_SKIN, NetworkHandler::defaultSkinPacket);
-	}
 
-	public static void errorLog(String error) {
-		LOGGER.error("[FabricTailor] An error occurred: " + error);
+		ServerConfigurationConnectionEvents.CONFIGURE.register(NetworkHandler::onConfigured);
+
+		PayloadTypeRegistry.playC2S().register(VanillaSkinPayload.TYPE, VanillaSkinPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(VanillaSkinPayload.TYPE, NetworkHandler::changeVanillaSkinPacket);
+
+		PayloadTypeRegistry.playC2S().register(HDSkinPayload.TYPE, HDSkinPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(HDSkinPayload.TYPE, NetworkHandler::changeHDSkinPacket);
+
+		PayloadTypeRegistry.playC2S().register(DefaultSkinPayload.TYPE, DefaultSkinPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(DefaultSkinPayload.TYPE, NetworkHandler::defaultSkinPacket);
 	}
 
 	public static void reloadConfig() {
