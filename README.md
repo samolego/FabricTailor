@@ -20,14 +20,20 @@ Please see the [wiki](https://github.com/samolego/FabricTailor/wiki) :wink:.
 ## Permissions
 
 FabricTailor provides permission support for permission manager of your choice. Skin changing is granted by default.
-/skin command
+
+* `/skin` command permission
 ```
 fabrictailor.command.skin
 ```
-You can also disable skin clearing / setting only
+* You can also disable skin clearing / setting only
 ```
 fabrictailor.command.skin.set
 ```
+* Or setting by URL only
+```
+fabrictailor.command.skin.set.url
+```
+* In general, each command subnode has its own permission node, lowercase and separated by dots.
 
 
 ## Setup
