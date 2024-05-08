@@ -17,7 +17,7 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v1
         with:
-          java-version: 17
+          java-version: 21
       - name: make gradle wrapper executable
         if: ${{ runner.os != 'Windows' }}
         run: chmod +x ./gradlew
