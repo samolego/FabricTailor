@@ -194,7 +194,7 @@ public class SkinCommand {
             THREADPOOL.submit(() -> {
                 Property skinData = skinProvider.get();
 
-                if(skinData == null) {
+                if (skinData == null) {
                     player.displayClientMessage(SKIN_SET_ERROR, false);
                 } else {
                     if (!TATERZENS_LOADED || !TaterzenSkins.setTaterzenSkin(player, skinData)) {

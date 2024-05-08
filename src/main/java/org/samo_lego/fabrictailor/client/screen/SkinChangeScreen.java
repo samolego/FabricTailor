@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
@@ -24,6 +25,7 @@ import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
 import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
+import org.samo_lego.fabrictailor.network.payload.DefaultSkinPayload;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.io.File;
@@ -139,7 +141,9 @@ public class SkinChangeScreen extends Screen {
             this.addRenderableWidget(
                     Button.builder(TextTranslations.create("button.fabrictailor.set_default_skin"),
                                     onClick -> {
-                                        minecraft.player.connection.sendUnsignedCommand("skin default");
+                                        var profile = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile();
+                                        var payload = new DefaultSkinPayload(profile.getProperties().get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next());
+                                        ClientPlayNetworking.send(payload);
                                         this.onClose();
                                     })
                             .pos(width / 2 - BUTTON_WIDTH / 2 - 1, buttonY)
@@ -236,16 +240,16 @@ public class SkinChangeScreen extends Screen {
             float yHeadRotO = player.yHeadRotO;
             float yHeadRot = player.yHeadRot;
 
-            player.yBodyRot = f * 20.0f;
-            player.setYRot(f * 40.0f);
-            player.setXRot(-g * 20.0f);
-            player.yHeadRot = player.getYRot();
-            player.yHeadRotO = player.getYRot();
+            player.yBodyRot += 180.0f;
+            player.setYRot(yRot + 180f);
+            player.setXRot(xRot + 180.0f);
+            player.yHeadRot += 180.0f;
+            player.yHeadRotO += 180.0f;
 
 
             int x = this.startX + 24;
             int y = this.startY - 76;
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
+            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, -mouseX - 2, mouseY - 16, this.minecraft.player);
 
             player.yBodyRot = yBodyRot;
             player.setYRot(yRot);

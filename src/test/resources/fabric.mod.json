@@ -21,6 +21,9 @@
   "entrypoints": {
     "main": [
       "org.samo_lego.fabrictailor.testmod.TailorTest"
+    ],
+    "client": [
+      "org.samo_lego.fabrictailor.testmod.TailorTest"
     ]
   },
   "mixins": [ ],

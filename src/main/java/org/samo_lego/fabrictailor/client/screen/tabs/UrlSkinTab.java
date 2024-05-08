@@ -75,7 +75,7 @@ public class UrlSkinTab implements SkinTabType {
                 }
 
                 // Check if tld is allowed
-                String tld = InternetDomainName.from(skinUrl.getHost()).topPrivateDomain().toString();
+                String tld = InternetDomainName.from(skinUrl.getHost()).topDomainUnderRegistrySuffix().toString();
                 if (!config.allowedTextureDomains.contains(tld)) {
                     // Redirect to duckduckgo
                     // e.g. convert https://image.com/image.png to https://external-content.duckduckgo.com/iu/?u=https://image.com/image.png

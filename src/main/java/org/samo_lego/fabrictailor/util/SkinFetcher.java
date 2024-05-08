@@ -8,6 +8,7 @@ import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -31,9 +32,9 @@ public class SkinFetcher {
     public static Property setSkinFromFile(String skinFilePath, boolean useSlim) {
         File skinFile = new File(skinFilePath);
         try (FileInputStream input = new FileInputStream(skinFile)) {
-            if(input.read() == 137) {
+            if (input.read() == 137) {
                 try {
-                    String reply = urlRequest(new URL("https://api.mineskin.org/generate/upload?model=" + (useSlim ? "slim" : "steve")), false, skinFile);
+                    String reply = urlRequest(URI.create("https://api.mineskin.org/generate/upload?model=" + (useSlim ? "slim" : "steve")).toURL(), false, skinFile);
                     return getSkinFromReply(reply);
                 } catch (IOException e) {
                     // Error uploading
@@ -56,7 +57,7 @@ public class SkinFetcher {
     @Nullable
     public static Property fetchSkinByUrl(String skinUrl, boolean useSlim) {
         try {
-            URL url = new URL(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", URLEncoder.encode(skinUrl, StandardCharsets.UTF_8), useSlim ? "slim" : "steve"));
+            URL url = URI.create(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", URLEncoder.encode(skinUrl, StandardCharsets.UTF_8), useSlim ? "slim" : "steve")).toURL();
             String reply = urlRequest(url, false, null);
             return getSkinFromReply(reply);
         } catch (IOException e) {
@@ -74,13 +75,13 @@ public class SkinFetcher {
     @Nullable
     public static Property fetchSkinByName(String playername) {
         try {
-            String reply = urlRequest(new URL("https://api.mojang.com/users/profiles/minecraft/" + playername), true, null);
+            String reply = urlRequest(URI.create("https://api.mojang.com/users/profiles/minecraft/" + playername).toURL(), true, null);
 
-            if(reply == null || !reply.contains("id")) {
-                reply = urlRequest(new URL(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)), false, null);
+            if (reply == null || !reply.contains("id")) {
+                reply = urlRequest(URI.create(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)).toURL(), false, null);
             } else {
                 String uuid = JsonParser.parseString(reply).getAsJsonObject().get("id").getAsString();
-                reply = urlRequest(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false"), true, null);
+                reply = urlRequest(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").toURL(), true, null);
             }
             return getSkinFromReply(reply);
         } catch (IOException e) {
@@ -123,12 +124,13 @@ public class SkinFetcher {
 
         String reply = null;
 
-        if(connection instanceof HttpsURLConnection httpsConnection) {
+        if (connection instanceof HttpsURLConnection httpsConnection) {
             httpsConnection.setUseCaches(false);
             httpsConnection.setDoOutput(true);
             httpsConnection.setDoInput(true);
             httpsConnection.setRequestMethod(useGetMethod ? "GET" : "POST");
-            if(image != null) {
+            if (image != null) {
+                // Do a POST request with image
                 String boundary = UUID.randomUUID().toString();
                 httpsConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
                 httpsConnection.setRequestProperty("User-Agent", "User-Agent");
@@ -151,8 +153,8 @@ public class SkinFetcher {
                 writer.append(LINE);
                 writer.flush();
 
-                byte[] fileBytes =  Files.readAllBytes(image.toPath());
-                outputStream.write(fileBytes,  0, fileBytes.length);
+                byte[] fileBytes = Files.readAllBytes(image.toPath());
+                outputStream.write(fileBytes, 0, fileBytes.length);
 
                 outputStream.flush();
                 writer.append(LINE);
@@ -161,11 +163,12 @@ public class SkinFetcher {
                 writer.append("--").append(boundary).append("--").append(LINE);
                 writer.close();
             }
-            if(httpsConnection.getResponseCode() == HttpURLConnection.HTTP_OK)
+
+            if (httpsConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 reply = getContent(connection);
+            }
             httpsConnection.disconnect();
-        }
-        else {
+        } else {
             reply = getContent(connection);
         }
         return reply;
@@ -186,9 +189,9 @@ public class SkinFetcher {
                 Scanner scanner = new Scanner(isr)
         ) {
             StringBuilder reply = new StringBuilder();
-            while(scanner.hasNextLine()) {
+            while (scanner.hasNextLine()) {
                 String line = scanner.next();
-                if(line.trim().isEmpty())
+                if (line.trim().isEmpty())
                     continue;
                 reply.append(line);
             }
