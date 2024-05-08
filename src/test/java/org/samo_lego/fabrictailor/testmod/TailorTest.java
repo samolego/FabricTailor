@@ -19,7 +19,6 @@ import org.samo_lego.fabrictailor.util.SkinFetcher;
 public class TailorTest implements ModInitializer {
     @Override
     public void onInitialize() {
-        // Add command for "/hdskin"
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             this.serversideSkinCmd(dispatcher);
         });
