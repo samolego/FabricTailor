@@ -18,6 +18,9 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.client.screen.tabs.CapeTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
@@ -234,28 +237,10 @@ public class SkinChangeScreen extends Screen {
             float f = (float) Math.atan(mousex / 40.0f);
             float g = (float) Math.atan(mousey / 40.0f);
 
-            float yBodyRot = player.yBodyRot;
-            float yRot = player.getYRot();
-            float xRot = player.getXRot();
-            float yHeadRotO = player.yHeadRotO;
-            float yHeadRot = player.yHeadRot;
-
-            player.yBodyRot += 180.0f;
-            player.setYRot(yRot + 180f);
-            player.setXRot(xRot + 180.0f);
-            player.yHeadRot += 180.0f;
-            player.yHeadRotO += 180.0f;
-
-
             int x = this.startX + 24;
             int y = this.startY - 76;
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, -mouseX - 2, mouseY - 16, this.minecraft.player);
+            renderEntityInInventoryFollowsMouseBackwards(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
 
-            player.yBodyRot = yBodyRot;
-            player.setYRot(yRot);
-            player.setXRot(xRot);
-            player.yHeadRotO = yHeadRotO;
-            player.yHeadRot = yHeadRot;
         } else {
             // Drawing Player
             // Luckily vanilla code is available
@@ -263,6 +248,41 @@ public class SkinChangeScreen extends Screen {
             int y = this.startY - 76;
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
         }
+    }
+
+    public void renderEntityInInventoryFollowsMouseBackwards(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
+        float mousex = -(((float) width / 2) - 75 - g);
+        float mousey = ((float) height / 2) - h;
+        float n = (float) (i + k) / 2.0F;
+        float o = (float) (j + l) / 2.0F;
+        float p = (float) Math.atan(mousex / 40.0f);
+        float q = (float) Math.atan(mousey / 40.0f);
+        guiGraphics.enableScissor(i, j, k, l);
+        //float p = (float) Math.atan((double) ((n - g) / 40.0F));
+        //float q = (float) Math.atan((double) ((o - h) / 40.0F));
+        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
+        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(q * 20.0F * 0.017453292F);
+        quaternionf.mul(quaternionf2);
+        float r = livingEntity.yBodyRot;
+        float s = livingEntity.getYRot();
+        float t = livingEntity.getXRot();
+        float u = livingEntity.yHeadRotO;
+        float v = livingEntity.yHeadRot;
+        livingEntity.yBodyRot = p * 40.0F;
+        livingEntity.setYRot(p * 40.0F);
+        livingEntity.setXRot(-q * 40.0F);
+        livingEntity.yHeadRot = livingEntity.getYRot();
+        livingEntity.yHeadRotO = livingEntity.getYRot();
+        float w = livingEntity.getScale();
+        Vector3f vector3f = new Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + f * w, 0.0F);
+        float x = (float) m / w;
+        InventoryScreen.renderEntityInInventory(guiGraphics, n, o, x, vector3f, quaternionf, quaternionf2, livingEntity);
+        livingEntity.yBodyRot = r;
+        livingEntity.setYRot(s);
+        livingEntity.setXRot(t);
+        livingEntity.yHeadRotO = u;
+        livingEntity.yHeadRot = v;
+        guiGraphics.disableScissor();
     }
 
     /**
