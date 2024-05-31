@@ -14,7 +14,7 @@ import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import javax.imageio.ImageIO;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;

@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -15,7 +14,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static net.minecraft.ChatFormatting.WHITE;
 import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
 
@@ -99,7 +98,7 @@ public class SkinChangeScreen extends Screen {
         this.skinModelCheckbox.visible = false;
 
         // Text field input
-        skinInput = new EditBox(this.font, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, Component.translatable("itemGroup.search").withStyle(ChatFormatting.WHITE));
+        skinInput = new EditBox(this.font, width / 2, height / 2 - 29, BUTTON_WIDTH, 14, Component.translatable("itemGroup.search").withStyle(WHITE));
         skinInput.setMaxLength(256);
         skinInput.setVisible(true);
         skinInput.setBordered(true);
@@ -227,7 +226,6 @@ public class SkinChangeScreen extends Screen {
         // Other renders
         this.drawTabs(guiGraphics, startX, startY);
         this.drawIcons(guiGraphics, startX, startY);
-        this.drawWidgetTooltips(guiGraphics, startX, startY, mouseX, mouseY);
 
 
         if (this.selectedTab.showModelBackwards()) {
@@ -248,6 +246,9 @@ public class SkinChangeScreen extends Screen {
             int y = this.startY - 76;
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
         }
+
+        // draw last to fix some overlapping issue that would hide text
+        this.drawWidgetTooltips(guiGraphics, startX, startY, mouseX, mouseY);
     }
 
     public void renderEntityInInventoryFollowsMouseBackwards(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
