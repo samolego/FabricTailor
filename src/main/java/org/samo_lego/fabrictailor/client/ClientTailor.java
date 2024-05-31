@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
@@ -62,7 +61,6 @@ public class ClientTailor implements ClientModInitializer {
             forceOpen = false;
         });
 
-        PayloadTypeRegistry.configurationS2C().register(FabricTailorHelloPayload.TYPE, FabricTailorHelloPayload.CODEC);
         ClientConfigurationNetworking.registerGlobalReceiver(FabricTailorHelloPayload.TYPE, (payload, context) -> {
             TAILORED_SERVER = true;
             ALLOW_DEFAULT_SKIN = payload.allowSkinButton();
