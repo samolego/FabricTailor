@@ -11,7 +11,7 @@ import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_DEFAUL
 
 public record DefaultSkinPayload(Property skinProperty) implements CustomPacketPayload {
 
-    public static final Type<DefaultSkinPayload> TYPE = CustomPacketPayload.createType(FABRICTAILOR_DEFAULT_SKIN.toString());
+    public static final Type<DefaultSkinPayload> TYPE = new CustomPacketPayload.Type<>(FABRICTAILOR_DEFAULT_SKIN);
     public static final StreamCodec<FriendlyByteBuf, DefaultSkinPayload> CODEC = StreamCodec.composite(PropertyExtension.STREAM_CODEC, DefaultSkinPayload::skinProperty, DefaultSkinPayload::new);
 
     @Override

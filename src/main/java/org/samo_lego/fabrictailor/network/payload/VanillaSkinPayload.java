@@ -11,7 +11,7 @@ import static org.samo_lego.fabrictailor.network.SkinPackets.FABRICTAILOR_VANILL
 
 public record VanillaSkinPayload(Property skinProperty) implements CustomPacketPayload {
 
-    public static final Type<VanillaSkinPayload> TYPE = CustomPacketPayload.createType(FABRICTAILOR_VANILLA_CHANGE.toString());
+    public static final Type<VanillaSkinPayload> TYPE = new CustomPacketPayload.Type<>(FABRICTAILOR_VANILLA_CHANGE);
     public static final StreamCodec<FriendlyByteBuf, VanillaSkinPayload> CODEC = StreamCodec.composite(PropertyExtension.STREAM_CODEC, VanillaSkinPayload::skinProperty, VanillaSkinPayload::new);
 
     @Override
