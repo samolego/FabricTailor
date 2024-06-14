@@ -1,7 +1,14 @@
 package org.samo_lego.fabrictailor.client.screen;
 
+import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.blaze3d.systems.RenderSystem;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -15,13 +22,15 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.LivingEntity;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
+import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
+import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
 import org.samo_lego.fabrictailor.client.screen.tabs.CapeTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
@@ -30,15 +39,6 @@ import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 import org.samo_lego.fabrictailor.network.payload.DefaultSkinPayload;
 import org.samo_lego.fabrictailor.util.TextTranslations;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
-import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
 
 @Environment(EnvType.CLIENT)
 public class SkinChangeScreen extends Screen {
@@ -145,8 +145,16 @@ public class SkinChangeScreen extends Screen {
                     Button.builder(TextTranslations.create("button.fabrictailor.set_default_skin"),
                                     onClick -> {
                                         var profile = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile();
-                                        var payload = new DefaultSkinPayload(profile.getProperties().get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next());
-                                        ClientPlayNetworking.send(payload);
+
+                                        // could return empty collection, Iterator#next in this case produces NoSuchElementException
+                                        Optional<Property> optionalProperty = profile.getProperties()
+                                                .get(TailoredPlayer.PROPERTY_TEXTURES)
+                                                .stream()
+                                                .findFirst();
+                                        if (optionalProperty.isPresent()) {
+                                            CustomPacketPayload payload = new DefaultSkinPayload(optionalProperty.get());
+                                            ClientPlayNetworking.send(payload);
+                                        }
                                         this.onClose();
                                     })
                             .pos(width / 2 - BUTTON_WIDTH / 2 - 1, buttonY)
