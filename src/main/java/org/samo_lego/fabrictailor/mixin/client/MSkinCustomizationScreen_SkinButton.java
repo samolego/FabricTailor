@@ -3,16 +3,12 @@ package org.samo_lego.fabrictailor.mixin.client;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.OptionsList;
-import net.minecraft.client.gui.screens.OptionsSubScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.SkinCustomizationScreen;
-import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.client.gui.screens.options.OptionsSubScreen;
+import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
 import net.minecraft.network.chat.Component;
-import org.jetbrains.annotations.Nullable;
 import org.samo_lego.fabrictailor.client.ClientTailor;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,13 +18,13 @@ import java.util.List;
 
 
 @Mixin(SkinCustomizationScreen.class)
-public class MSkinCustomizationScreen_SkinButton extends OptionsSubScreen {
+public abstract class MSkinCustomizationScreen_SkinButton extends OptionsSubScreen {
 
     public MSkinCustomizationScreen_SkinButton(Screen screen, Options options, Component component) {
         super(screen, options, component);
     }
 
-    @Inject(method = "init",
+    @Inject(method = "addOptions",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/components/OptionsList;addSmall(Ljava/util/List;)V"

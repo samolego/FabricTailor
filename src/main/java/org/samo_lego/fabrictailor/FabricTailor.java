@@ -16,6 +16,7 @@ import org.samo_lego.fabrictailor.compatibility.CarpetFunctions;
 import org.samo_lego.fabrictailor.config.TailorConfig;
 import org.samo_lego.fabrictailor.network.NetworkHandler;
 import org.samo_lego.fabrictailor.network.payload.DefaultSkinPayload;
+import org.samo_lego.fabrictailor.network.payload.FabricTailorHelloPayload;
 import org.samo_lego.fabrictailor.network.payload.HDSkinPayload;
 import org.samo_lego.fabrictailor.network.payload.VanillaSkinPayload;
 
@@ -55,6 +56,8 @@ public class FabricTailor implements ModInitializer {
 		ServerPlayConnectionEvents.INIT.register(NetworkHandler::onInit);
 
 		ServerConfigurationConnectionEvents.CONFIGURE.register(NetworkHandler::onConfigured);
+
+		PayloadTypeRegistry.configurationS2C().register(FabricTailorHelloPayload.TYPE, FabricTailorHelloPayload.CODEC);
 
 		PayloadTypeRegistry.playC2S().register(VanillaSkinPayload.TYPE, VanillaSkinPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(VanillaSkinPayload.TYPE, NetworkHandler::changeVanillaSkinPacket);
