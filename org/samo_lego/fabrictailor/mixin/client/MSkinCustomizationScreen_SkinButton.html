@@ -88,7 +88,7 @@ loadScripts(document, 'script');</script>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance">net.minecraft.client.gui.components.events.AbstractContainerEventHandler
 <div class="inheritance">net.minecraft.client.gui.screens.Screen
-<div class="inheritance">net.minecraft.client.gui.screens.OptionsSubScreen
+<div class="inheritance">net.minecraft.client.gui.screens.options.OptionsSubScreen
 <div class="inheritance">org.samo_lego.fabrictailor.mixin.client.MSkinCustomizationScreen_SkinButton</div>
 </div>
 </div>
@@ -100,8 +100,8 @@ loadScripts(document, 'script');</script>
 <dd><code>net.minecraft.client.gui.components.events.ContainerEventHandler</code>, <code>net.minecraft.client.gui.components.events.GuiEventListener</code>, <code>net.minecraft.client.gui.components.Renderable</code>, <code>net.minecraft.client.gui.components.TabOrderedElement</code></dd>
 </dl>
 <hr>
-<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">MSkinCustomizationScreen_SkinButton</span>
-<span class="extends-implements">extends net.minecraft.client.gui.screens.OptionsSubScreen</span></div>
+<div class="type-signature"><span class="modifiers">public abstract class </span><span class="element-name type-name-label">MSkinCustomizationScreen_SkinButton</span>
+<span class="extends-implements">extends net.minecraft.client.gui.screens.options.OptionsSubScreen</span></div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -119,11 +119,11 @@ loadScripts(document, 'script');</script>
 <section class="field-summary" id="field-summary">
 <h2>Field Summary</h2>
 <div class="inherited-list">
-<h3 id="fields-inherited-from-class-net.minecraft.client.gui.screens.OptionsSubScreen">Fields inherited from class&nbsp;net.minecraft.client.gui.screens.OptionsSubScreen</h3>
-<code>lastScreen, layout, options</code></div>
+<h3 id="fields-inherited-from-class-net.minecraft.client.gui.screens.options.OptionsSubScreen">Fields inherited from class&nbsp;net.minecraft.client.gui.screens.options.OptionsSubScreen</h3>
+<code>lastScreen, layout, list, options</code></div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-net.minecraft.client.gui.screens.Screen">Fields inherited from class&nbsp;net.minecraft.client.gui.screens.Screen</h3>
-<code>CUBE_MAP, font, FOOTER_SEPARATOR, HEADER_SEPARATOR, height, INWORLD_FOOTER_SEPARATOR, INWORLD_HEADER_SEPARATOR, MENU_BACKGROUND, minecraft, PANORAMA, screenExecutor, title, width</code></div>
+<code>CUBE_MAP, font, FOOTER_SEPARATOR, HEADER_SEPARATOR, height, INWORLD_FOOTER_SEPARATOR, INWORLD_HEADER_SEPARATOR, MENU_BACKGROUND, minecraft, narratorButton, PANORAMA, screenExecutor, title, width</code></div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-net.minecraft.client.gui.components.events.GuiEventListener">Fields inherited from interface&nbsp;net.minecraft.client.gui.components.events.GuiEventListener</h3>
 <code>DOUBLE_CLICK_THRESHOLD_MS</code></div>
@@ -149,11 +149,11 @@ loadScripts(document, 'script');</script>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-net.minecraft.client.gui.screens.OptionsSubScreen">Methods inherited from class&nbsp;net.minecraft.client.gui.screens.OptionsSubScreen</h3>
-<code>addFooter, addTitle, init, onClose, removed, repositionElements</code></div>
+<h3 id="methods-inherited-from-class-net.minecraft.client.gui.screens.options.OptionsSubScreen">Methods inherited from class&nbsp;net.minecraft.client.gui.screens.options.OptionsSubScreen</h3>
+<code>addContents, addFooter, addOptions, addTitle, init, onClose, removed, repositionElements</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-net.minecraft.client.gui.screens.Screen">Methods inherited from class&nbsp;net.minecraft.client.gui.screens.Screen</h3>
-<code>added, addRenderableOnly, addRenderableWidget, addWidget, advancePanoramaTime, afterKeyboardAction, afterMouseAction, afterMouseMove, changeFocus, children, clearFocus, clearTooltipForNextRenderPass, clearWidgets, findNarratableWidget, getBackgroundMusic, getNarrationMessage, getRectangle, getTitle, getTooltipFromItem, getUsageNarration, handleComponentClicked, handleDelayedNarration, hasAltDown, hasControlDown, hasShiftDown, init, insertText, isCopy, isCut, isMouseOver, isPaste, isPauseScreen, isSelectAll, isValidCharacterForName, keyPressed, narrationEnabled, onFilesDrop, rebuildWidgets, removeWidget, render, renderBackground, renderBlurredBackground, renderMenuBackground, renderMenuBackground, renderMenuBackgroundTexture, renderPanorama, renderTransparentBackground, renderWithTooltip, resize, setInitialFocus, setInitialFocus, setTooltipForNextRenderPass, setTooltipForNextRenderPass, setTooltipForNextRenderPass, setTooltipForNextRenderPass, shouldCloseOnEsc, shouldNarrateNavigation, tick, triggerImmediateNarration, updateNarratedWidget, updateNarrationState, wrapScreenError</code></div>
+<code>added, addRenderableOnly, addRenderableWidget, addWidget, afterKeyboardAction, afterMouseAction, afterMouseMove, changeFocus, children, clearFocus, clearTooltipForNextRenderPass, clearWidgets, findNarratableWidget, getBackgroundMusic, getNarrationMessage, getRectangle, getTitle, getTooltipFromItem, getUsageNarration, handleComponentClicked, handleDelayedNarration, hasAltDown, hasControlDown, hasShiftDown, init, insertText, isCopy, isCut, isMouseOver, isPaste, isPauseScreen, isSelectAll, isValidCharacterForName, keyPressed, onFilesDrop, rebuildWidgets, removeWidget, render, renderBackground, renderBlurredBackground, renderMenuBackground, renderMenuBackground, renderMenuBackgroundTexture, renderPanorama, renderTransparentBackground, renderWithTooltip, resize, setInitialFocus, setInitialFocus, setTooltipForNextRenderPass, setTooltipForNextRenderPass, setTooltipForNextRenderPass, setTooltipForNextRenderPass, shouldCloseOnEsc, shouldNarrateNavigation, tick, triggerImmediateNarration, updateNarratedWidget, updateNarrationState, updateNarratorStatus, wrapScreenError</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-net.minecraft.client.gui.components.events.AbstractContainerEventHandler">Methods inherited from class&nbsp;net.minecraft.client.gui.components.events.AbstractContainerEventHandler</h3>
 <code>getFocused, isDragging, setDragging, setFocused</code></div>
