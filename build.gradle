@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.8.9'
     id 'maven-publish'
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.modrinth.minotaur" version "2.+"
@@ -40,11 +40,11 @@ dependencies {
     modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
 
     // LuckPerms
-    modImplementation(include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
+    modImplementation(include('me.lucko:fabric-permissions-api:0.3.1'))
 
     // Carpet
-    modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
-    modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
+    modImplementation("carpet:fabric-carpet:1.21.2-pre3-${project.carpet_core_version}")
+    //modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
 }
 
 processResources {

@@ -16,6 +16,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -228,7 +229,7 @@ public class SkinChangeScreen extends Screen {
 
         // Window texture
         RenderSystem.enableBlend();
-        guiGraphics.blit(AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140);
+        guiGraphics.blit(RenderType::guiTextured, AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140, 256, 256);
 
 
         // Render input field
@@ -239,23 +240,13 @@ public class SkinChangeScreen extends Screen {
         this.drawIcons(guiGraphics, startX, startY);
         this.drawWidgetTooltips(guiGraphics, startX, startY, mouseX, mouseY);
 
-
+        int x = this.startX + 24;
+        int y = this.startY - 76;
         if (this.selectedTab.showModelBackwards()) {
-            float mousex = -(((float) width / 2) - 75 - mouseX);
-            float mousey = ((float) height / 2) - mouseY;
-            var player = minecraft.player;
-            float f = (float) Math.atan(mousex / 40.0f);
-            float g = (float) Math.atan(mousey / 40.0f);
-
-            int x = this.startX + 24;
-            int y = this.startY - 76;
             renderEntityInInventoryFollowsMouseBackwards(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
-
         } else {
             // Drawing Player
             // Luckily vanilla code is available
-            int x = this.startX + 24;
-            int y = this.startY - 76;
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
         }
     }

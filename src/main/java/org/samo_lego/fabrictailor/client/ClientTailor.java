@@ -47,7 +47,7 @@ public class ClientTailor implements ClientModInitializer {
                 if (TAILORED_SERVER || forceOpen) {
                     client.setScreen(SKIN_CHANGE_SCREEN);
                 } else {
-                    client.player.sendSystemMessage(TextTranslations.create("error.fabrictailor.not_installed").withStyle(ChatFormatting.RED));
+                    client.player.displayClientMessage(TextTranslations.create("error.fabrictailor.not_installed").withStyle(ChatFormatting.RED), false);
                     forceOpen = true;
                 }
             }

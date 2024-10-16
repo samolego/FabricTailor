@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
-import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
+import net.minecraft.network.protocol.game.ClientboundSetCursorItemPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
 import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
@@ -28,6 +28,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -121,14 +122,15 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
                                 level.isDebug(),
                                 level.isFlat(),
                                 self.getLastDeathLocation(),
-                                this.getPortalCooldown()
+                                this.getPortalCooldown(),
+                                level.getSeaLevel()
                         ),
-                        (byte) 3
+                        ClientboundRespawnPacket.KEEP_ALL_DATA
                 )
         );
 
-        this.connection.send(new ClientboundPlayerPositionPacket(self.getX(), self.getY(), self.getZ(), self.getYRot(), self.getXRot(), Collections.emptySet(), 0));
-        this.connection.send(new ClientboundSetCarriedItemPacket(this.getInventory().selected));
+        this.connection.send(new ClientboundPlayerPositionPacket(0, PositionMoveRotation.of(self), Collections.emptySet()));
+        this.connection.send(new ClientboundSetCursorItemPacket(this.getInventory().getSelected()));
 
         this.connection.send(new ClientboundChangeDifficultyPacket(level.getDifficulty(), level.getLevelData().isDifficultyLocked()));
         this.connection.send(new ClientboundSetExperiencePacket(this.experienceProgress, this.totalExperience, this.experienceLevel));
