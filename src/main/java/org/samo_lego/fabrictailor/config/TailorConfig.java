@@ -39,7 +39,7 @@ public class TailorConfig implements IBrigadierConfigurator {
     public final String _comment_customSkinServer0 = "";
     @SerializedName("// Leave empty to use default minecraft usernames (and ely.by fallback).")
     public final String _comment_customSkinServer1 = "";
-    @SerializedName("// Available parameters: {player}. Example: https://skins.samolego.org/{player}.png")
+    @SerializedName("// Available parameters: {player}. Example: https://skins.samolego.org/{player}")
     public final String _comment_customSkinServer2 = "";
     @BrigadierDescription(defaultOption = "")
     @SerializedName("custom_skin_server")
