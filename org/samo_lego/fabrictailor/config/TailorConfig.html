@@ -91,12 +91,12 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code>org.samo_lego.config2brigadier.IBrigadierConfigurator</code></dd>
+<dd><code>org.samo_lego.config2brigadier.common.IBrigadierConfigurator</code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">TailorConfig</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements org.samo_lego.config2brigadier.IBrigadierConfigurator</span></div>
+implements org.samo_lego.config2brigadier.common.IBrigadierConfigurator</span></div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -159,8 +159,8 @@ implements org.samo_lego.config2brigadier.IBrigadierConfigurator</span></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
-<h3 id="fields-inherited-from-class-org.samo_lego.config2brigadier.IBrigadierConfigurator">Fields inherited from interface&nbsp;org.samo_lego.config2brigadier.IBrigadierConfigurator</h3>
-<code>COMMENT_PREFIX</code></div>
+<h3 id="fields-inherited-from-class-org.samo_lego.config2brigadier.common.IBrigadierConfigurator">Fields inherited from interface&nbsp;org.samo_lego.config2brigadier.common.IBrigadierConfigurator</h3>
+<code>COMMENT_PREFIX, CONFIG_STR, EDIT_STR, RELOAD_STR</code></div>
 </section>
 </li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
@@ -203,8 +203,8 @@ implements org.samo_lego.config2brigadier.IBrigadierConfigurator</span></div>
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.samo_lego.config2brigadier.IBrigadierConfigurator">Methods inherited from interface&nbsp;org.samo_lego.config2brigadier.IBrigadierConfigurator</h3>
-<code>enableSerializedNameComments, generateCommand, generateFieldDescription, generateFieldInfo, getCommentPrefix, getDescription, recursiveEditCommand, recursiveReload, reload, shouldExclude, writeToFile</code></div>
+<h3 id="methods-inherited-from-class-org.samo_lego.config2brigadier.common.IBrigadierConfigurator">Methods inherited from interface&nbsp;org.samo_lego.config2brigadier.common.IBrigadierConfigurator</h3>
+<code>buildEditCommand, enableSerializedNameComments, generateCommand, generateConfigCommand, generateFieldDescription, generateFieldInfo, generateReloadableConfigCommand, getCommentPrefix, getDescription, recursiveEditCommand, recursiveReload, reload, shouldExclude, writeToFile</code></div>
 </section>
 </li>
 </ul>
@@ -369,7 +369,7 @@ implements org.samo_lego.config2brigadier.IBrigadierConfigurator</span></div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">save</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code>save</code>&nbsp;in interface&nbsp;<code>org.samo_lego.config2brigadier.IBrigadierConfigurator</code></dd>
+<dd><code>save</code>&nbsp;in interface&nbsp;<code>org.samo_lego.config2brigadier.common.IBrigadierConfigurator</code></dd>
 </dl>
 </section>
 </li>
