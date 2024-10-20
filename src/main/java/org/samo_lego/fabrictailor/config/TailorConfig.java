@@ -3,9 +3,9 @@ package org.samo_lego.fabrictailor.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
-import org.samo_lego.config2brigadier.IBrigadierConfigurator;
-import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
-import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
+import org.samo_lego.config2brigadier.common.IBrigadierConfigurator;
+import org.samo_lego.config2brigadier.common.annotation.BrigadierDescription;
+import org.samo_lego.config2brigadier.common.annotation.BrigadierExcluded;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

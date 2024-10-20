@@ -20,6 +20,6 @@ public class CarpetFunctions {
      */
     @ScarpetFunction
     public String ft_get_skin_id(ServerPlayer player) {
-        return ((TailoredPlayer) player).getSkinId();
+        return ((TailoredPlayer) player).fabrictailor_getSkinId();
     }
 }

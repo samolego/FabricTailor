@@ -36,7 +36,7 @@ public class FabrictailorCommand {
                 .build();
 
         // Generate command for in-game editing
-        config.generateCommand(editNode);
+        config.buildEditCommand(editNode, "fabrictailor.command.fabrictailor.config.edit");
 
         configNode.addChild(editNode);
         root.addChild(configNode);
@@ -56,8 +56,8 @@ public class FabrictailorCommand {
 
     private static int setDefaultSkin(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        config.defaultSkin.value = ((TailoredPlayer) player).getSkinValue();
-        config.defaultSkin.signature = ((TailoredPlayer) player).getSkinSignature();
+        config.defaultSkin.value = ((TailoredPlayer) player).fabrictailor_getSkinValue().orElse("");
+        config.defaultSkin.signature = ((TailoredPlayer) player).fabrictailor_getSkinSignature().orElse("");
 
         config.save();
 
