@@ -35,11 +35,11 @@ public class TailorConfig implements IBrigadierConfigurator {
     @SerializedName("skin_change_timer")
     public long skinChangeTimer = -1;
 
-    @SerializedName("// Custom skin server URL (takes priority over default minecraft usernames).")
+    @SerializedName("// Custom skin server URL.")
     public final String _comment_customSkinServer0 = "";
-    @SerializedName("// Leave empty to use default minecraft usernames (and ely.by fallback).")
+    @SerializedName("// If not empty, you'll get another command /skin set custom, which will use this server.")
     public final String _comment_customSkinServer1 = "";
-    @SerializedName("// Available parameters: {player}. Example: https://skins.samolego.org/{player}")
+    @SerializedName("// Available parameters: {player}. Example: https://skins.samolego.org/{player}.png. Skins returned need to be 64x64!")
     public final String _comment_customSkinServer2 = "";
     @BrigadierDescription(defaultOption = "")
     @SerializedName("custom_skin_server")
