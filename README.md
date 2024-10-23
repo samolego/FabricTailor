@@ -10,6 +10,15 @@ A server-side or singleplayer skin changing / restoring mod.
 Download it on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabrictailor)
 or [Modrinth](https://modrinth.com/mod/FabricTailor)
 
+![2020-12-16_10 (1)](https://user-images.githubusercontent.com/34912839/103739608-24a0d000-4ff6-11eb-871c-234408ebf11e.png)
+
+<br>
+
+Client screen (*optional*)
+
+![2020-12-16_10](https://user-images.githubusercontent.com/34912839/103739615-266a9380-4ff6-11eb-9753-fbf7c53a8659.png)
+
+
 ## Who can see skins?
 tl;dr:
 * vanilla skins - all players
