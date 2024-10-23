@@ -43,7 +43,7 @@ dependencies {
     modImplementation(include('me.lucko:fabric-permissions-api:0.3.1'))
 
     // Carpet
-    modImplementation("carpet:fabric-carpet:1.21.2-pre3-${project.carpet_core_version}")
+    modImplementation("carpet:fabric-carpet:${project.carpet_core_version}")
     //modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
 }
 
@@ -105,7 +105,12 @@ curseforge {
         id = "390114"
         changelog = "A changelog can be found at https://github.com/samolego/FabricTailor/releases/latest"
         releaseType = "release"
-        addGameVersion "${project.minecraft_version}"
+        if (project.minecraft_version.contains("-")) {
+            // yuck
+            addGameVersion "${project.minecraft_version.split("-")[0]}-Snaspshot"
+        } else {
+            addGameVersion "${project.minecraft_version}"
+        }
         addGameVersion "Fabric"
 
         mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
