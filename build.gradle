@@ -107,13 +107,13 @@ curseforge {
         releaseType = "release"
         if (project.minecraft_version.contains("-")) {
             // yuck
-            addGameVersion "${project.minecraft_version.split("-")[0]}-Snaspshot"
+            addGameVersion "${project.minecraft_version.split("-")[0]}-Snapshot"
         } else {
             addGameVersion "${project.minecraft_version}"
         }
         addGameVersion "Fabric"
 
-        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
+        mainArtifact(remapJar.archiveFile) {
             displayName = "[${project.minecraft_version}] FabricTailor ${version}"
         }
 
@@ -142,7 +142,7 @@ modrinth {
     versionName = "[${project.minecraft_version}] FabricTailor ${version}"
     versionType = "release"
 
-    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    uploadFile = remapJar.archiveFile
 
     gameVersions = [project.minecraft_version]
     loaders = ['fabric', 'quilt']
