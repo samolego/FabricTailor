@@ -1,7 +1,7 @@
 package org.samo_lego.fabrictailor.mixin.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.renderer.texture.HttpTexture;
+import net.minecraft.client.renderer.texture.SkinTextureDownloader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(HttpTexture.class)
+@Mixin(SkinTextureDownloader.class)
 public abstract class MHttpTexture_HDEnabler {
 
     @Shadow
@@ -30,13 +30,13 @@ public abstract class MHttpTexture_HDEnabler {
      * @reason Enable HD textures
      */
     @Inject(method = "processLegacySkin", at = @At("HEAD"), cancellable = true)
-    private void ft_enableHD(NativeImage skinImg, CallbackInfoReturnable<NativeImage> cir) {
-        cir.setReturnValue(this.ft_proccessSkin(skinImg));
+    private static void ft_enableHD(NativeImage skinImg, String string, CallbackInfoReturnable<NativeImage> cir) {
+        cir.setReturnValue(ft_proccessSkin(skinImg));
     }
 
 
     @Unique
-    private NativeImage ft_proccessSkin(NativeImage skinImg) {
+    private static NativeImage ft_proccessSkin(NativeImage skinImg) {
         int height = skinImg.getHeight();
         int width = skinImg.getWidth();
 

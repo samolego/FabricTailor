@@ -92,28 +92,17 @@ public class TailorConfig implements IBrigadierConfigurator {
      * @return TaterzenLanguage object
      */
     public static TailorConfig loadConfigFile(File file, boolean serverEnvironment) {
-        TailorConfig config = null;
-        if (file.exists()) {
-            try (BufferedReader fileReader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)
-            )) {
-                config = gson.fromJson(fileReader, TailorConfig.class);
-            } catch (IOException e) {
-                errorLog(MOD_ID + " Problem occurred when trying to load config: " + e.getMessage());
-            }
-        }
-        if(config == null) {
+        return IBrigadierConfigurator.loadConfigFile(file, TailorConfig.class, () -> {
             // Config doesn't exist yet
-            config = new TailorConfig();
-            if(serverEnvironment) {
+            var config = new TailorConfig();
+            if (serverEnvironment) {
                 // A bit different default config
                 config.skinChangeTimer = 60;
             } else {
                 config.defaultSkin.applyToAll = true;
             }
-        }
-        config.save();
 
-        return config;
+            return config;
+        });
     }
 }
