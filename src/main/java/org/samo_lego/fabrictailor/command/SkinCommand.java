@@ -35,7 +35,6 @@ import static org.samo_lego.fabrictailor.util.SkinFetcher.setSkinFromFile;
 
 public class SkinCommand {
     private static final MutableComponent SKIN_SET_ERROR = TextTranslations.create("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED);
-    private static final boolean TATERZENS_LOADED = FabricLoader.getInstance().isModLoaded("taterzens");
     private static final MutableComponent SET_SKIN_ATTEMPT = TextTranslations.create("command.fabrictailor.skin.set.attempt");
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -61,7 +60,7 @@ public class SkinCommand {
                                 ctx.getSource().sendFailure(
                                         TextTranslations.create("command.fabrictailor.skin.set.404.url").withStyle(ChatFormatting.RED)
                                 );
-                                return 1;
+                                return 0;
                             })
                     )
                     .then(literal("upload")
@@ -82,7 +81,7 @@ public class SkinCommand {
                                 ctx.getSource().sendFailure(
                                         TextTranslations.create("command.fabrictailor.skin.set.404.path").withStyle(ChatFormatting.RED)
                                 );
-                                return 1;
+                                return 0;
                             })
                     )
                     .then(literal("custom")
@@ -103,7 +102,7 @@ public class SkinCommand {
                                 ctx.getSource().sendFailure(
                                         TextTranslations.create("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
                                 );
-                                return 1;
+                                return 0;
                             })
                     )
                     .then(literal("player")
@@ -115,14 +114,14 @@ public class SkinCommand {
                                 ctx.getSource().sendFailure(
                                         TextTranslations.create("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
                                 );
-                                return 1;
+                                return 0;
                             })
                     )
                     .executes(ctx -> {
                         ctx.getSource().sendFailure(
                                 TextTranslations.create("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED)
                         );
-                        return 1;
+                        return 0;
                     })
             )
                 .then(literal("clear")
@@ -155,17 +154,21 @@ public class SkinCommand {
 
         // Warn about server path for uploads
         MinecraftServer server = player.getServer();
-        if(server != null && server.isDedicatedServer()) {
-            player.displayClientMessage(
+        if (server != null && server.isDedicatedServer() && config.logging.skinChangeFeedback) {
+                player.displayClientMessage(
                     TextTranslations.create("hint.fabrictailor.server_skin_path").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
 
         setSkin(player, () -> setSkinFromFile(skinFilePath, useSlim));
-        player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
-                false
-        );
+        
+        if (config.logging.skinChangeFeedback) {
+            player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
+                    false
+            );
+        }
+        
         return 1;
     }
 
@@ -189,7 +192,7 @@ public class SkinCommand {
         long lastChange = ((TailoredPlayer) player).fabrictailor_getLastSkinChange();
         long now = System.currentTimeMillis();
 
-        if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
+        if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
             THREADPOOL.submit(() -> {
                 Property skinData = skinProvider.get();
@@ -197,10 +200,11 @@ public class SkinCommand {
                 if (skinData == null) {
                     player.displayClientMessage(SKIN_SET_ERROR, false);
                 } else {
-                    if (!TATERZENS_LOADED || !TaterzenSkins.setTaterzenSkin(player, skinData)) {
-                        ((TailoredPlayer) player).fabrictailor_setSkin(skinData, true);
+                    ((TailoredPlayer) player).fabrictailor_setSkin(skinData, true);
+                    
+                    if (config.logging.skinChangeFeedback) {
+                        player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
                     }
-                    player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
                 }
             });
         } else {
@@ -221,12 +225,15 @@ public class SkinCommand {
         long lastChange = ((TailoredPlayer) player).fabrictailor_getLastSkinChange();
         long now = System.currentTimeMillis();
 
-        if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
+        if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             ((TailoredPlayer) player).fabrictailor_clearSkin();
-            player.displayClientMessage(
-                    TextTranslations.create("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
-                    false
-            );
+            if (config.logging.skinChangeFeedback) {
+                player.displayClientMessage(
+                        TextTranslations.create("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
+                        false
+                );
+            }
+            
             return true;
         }
 

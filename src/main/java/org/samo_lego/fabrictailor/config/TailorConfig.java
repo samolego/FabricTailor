@@ -3,6 +3,7 @@ package org.samo_lego.fabrictailor.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import jdk.jshell.execution.Util;
 import org.samo_lego.config2brigadier.common.IBrigadierConfigurator;
 import org.samo_lego.config2brigadier.common.annotation.BrigadierDescription;
 import org.samo_lego.config2brigadier.common.annotation.BrigadierExcluded;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.samo_lego.fabrictailor.FabricTailor.*;
+import static org.samo_lego.fabrictailor.util.Logging.error;
 
 public class TailorConfig implements IBrigadierConfigurator {
     private static final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
@@ -23,6 +25,21 @@ public class TailorConfig implements IBrigadierConfigurator {
     @BrigadierDescription(defaultOption = "true")
     @SerializedName("allow_capes")
     public boolean allowCapes = true;
+    
+    public Logging logging = new Logging();
+    
+    public static class Logging {
+        @SerializedName("// Whether to send (successful) command feedback for skin changes. Errors are sent regardless.")
+        public final String _comment_skinChangeFeedback = "(default: true)";
+        @BrigadierDescription(defaultOption = "true")
+        @SerializedName("skin_change_feedback")
+        public boolean skinChangeFeedback = true;
+
+        @SerializedName("// Whether to send debug messages to console.")
+        public final String _comment_debug = "(default: false)";
+        @BrigadierDescription(defaultOption = "false")
+        public boolean debug = false;
+    }
 
     @SerializedName("// Default skin for new players. Use command `/fabrictailor setDefaultSkin` to set those values.")
     public final String _comment_defaultSkin = "";
@@ -68,7 +85,7 @@ public class TailorConfig implements IBrigadierConfigurator {
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8)) {
             gson.toJson(this, writer);
         } catch (IOException e) {
-            errorLog("Problem occurred when saving config: " + e.getMessage());
+            error("Problem occurred when saving config: " + e.getMessage());
         }
 
     }
@@ -99,7 +116,7 @@ public class TailorConfig implements IBrigadierConfigurator {
             )) {
                 config = gson.fromJson(fileReader, TailorConfig.class);
             } catch (IOException e) {
-                errorLog(MOD_ID + " Problem occurred when trying to load config: " + e.getMessage());
+                error(MOD_ID + " Problem occurred when trying to load config: " + e.getMessage());
             }
         }
         if(config == null) {

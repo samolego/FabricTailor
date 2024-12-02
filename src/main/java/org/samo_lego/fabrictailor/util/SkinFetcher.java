@@ -17,9 +17,6 @@ import java.nio.file.Files;
 import java.util.Scanner;
 import java.util.UUID;
 
-import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
-
-
 public class SkinFetcher {
 
     /**
@@ -38,12 +35,12 @@ public class SkinFetcher {
                     return getSkinFromReply(reply);
                 } catch (IOException e) {
                     // Error uploading
-                    errorLog(e.getMessage());
+                    Logging.error(e.getMessage());
                 }
             }
         } catch (IOException e) {
             // Not an image
-            errorLog(e.getMessage());
+            Logging.error(e.getMessage());
         }
         return null;
     }
@@ -61,7 +58,7 @@ public class SkinFetcher {
             String reply = urlRequest(url, false, null);
             return getSkinFromReply(reply);
         } catch (IOException e) {
-            errorLog(e.getMessage());
+            Logging.error(e.getMessage());
         }
         return null;
     }
@@ -85,7 +82,7 @@ public class SkinFetcher {
             }
             return getSkinFromReply(reply);
         } catch (IOException e) {
-            errorLog(e.getMessage());
+            Logging.error(e.getMessage());
         }
         return null;
     }

@@ -14,8 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
-
 public class TextTranslations {
     private static final boolean SERVER_TRANSLATIONS_LOADED = FabricLoader.getInstance().isModLoaded("server_translations_api");
     private static final JsonObject LANG;
@@ -39,7 +37,7 @@ public class TextTranslations {
                 LANG1 = gson.fromJson(reader, JsonObject.class);
             }
         } catch (IOException e) {
-            errorLog("Problem occurred when trying to load language: " + e.getMessage());
+            Logging.error("Problem occurred when trying to load language: " + e.getMessage());
             LANG1 = new JsonObject();
         }
         LANG = LANG1;

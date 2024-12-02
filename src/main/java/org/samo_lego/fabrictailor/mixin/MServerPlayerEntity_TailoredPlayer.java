@@ -36,6 +36,7 @@ import net.minecraft.world.level.biome.BiomeManager;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.mixin.accessors.AChunkMap;
 import org.samo_lego.fabrictailor.mixin.accessors.ATrackedEntity;
+import org.samo_lego.fabrictailor.util.Logging;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -49,7 +50,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.samo_lego.fabrictailor.FabricTailor.config;
-import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 import static org.samo_lego.fabrictailor.mixin.accessors.APlayer.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayer.class)
@@ -94,9 +94,11 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     @Override
     public void fabrictailor_reloadSkin() {
         if (self.getServer() == null) {
-            errorLog("Tried to reload skin form client side! This should not happen!");
+            Logging.error("Tried to reload skin form client side! This should not happen!");
             return;
         }
+        
+        Logging.debug("Reloading skin for player " + self.getName().getString());
 
         // Refreshing in tablist for each player
         PlayerList playerManager = self.getServer().getPlayerList();
@@ -106,11 +108,16 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         ServerChunkCache manager = self.serverLevel().getChunkSource();
         ChunkMap storage = manager.chunkMap;
         ATrackedEntity trackerEntry = ((AChunkMap) storage).getEntityTrackers().get(self.getId());
+        if (config.logging.debug) {
+            Logging.debug("Trackers for the player: " + trackerEntry.getSeenBy().size());
+            trackerEntry.getSeenBy().forEach(tracking -> Logging.debug("Tracker for player: " + tracking.getPlayer().getName().getString()));
+        }
 
         // Refreshing skin in world for all that see the player
         trackerEntry.getSeenBy().forEach(tracking -> trackerEntry.getServerEntity().addPairing(tracking.getPlayer()));
 
         // need to change the player entity on the client
+        Logging.debug("Reloading player skin on player's client.");
         ServerLevel level = self.serverLevel();
         this.connection.send(new ClientboundRespawnPacket(
                         new CommonPlayerSpawnInfo(
@@ -173,8 +180,11 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
      * @param skinData skin texture data
      * @param reload   whether to send packets around for skin reload
      */
+    @Override
     public void fabrictailor_setSkin(Property skinData, boolean reload) {
+        Logging.debug("Setting skin for player " + self.getName().getString());
         try {
+            Logging.debug("Clearing existing skin for player");
             this.map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
         } catch (Exception ignored) {
             // Player has no skin data, no worries
@@ -195,7 +205,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
             this.lastSkinChangeTime = System.currentTimeMillis();
         } catch (Error e) {
             // Something went wrong when trying to set the skin
-            errorLog(e.getMessage());
+            Logging.error(e.getMessage());
         }
     }
 
@@ -284,10 +294,15 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         this.lastSkinChangeTime = 0;
     }
 
+    /**
+     * Disables cape if needed by faking the player model customisation.
+     * @param clientSkinPrefs client skin preferences
+     * @param ci callback info
+     */
     @Inject(method = "updateOptions", at = @At("TAIL"))
-    private void disableCapeIfNeeded(ClientInformation clientInformation, CallbackInfo ci) {
+    private void disableCapeIfNeeded(ClientInformation clientSkinPrefs, CallbackInfo ci) {
         if (!config.allowCapes) {
-            byte playerModel = (byte) clientInformation.modelCustomisation();
+            byte playerModel = (byte) clientSkinPrefs.modelCustomisation();
 
             // Fake cape rule to be off
             playerModel = (byte) (playerModel & ~(1));
