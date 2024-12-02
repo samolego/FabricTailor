@@ -103,7 +103,7 @@ curseforge {
 
     project {
         id = "390114"
-        changelog = "A changelog can be found at https://github.com/samolego/FabricTailor/releases/latest"
+        changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
         releaseType = "release"
         if (project.minecraft_version.contains("-")) {
             // yuck
