@@ -34,7 +34,7 @@ import static org.samo_lego.fabrictailor.util.SkinFetcher.fetchSkinByUrl;
 import static org.samo_lego.fabrictailor.util.SkinFetcher.setSkinFromFile;
 
 public class SkinCommand {
-    private static final MutableComponent SKIN_SET_ERROR = TextTranslations.create("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED);
+    private static final MutableComponent SKIN_SET_ERROR = TextTranslations.create("command.fabrictailor.skin.set.error").withStyle(ChatFormatting.RED);
     private static final MutableComponent SET_SKIN_ATTEMPT = TextTranslations.create("command.fabrictailor.skin.set.attempt");
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -56,12 +56,6 @@ public class SkinCommand {
                                             .executes(context -> setSkinUrl(context, true))
                                     )
                             )
-                            .executes(ctx -> {
-                                ctx.getSource().sendFailure(
-                                        TextTranslations.create("command.fabrictailor.skin.set.404.url").withStyle(ChatFormatting.RED)
-                                );
-                                return 0;
-                            })
                     )
                     .then(literal("upload")
                             .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.upload", true))
@@ -77,12 +71,6 @@ public class SkinCommand {
                                             .executes(context -> setSkinFile(context, true))
                                     )
                             )
-                            .executes(ctx -> {
-                                ctx.getSource().sendFailure(
-                                        TextTranslations.create("command.fabrictailor.skin.set.404.path").withStyle(ChatFormatting.RED)
-                                );
-                                return 0;
-                            })
                     )
                     .then(literal("custom")
                             .requires(src -> !config.customSkinServer.isEmpty() && Permissions.check(src, "fabrictailor.command.skin.set.custom", true))
@@ -98,12 +86,6 @@ public class SkinCommand {
                                             .executes(context -> setSkinCustom(context, true))
                                     )
                             )
-                            .executes(ctx -> {
-                                ctx.getSource().sendFailure(
-                                        TextTranslations.create("command.fabrictailor.skin.set.404.playername").withStyle(ChatFormatting.RED)
-                                );
-                                return 0;
-                            })
                     )
                     .then(literal("player")
                             .requires(src -> Permissions.check(src, "fabrictailor.command.skin.set.player", true))
@@ -117,16 +99,10 @@ public class SkinCommand {
                                 return 0;
                             })
                     )
-                    .executes(ctx -> {
-                        ctx.getSource().sendFailure(
-                                TextTranslations.create("command.fabrictailor.skin.set.404").withStyle(ChatFormatting.RED)
-                        );
-                        return 0;
-                    })
             )
-                .then(literal("clear")
-                        .requires(src -> Permissions.check(src, "fabrictailor.command.skin.clear", true))
-                        .executes(context -> clearSkin(context.getSource().getPlayerOrException()) ? 1 : 0))
+            .then(literal("clear")
+                    .requires(src -> Permissions.check(src, "fabrictailor.command.skin.clear", true))
+                    .executes(context -> clearSkin(context.getSource().getPlayerOrException()) ? 1 : 0))
         );
     }
 

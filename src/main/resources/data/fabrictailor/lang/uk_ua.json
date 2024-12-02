@@ -1,12 +1,9 @@
 {
   "command.fabrictailor.skin.set.attempt": "Спроба встановити шкіру ... Будь ласка, зачекайте.",
-  "command.fabrictailor.skin.404": "Сталася помилка під час спроби отримати шкіру.",
-  "command.fabrictailor.skin.set.404": "Ви повинні надати URL, ім'я гравця або файл скіна, яку ви хочете встановити.",
   "command.fabrictailor.skin.set.404.url": "Ви повинні надати URL та варіант скіна, яку ви хочете встановити.",
   "command.fabrictailor.skin.set.404.path": "Ви повинні надати шлях до файлу та варіант скіна, яку ви хочете встановити.",
   "command.fabrictailor.skin.set.404.playername": "Ви повинні надати ім'я гравця.",
   "command.fabrictailor.skin.set.success": "Шкіру успішно встановлено.",
-  "command.fabrictailor.skin.set.error": "Здається, у цього гравця немає збережених шкір.",
   "command.fabrictailor.skin.clear.success": "Шкіру успішно видалено.",
   "command.fabrictailor.skin.clear.error": "Сталася помилка під час спроби видалити шкіру.",
   "command.fabrictailor.skin.please_wait": "Завантаження скіна. Будь ласка, зачекайте.",

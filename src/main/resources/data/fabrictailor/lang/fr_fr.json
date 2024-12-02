@@ -1,12 +1,9 @@
 {
   "command.fabrictailor.skin.set.attempt": "Tentative de définir le skin... Veuillez patienter.",
-  "command.fabrictailor.skin.404": "Une erreur est survenue lors de la récupération du skin.",
-  "command.fabrictailor.skin.set.404": "Vous devez fournir une URL, un nom de joueur ou un fichier du skin que vous voulez.",
   "command.fabrictailor.skin.set.404.url": "Vous devez fournir l'URL et la variante du skin que vous voulez.",
   "command.fabrictailor.skin.set.404.path": "Vous devez fournir le chemin du fichier et la variante du skin que vous voulez.",
   "command.fabrictailor.skin.set.404.playername": "Vous devez fournir le nom du joueur.",
   "command.fabrictailor.skin.set.success": "Le skin a été définie avec succès.",
-  "command.fabrictailor.skin.set.error": "Ce joueur ne semble pas avoir de skins enregistrées.",
   "command.fabrictailor.skin.clear.success": "Le skin a été effacée avec succès.",
   "command.fabrictailor.skin.clear.error": "Une erreur est survenue lors de la suppression de votre skin.",
   "command.fabrictailor.skin.please_wait": "Téléversement du skin. Veuillez patienter.",

@@ -5,7 +5,9 @@ import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.Nullable;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 
+import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
+import java.awt.image.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -27,10 +29,20 @@ public class SkinFetcher {
      * @return property containing skin value and signature if successful, otherwise null.
      */
     public static Property setSkinFromFile(String skinFilePath, boolean useSlim) {
+        Logging.debug("Fetching skin from file: " + skinFilePath);
         File skinFile = new File(skinFilePath);
         try (FileInputStream input = new FileInputStream(skinFile)) {
+            Logging.debug("Checking file type: " + input.read());
             if (input.read() == 137) {
+                // Check image dimensions
+                BufferedImage image = ImageIO.read(skinFile);
+                if (image.getWidth() != 64 || (image.getHeight() != 64 && image.getHeight() != 32)) {
+                    Logging.error("Image dimensions are not 64x64 or 32x64! The actual format is: " + image.getWidth() + "x" + image.getHeight());
+                    return null;
+                }
+                
                 try {
+                    Logging.debug("Uploading skin to MineSkin.");
                     String reply = urlRequest(URI.create("https://api.mineskin.org/generate/upload?model=" + (useSlim ? "slim" : "steve")).toURL(), false, skinFile);
                     return getSkinFromReply(reply);
                 } catch (IOException e) {
@@ -53,6 +65,7 @@ public class SkinFetcher {
      */
     @Nullable
     public static Property fetchSkinByUrl(String skinUrl, boolean useSlim) {
+        Logging.debug("Fetching skin from URL: " + skinUrl);
         try {
             URL url = URI.create(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", URLEncoder.encode(skinUrl, StandardCharsets.UTF_8), useSlim ? "slim" : "steve")).toURL();
             String reply = urlRequest(url, false, null);
@@ -71,13 +84,16 @@ public class SkinFetcher {
      */
     @Nullable
     public static Property fetchSkinByName(String playername) {
+        Logging.debug("Fetching Mojang skin of player: " + playername);
         try {
             String reply = urlRequest(URI.create("https://api.mojang.com/users/profiles/minecraft/" + playername).toURL(), true, null);
 
             if (reply == null || !reply.contains("id")) {
+                Logging.debug("Mojang skin not found, trying via proxy.");
                 reply = urlRequest(URI.create(String.format("http://skinsystem.ely.by/textures/signed/%s.png?proxy=true", playername)).toURL(), false, null);
             } else {
                 String uuid = JsonParser.parseString(reply).getAsJsonObject().get("id").getAsString();
+                Logging.debug("Mojang skin found. UUID: " + uuid);
                 reply = urlRequest(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").toURL(), true, null);
             }
             return getSkinFromReply(reply);
@@ -96,6 +112,7 @@ public class SkinFetcher {
      */
     @Nullable
     protected static Property getSkinFromReply(String reply) {
+        Logging.debug("Parsing skin reply: " + reply);
         if (reply == null || reply.contains("error") || reply.isEmpty()) {
             return null;
         }

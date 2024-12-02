@@ -1,13 +1,12 @@
 {
 
   "command.fabrictailor.skin.set.attempt": "Trying to set the skin ... Please wait.",
-  "command.fabrictailor.skin.404": "An error occurred when trying to fetch skin.",
-  "command.fabrictailor.skin.set.404": "You have to provide URL, player's name or file of the skin you want.",
+  "command.fabrictailor.skin.error": "An error occurred when trying to set this skin.",
+  "command.fabrictailor.skin.set.error": "There was a problem with fetching the skin.",
   "command.fabrictailor.skin.set.404.url": "You have to provide URL and variant of the skin you want.",
   "command.fabrictailor.skin.set.404.path": "You have to provide file path and variant of the skin you want.",
   "command.fabrictailor.skin.set.404.playername": "You have to provide player's name.",
   "command.fabrictailor.skin.set.success": "Skin was set successfully.",
-  "command.fabrictailor.skin.set.error": "This player doesn't seem to have any skins saved.",
   "command.fabrictailor.skin.clear.success": "Skin was cleared successfully.",
   "command.fabrictailor.skin.clear.error": "An error occurred when trying to clear your skin.",
   "command.fabrictailor.skin.please_wait": "Uploading skin. Please wait.",
