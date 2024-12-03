@@ -54,7 +54,7 @@ public class NetworkHandler {
                 
                 // Try to set skin now
                 if (skinData != null) {
-                    ((TailoredPlayer) player).fabrictailor_setSkin(skinData, false);
+                    ((TailoredPlayer) player).fabrictailor_setSkin(skinData, true);
                 }
                 ((TailoredPlayer) player).fabrictailor_resetLastSkinChange();
             }

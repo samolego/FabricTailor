@@ -43,9 +43,8 @@ dependencies {
     modImplementation(include('me.lucko:fabric-permissions-api:0.3.1'))
 
     // Carpet
-    modImplementation("carpet:fabric-carpet:${project.carpet_core_version}")
-    //modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
-}
+    modCompileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
+}   
 
 processResources {
     inputs.property "version", project.version
