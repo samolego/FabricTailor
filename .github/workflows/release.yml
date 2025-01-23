@@ -31,17 +31,17 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and publish with Gradle
-        run: ./gradlew build modrinth curseforge --stacktrace
-        env:
-          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          CHANGELOG: ${{ github.event.release.body }}
-        #  MAVEN_URL: ${{ secrets.MAVEN_URL }}
-        #  MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-        #  MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+        run: ./gradlew build --stacktrace
 
       - name: Upload GitHub release
         uses: AButler/upload-release-assets@v2.0
         with:
           files: 'build/libs/*.jar;!build/libs/*-sources.jar;!build/libs/*-dev.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish with Gradle
+        run: ./gradlew modrinth curseforge --stacktrace
+        env:
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CHANGELOG: ${{ github.event.release.body }}
