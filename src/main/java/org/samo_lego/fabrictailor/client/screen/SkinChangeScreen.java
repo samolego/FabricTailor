@@ -31,6 +31,7 @@ import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
 import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 import org.samo_lego.fabrictailor.network.payload.DefaultSkinPayload;
+import org.samo_lego.fabrictailor.util.Logging;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
 import java.io.File;
@@ -39,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
@@ -176,6 +178,7 @@ public class SkinChangeScreen extends Screen {
     }
 
     private void applyNewSkin() {
+        Logging.debug("Applying new skin! On tab: " + this.selectedTab.getTitle().getString() + " with parameter: " + skinInput.getValue() + ". Slim skin: " + this.skinModelCheckbox.selected());
         new CompletableFuture<>().completeAsync(() -> {
             final var packetInfo = this.selectedTab.getSkinChangePacket(minecraft.player, skinInput.getValue(), this.skinModelCheckbox.selected());
             packetInfo.ifPresent(packet -> {

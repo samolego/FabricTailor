@@ -32,8 +32,9 @@ public class SkinFetcher {
         Logging.debug("Fetching skin from file: " + skinFilePath);
         File skinFile = new File(skinFilePath);
         try (FileInputStream input = new FileInputStream(skinFile)) {
-            Logging.debug("Checking file type: " + input.read());
-            if (input.read() == 137) {
+            var fileType = input.read();
+            Logging.debug("Checking file type: " + fileType);
+            if (fileType == 137) {
                 // Check image dimensions
                 BufferedImage image = ImageIO.read(skinFile);
                 if (image.getWidth() != 64 || (image.getHeight() != 64 && image.getHeight() != 32)) {
@@ -43,7 +44,7 @@ public class SkinFetcher {
                 
                 try {
                     Logging.debug("Uploading skin to MineSkin.");
-                    String reply = urlRequest(URI.create("https://api.mineskin.org/generate/upload?model=" + (useSlim ? "slim" : "steve")).toURL(), false, skinFile);
+                    String reply = urlRequest(URI.create("https://api.mineskin.org/generate/upload?v2=true&model=" + (useSlim ? "slim" : "steve")).toURL(), false, skinFile);
                     return getSkinFromReply(reply);
                 } catch (IOException e) {
                     // Error uploading
@@ -67,7 +68,7 @@ public class SkinFetcher {
     public static Property fetchSkinByUrl(String skinUrl, boolean useSlim) {
         Logging.debug("Fetching skin from URL: " + skinUrl);
         try {
-            URL url = URI.create(String.format("https://api.mineskin.org/generate/url?url=%s&model=%s", URLEncoder.encode(skinUrl, StandardCharsets.UTF_8), useSlim ? "slim" : "steve")).toURL();
+            URL url = URI.create(String.format("https://api.mineskin.org/generate/url?v2=true&url=%s&model=%s", URLEncoder.encode(skinUrl, StandardCharsets.UTF_8), useSlim ? "slim" : "steve")).toURL();
             String reply = urlRequest(url, false, null);
             return getSkinFromReply(reply);
         } catch (IOException e) {
