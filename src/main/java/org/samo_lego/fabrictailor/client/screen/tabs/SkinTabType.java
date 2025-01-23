@@ -27,7 +27,7 @@ public interface SkinTabType {
     ItemStack getIcon();
 
     default boolean isSelected(int startX, int startY, int mouseX, int mouseY) {
-        return mouseX > startX && mouseX < startX + this.width && mouseY > startY && mouseY < startY + this.height;
+        return mouseX > startX && mouseX < startX + width && mouseY > startY && mouseY < startY + height;
     }
 
     Optional<CustomPacketPayload> getSkinChangePacket(LocalPlayer player, String param, boolean useSlim);
