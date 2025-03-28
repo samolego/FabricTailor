@@ -1,6 +1,8 @@
 package org.samo_lego.fabrictailor.util;
 
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.authlib.properties.Property;
 import org.jetbrains.annotations.Nullable;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
@@ -11,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Scanner;
@@ -33,7 +34,7 @@ public class SkinFetcher {
         try (FileInputStream input = new FileInputStream(skinFile)) {
             if (input.read() == 137) {
                 try {
-                    String reply = urlRequest(URI.create("https://api.mineskin.org/generate/upload?v2=true&model=" + (useSlim ? "slim" : "steve")).toURL(), false, skinFile);
+                    String reply = urlRequest(URI.create("https://api.mineskin.org/v2/generate").toURL(), false, skinFile, null, useSlim ? "slim" : "classic");
                     return getSkinFromReply(reply);
                 } catch (IOException e) {
                     // Error uploading
@@ -56,8 +57,7 @@ public class SkinFetcher {
     @Nullable
     public static Property fetchSkinByUrl(String skinUrl, boolean useSlim) {
         try {
-            URL url = URI.create(String.format("https://api.mineskin.org/generate/url?v2=true&url=%s&model=%s", URLEncoder.encode(skinUrl, StandardCharsets.UTF_8), useSlim ? "slim" : "steve")).toURL();
-            String reply = urlRequest(url, false, null);
+            String reply = urlRequest(URI.create("https://api.mineskin.org/v2/generate").toURL(), false, null, skinUrl, useSlim ? "slim" : "classic");
             return getSkinFromReply(reply);
         } catch (IOException e) {
             errorLog(e.getMessage());
@@ -108,6 +108,10 @@ public class SkinFetcher {
         return new Property(TailoredPlayer.PROPERTY_TEXTURES, value, signature);
     }
 
+    private static String urlRequest(URL url, boolean useGetMethod, @Nullable File image) throws IOException {
+        return urlRequest(url, useGetMethod, image, null, "classic");
+    }
+
     /**
      * Gets reply from a skin website.
      * Used internally only.
@@ -118,7 +122,7 @@ public class SkinFetcher {
      * @return reply from website as string
      * @throws IOException IOException is thrown when connection fails for some reason.
      */
-    private static String urlRequest(URL url, boolean useGetMethod, @Nullable File image) throws IOException {
+    private static String urlRequest(URL url, boolean useGetMethod, @Nullable File image, @Nullable String skinUrl, String variant) throws IOException {
         URLConnection connection = url.openConnection();
 
         String reply = null;
@@ -128,12 +132,12 @@ public class SkinFetcher {
             httpsConnection.setDoOutput(true);
             httpsConnection.setDoInput(true);
             httpsConnection.setRequestMethod(useGetMethod ? "GET" : "POST");
+
             if (image != null) {
-                // Do a POST request with image
+                // Do a POST request
                 String boundary = UUID.randomUUID().toString();
                 httpsConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
                 httpsConnection.setRequestProperty("User-Agent", "User-Agent");
-
                 OutputStream outputStream = httpsConnection.getOutputStream();
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
 
@@ -146,7 +150,10 @@ public class SkinFetcher {
                 writer.flush();
 
                 writer.append("--").append(boundary).append(LINE);
-                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(image.getName()).append("\"").append(LINE);
+                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(image.getName()).append("\"");
+                if (variant != null)
+                    writer.append("; variant=\"").append(variant).append("\"");
+                writer.append(LINE);
                 writer.append("Content-Type: image/png").append(LINE);
                 writer.append("Content-Transfer-Encoding: binary").append(LINE);
                 writer.append(LINE);
@@ -160,6 +167,22 @@ public class SkinFetcher {
                 writer.flush();
 
                 writer.append("--").append(boundary).append("--").append(LINE);
+                writer.close();
+            }
+
+            if (skinUrl != null) {
+                // Do a POST request
+                httpsConnection.setRequestProperty("Content-Type", "application/json");
+                httpsConnection.setRequestProperty("User-Agent", "User-Agent");
+                OutputStream outputStream = httpsConnection.getOutputStream();
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+
+                JsonObject json = new JsonObject();
+                json.addProperty("url", skinUrl);
+                json.addProperty("variant", variant);
+
+                writer.write(json.toString());
+                writer.flush();
                 writer.close();
             }
 
