@@ -231,7 +231,6 @@ public class SkinChangeScreen extends Screen {
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        RenderSystem.enableBlend();
         guiGraphics.blit(RenderType::guiTextured, AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140, 256, 256);
 
 
