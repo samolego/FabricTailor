@@ -137,7 +137,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         );
 
         this.connection.send(new ClientboundPlayerPositionPacket(0, PositionMoveRotation.of(self), Collections.emptySet()));
-        this.connection.send(new ClientboundSetCursorItemPacket(this.getInventory().getSelected()));
+        this.connection.send(new ClientboundSetCursorItemPacket(this.getInventory().getSelectedItem()));
 
         this.connection.send(new ClientboundChangeDifficultyPacket(level.getDifficulty(), level.getLevelData().isDifficultyLocked()));
         this.connection.send(new ClientboundSetExperiencePacket(this.experienceProgress, this.totalExperience, this.experienceLevel));
@@ -326,12 +326,16 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readCustomDataFromNbt(CompoundTag tag, CallbackInfo ci) {
-        CompoundTag skinDataTag = tag.getCompound("fabrictailor:skin_data");
-        this.skinValue = skinDataTag.contains("value") ? skinDataTag.getString("value") : null;
-        this.skinSignature = skinDataTag.contains("signature") ? skinDataTag.getString("signature") : null;
-
-        if (this.skinValue != null) {
-            this.fabrictailor_setSkin(this.skinValue, this.skinSignature, false);
+        CompoundTag skinDataTag = tag.getCompound("fabrictailor:skin_data").get();
+        Optional<String> skinValueOP = skinDataTag.getString("value");
+        Optional<String> skinSignatureOP = skinDataTag.getString("signature");
+        // https://fabricmc.net/2025/03/24/1215.html#nbt
+        if (skinValueOP.isEmpty() || skinSignatureOP.isEmpty()) {
+            return;
         }
+
+        this.skinValue = skinValueOP.get();
+        this.skinSignature = skinSignatureOP.get();
+        this.fabrictailor_setSkin(this.skinValue, this.skinSignature, false);
     }
 }
