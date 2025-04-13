@@ -327,7 +327,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readCustomDataFromNbt(CompoundTag tag, CallbackInfo ci) {
         Optional<CompoundTag> skinDataTagOP = tag.getCompound("fabrictailor:skin_data");
-        if(skinDataTag.isEmpty()) return; // This causes an java.util.NoSuchElementException for new players I believe.
+        if(skinDataTagOP.isEmpty()) return; // This causes an java.util.NoSuchElementException for new players I believe.
         CompoundTag skinDataTag = skinDataTagOP.get();
         Optional<String> skinValueOP = skinDataTag.getString("value");
         Optional<String> skinSignatureOP = skinDataTag.getString("signature");
