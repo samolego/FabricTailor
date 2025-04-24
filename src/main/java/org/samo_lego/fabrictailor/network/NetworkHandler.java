@@ -36,26 +36,24 @@ public class NetworkHandler {
             Optional<String> value = ((TailoredPlayer) player).fabrictailor_getSkinValue();
             Optional<String> signature = ((TailoredPlayer) player).fabrictailor_getSkinSignature();
 
-            Property skinData = null;
+            Optional<Property> skinData = Optional.empty();
             if (value.isEmpty() || signature.isEmpty()) {
 
                 if (!config.defaultSkin.applyToAll) {
                     skinData = fetchSkinByName(player.getGameProfile().getName());
                 }
 
-                if (skinData == null) {
+                if (skinData.isEmpty()) {
                     var defValue = config.defaultSkin.value;
                     var defSignature = config.defaultSkin.signature;
 
                     if (!defValue.isEmpty() && !defSignature.isEmpty()) {
-                        skinData = new Property(TailoredPlayer.PROPERTY_TEXTURES, defValue, defSignature);
+                        skinData = Optional.of(new Property(TailoredPlayer.PROPERTY_TEXTURES, defValue, defSignature));
                     }
                 }
                 
                 // Try to set skin now
-                if (skinData != null) {
-                    ((TailoredPlayer) player).fabrictailor_setSkin(skinData, true);
-                }
+                skinData.ifPresent(property -> ((TailoredPlayer) player).fabrictailor_setSkin(property, true));
                 ((TailoredPlayer) player).fabrictailor_resetLastSkinChange();
             }
         });

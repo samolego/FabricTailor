@@ -5,7 +5,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -16,11 +15,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.compatibility.TaterzenSkins;
 import org.samo_lego.fabrictailor.mixin.accessors.AEntitySelector;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
@@ -164,19 +163,19 @@ public class SkinCommand {
         return 1;
     }
 
-    public static void setSkin(ServerPlayer player, Supplier<Property> skinProvider) {
+    public static void setSkin(ServerPlayer player, Supplier<Optional<Property>> skinProvider) {
         long lastChange = ((TailoredPlayer) player).fabrictailor_getLastSkinChange();
         long now = System.currentTimeMillis();
 
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
             THREADPOOL.submit(() -> {
-                Property skinData = skinProvider.get();
+                var skinData = skinProvider.get();
 
-                if (skinData == null) {
+                if (skinData.isEmpty()) {
                     player.displayClientMessage(SKIN_SET_ERROR, false);
                 } else {
-                    ((TailoredPlayer) player).fabrictailor_setSkin(skinData, true);
+                    ((TailoredPlayer) player).fabrictailor_setSkin(skinData.get(), true);
                     
                     if (config.logging.skinChangeFeedback) {
                         player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);

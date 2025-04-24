@@ -40,11 +40,7 @@ public class LocalSkinTab implements SkinTabType {
 
     @Override
     public Optional<CustomPacketPayload> getSkinChangePacket(LocalPlayer player, String filePath, boolean useSlim) {
-        Property skinData = SkinFetcher.setSkinFromFile(filePath, useSlim);
-
-        if (skinData == null)
-            return Optional.empty();
-        return Optional.of(new VanillaSkinPayload(skinData));
+        return SkinFetcher.setSkinFromFile(filePath, useSlim).map(VanillaSkinPayload::new);
     }
 
     @Override

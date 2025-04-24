@@ -47,12 +47,7 @@ public class PlayerSkinTab implements SkinTabType {
 
     @Override
     public Optional<CustomPacketPayload> getSkinChangePacket(LocalPlayer player, String playername, boolean _ignored) {
-        Property skinData = SkinFetcher.fetchSkinByName(playername);
-
-        if (skinData == null)
-            return Optional.empty();
-
-        return Optional.of(new VanillaSkinPayload(skinData));
+        return SkinFetcher.fetchSkinByName(playername).map(VanillaSkinPayload::new);
     }
 
     @Override

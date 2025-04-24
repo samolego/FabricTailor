@@ -2,9 +2,7 @@ package org.samo_lego.fabrictailor.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonWriter;
 import com.mojang.authlib.properties.Property;
-import org.jetbrains.annotations.Nullable;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 
 import javax.imageio.ImageIO;
@@ -17,10 +15,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 
-import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
 
 public class SkinFetcher {
 
@@ -31,7 +29,7 @@ public class SkinFetcher {
      * @param useSlim whether slim format should be used
      * @return property containing skin value and signature if successful, otherwise null.
      */
-    public static Property setSkinFromFile(String skinFilePath, boolean useSlim) {
+    public static Optional<Property> setSkinFromFile(String skinFilePath, boolean useSlim) {
         Logging.debug("Fetching skin from file: " + skinFilePath);
         File skinFile = new File(skinFilePath);
         try (FileInputStream input = new FileInputStream(skinFile)) {
@@ -42,7 +40,7 @@ public class SkinFetcher {
                 BufferedImage image = ImageIO.read(skinFile);
                 if (image.getWidth() != 64 || (image.getHeight() != 64 && image.getHeight() != 32)) {
                     Logging.error("Image dimensions are not 64x64 or 32x64! The actual format is: " + image.getWidth() + "x" + image.getHeight());
-                    return null;
+                    return Optional.empty();
                 }
                 
                 try {
@@ -57,7 +55,7 @@ public class SkinFetcher {
             // Not an image
             Logging.error(e.getMessage());
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -66,8 +64,7 @@ public class SkinFetcher {
      * @param skinUrl string url of the skin
      * @return property containing skin value and signature if successful, otherwise null.
      */
-    @Nullable
-    public static Property fetchSkinByUrl(String skinUrl, boolean useSlim) {
+    public static Optional<Property> fetchSkinByUrl(String skinUrl, boolean useSlim) {
         Logging.debug("Fetching skin from URL: " + skinUrl);
         try {
             String reply = urlRequest(URI.create("https://api.mineskin.org/v2/generate").toURL(), false, null, skinUrl, useSlim ? "slim" : "classic");
@@ -75,7 +72,7 @@ public class SkinFetcher {
         } catch (IOException e) {
             Logging.error(e.getMessage());
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -84,8 +81,7 @@ public class SkinFetcher {
      * @param playername name of the player who has the skin wanted
      * @return property containing skin value and signature if successful, otherwise null.
      */
-    @Nullable
-    public static Property fetchSkinByName(String playername) {
+    public static Optional<Property> fetchSkinByName(String playername) {
         Logging.debug("Fetching Mojang skin of player: " + playername);
         try {
             String reply = urlRequest(URI.create("https://api.mojang.com/users/profiles/minecraft/" + playername).toURL(), true, null);
@@ -102,7 +98,7 @@ public class SkinFetcher {
         } catch (IOException e) {
             Logging.error(e.getMessage());
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -112,20 +108,19 @@ public class SkinFetcher {
      * @param reply API reply
      * @return property containing skin value and signature if successful, otherwise null.
      */
-    @Nullable
-    protected static Property getSkinFromReply(String reply) {
+    protected static Optional<Property> getSkinFromReply(String reply) {
         Logging.debug("Parsing skin reply: " + reply);
         if (reply == null || reply.contains("error") || reply.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
         String value = reply.split("\"value\":\"")[1].split("\"")[0];
         String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 
-        return new Property(TailoredPlayer.PROPERTY_TEXTURES, value, signature);
+        return Optional.of(new Property(TailoredPlayer.PROPERTY_TEXTURES, value, signature));
     }
 
-    private static String urlRequest(URL url, boolean useGetMethod, @Nullable File image) throws IOException {
+    private static String urlRequest(URL url, boolean useGetMethod, File image) throws IOException {
         return urlRequest(url, useGetMethod, image, null, "classic");
     }
 
@@ -139,7 +134,7 @@ public class SkinFetcher {
      * @return reply from website as string
      * @throws IOException IOException is thrown when connection fails for some reason.
      */
-    private static String urlRequest(URL url, boolean useGetMethod, @Nullable File image, @Nullable String skinUrl, String variant) throws IOException {
+    private static String urlRequest(URL url, boolean useGetMethod, File image, String skinUrl, String variant) throws IOException {
         URLConnection connection = url.openConnection();
 
         String reply = null;

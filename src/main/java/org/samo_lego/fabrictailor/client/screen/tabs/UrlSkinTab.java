@@ -60,12 +60,7 @@ public class UrlSkinTab implements SkinTabType {
 
             if (width == 64 && (height == 32 || height == 64)) {
                 // Normal skin (vanilla compatible)
-                var skinData = SkinFetcher.fetchSkinByUrl(url, useSlim);
-
-                if (skinData == null)
-                    return Optional.empty();
-
-                return Optional.of(new VanillaSkinPayload(skinData));
+                return SkinFetcher.fetchSkinByUrl(url, useSlim).map(VanillaSkinPayload::new);
             } else {
                 // HD skin (not vanilla compatible)
                 JsonObject metadata = null;
