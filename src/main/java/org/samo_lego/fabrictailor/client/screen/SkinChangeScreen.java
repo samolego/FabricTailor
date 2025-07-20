@@ -2,7 +2,6 @@ package org.samo_lego.fabrictailor.client.screen;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -16,7 +15,9 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -40,7 +41,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Logger;
 
 import static org.samo_lego.fabrictailor.client.ClientTailor.ALLOW_DEFAULT_SKIN;
 import static org.samo_lego.fabrictailor.client.ClientTailor.TAILORED_SERVER;
@@ -108,8 +108,7 @@ public class SkinChangeScreen extends Screen {
         skinInput.setMaxLength(256);
         skinInput.setVisible(true);
         skinInput.setBordered(true);
-        skinInput.setTextColor(16777215);
-
+        skinInput.setTextColor(0xFFFFFFFF);
         this.addWidget(skinInput);
 
         // "Set skin" button
@@ -170,7 +169,7 @@ public class SkinChangeScreen extends Screen {
 
     private void clearSkin() {
         if (TAILORED_SERVER) {
-            this.minecraft.player.connection.sendUnsignedCommand("skin clear");
+            this.minecraft.player.connection.sendCommand("skin clear");
         } else {
             ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
             // Reload skin - todo
@@ -219,23 +218,20 @@ public class SkinChangeScreen extends Screen {
      */
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        // Darkens background
-        this.renderBackground(guiGraphics, 0, 0, 0.5f);
         super.render(guiGraphics, mouseX, mouseY, delta);
 
         // Screen title
-        guiGraphics.drawCenteredString(font, title, width / 2, 15, 0xffffff);
+        guiGraphics.drawCenteredString(this.font, title, width / 2, 15, -1);
 
         // Starting position of the window texture
         this.startX = (this.width - 252) / 2;
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        guiGraphics.blit(RenderType::guiTextured, AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140, 256, 256);
 
 
-        // Render input field
-        skinInput.render(guiGraphics, startX, startY, delta);
+        this.skinInput.render(guiGraphics, startX, startY, delta);
 
         // Other renders
         this.drawTabs(guiGraphics, startX, startY);
@@ -263,8 +259,8 @@ public class SkinChangeScreen extends Screen {
         guiGraphics.enableScissor(i, j, k, l);
         //float p = (float) Math.atan((double) ((n - g) / 40.0F));
         //float q = (float) Math.atan((double) ((o - h) / 40.0F));
-        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
-        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(q * 20.0F * 0.017453292F);
+        Quaternionf quaternionf = (new Quaternionf()).rotateZ((float) Math.PI);
+        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(q * 20.0F * (float) (Math.PI / 180.0));
         quaternionf.mul(quaternionf2);
         float r = livingEntity.yBodyRot;
         float s = livingEntity.getYRot();
@@ -279,7 +275,7 @@ public class SkinChangeScreen extends Screen {
         float w = livingEntity.getScale();
         Vector3f vector3f = new Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + f * w, 0.0F);
         float x = (float) m / w;
-        InventoryScreen.renderEntityInInventory(guiGraphics, n, o, x, vector3f, quaternionf, quaternionf2, livingEntity);
+        InventoryScreen.renderEntityInInventory(guiGraphics, i, j, k, l, x, vector3f, quaternionf, quaternionf2, livingEntity);
         livingEntity.yBodyRot = r;
         livingEntity.setYRot(s);
         livingEntity.setXRot(t);
@@ -316,10 +312,10 @@ public class SkinChangeScreen extends Screen {
         }
 
         // Rendering title
-        guiGraphics.drawString(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFF);
+        guiGraphics.drawString(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFFFF);
 
         // Rendering description above input field
-        guiGraphics.drawString(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFF);
+        guiGraphics.drawString(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFFFF);
     }
 
 
@@ -351,8 +347,9 @@ public class SkinChangeScreen extends Screen {
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
 
+            ClientTooltipComponent clientTooltipComponent = ClientTooltipComponent.create(tab.getTitle().getVisualOrderText());
             if (tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY)) {
-                guiGraphics.renderTooltip(this.font, tab.getTitle(), mouseX, mouseY);
+                guiGraphics.renderTooltip(this.font, List.of(clientTooltipComponent), mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null);
                 break;
             }
         }
