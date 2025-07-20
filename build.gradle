@@ -145,5 +145,8 @@ modrinth {
 
     gameVersions = [project.minecraft_version]
     loaders = ['fabric', 'quilt']
+    dependencies {
+        required.project "fabric-api"
+    }
 
 }
