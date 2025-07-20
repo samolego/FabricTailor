@@ -5,8 +5,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -33,6 +31,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.mixin.accessors.AChunkMap;
 import org.samo_lego.fabrictailor.mixin.accessors.ATrackedEntity;
@@ -76,8 +76,8 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     @Unique
     private long lastSkinChangeTime = 0;
 
-    public MServerPlayerEntity_TailoredPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(level, blockPos, f, gameProfile);
+    public MServerPlayerEntity_TailoredPlayer(Level level, GameProfile gameProfile) {
+        super(level, gameProfile);
     }
 
 
@@ -105,7 +105,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(self.getUUID()))));
         playerManager.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(Collections.singleton(self)));
 
-        ServerChunkCache manager = self.serverLevel().getChunkSource();
+        ServerChunkCache manager = self.level().getChunkSource();
         ChunkMap storage = manager.chunkMap;
         ATrackedEntity trackerEntry = ((AChunkMap) storage).getEntityTrackers().get(self.getId());
         if (config.logging.debug) {
@@ -118,7 +118,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
 
         // need to change the player entity on the client
         Logging.debug("Reloading player skin on player's client.");
-        ServerLevel level = self.serverLevel();
+        ServerLevel level = self.level();
         this.connection.send(new ClientboundRespawnPacket(
                         new CommonPlayerSpawnInfo(
                                 level.dimensionTypeRegistration(),
@@ -312,25 +312,23 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
 
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void writeCustomDataToNbt(CompoundTag tag, CallbackInfo ci) {
+    private void writeCustomDataToNbt(ValueOutput valueOutput, CallbackInfo ci) {
         if (this.fabrictailor_getSkinValue().isPresent()) {
-            CompoundTag skinDataTag = new CompoundTag();
-            skinDataTag.putString("value", this.fabrictailor_getSkinValue().get());
+            ValueOutput skinData = valueOutput.child("fabrictailor:skin_data");
+            skinData.putString("value", this.fabrictailor_getSkinValue().get());
             if (this.fabrictailor_getSkinSignature().isPresent()) {
-                skinDataTag.putString("signature", this.fabrictailor_getSkinSignature().get());
+                skinData.putString("signature", this.fabrictailor_getSkinSignature().get());
             }
-
-            tag.put("fabrictailor:skin_data", skinDataTag);
         }
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void readCustomDataFromNbt(CompoundTag tag, CallbackInfo ci) {
-        Optional<CompoundTag> skinDataTagOP = tag.getCompound("fabrictailor:skin_data");
-        if(skinDataTagOP.isEmpty()) return; // This causes an java.util.NoSuchElementException for new players I believe.
-        CompoundTag skinDataTag = skinDataTagOP.get();
-        Optional<String> skinValueOP = skinDataTag.getString("value");
-        Optional<String> skinSignatureOP = skinDataTag.getString("signature");
+    private void readCustomDataFromNbt(ValueInput valueInput, CallbackInfo ci) {
+        Optional<ValueInput> skinDataOP = valueInput.child("fabrictailor:skin_data");
+        if(skinDataOP.isEmpty()) return; // This causes an java.util.NoSuchElementException for new players I believe.
+        ValueInput skinData = skinDataOP.get();
+        Optional<String> skinValueOP = skinData.getString("value");
+        Optional<String> skinSignatureOP = skinData.getString("signature");
         // https://fabricmc.net/2025/03/24/1215.html#nbt
         if (skinValueOP.isEmpty() || skinSignatureOP.isEmpty()) {
             return;
