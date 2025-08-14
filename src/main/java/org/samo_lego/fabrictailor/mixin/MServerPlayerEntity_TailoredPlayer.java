@@ -143,9 +143,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         this.connection.send(new ClientboundSetExperiencePacket(this.experienceProgress, this.totalExperience, this.experienceLevel));
         playerManager.sendLevelInfo(self, level);
         playerManager.sendPlayerPermissionLevel(self);
-
-        this.connection.send(new ClientboundSetHealthPacket(this.getHealth(), this.getFoodData().getFoodLevel(), this.getFoodData().getSaturationLevel()));
-
+        
         for (MobEffectInstance statusEffect : this.getActiveEffects()) {
             this.connection.send(new ClientboundUpdateMobEffectPacket(self.getId(), statusEffect, false));
         }
