@@ -311,9 +311,10 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void writeCustomDataToNbt(ValueOutput valueOutput, CallbackInfo ci) {
-        if (this.fabrictailor_getSkinValue().isPresent()) {
+        final var skinValue = this.fabrictailor_getSkinValue();
+        if (skinValue.isPresent()) {    
             ValueOutput skinData = valueOutput.child("fabrictailor:skin_data");
-            skinData.putString("value", this.fabrictailor_getSkinValue().get());
+            skinData.putString("value", skinValue.get());
             if (this.fabrictailor_getSkinSignature().isPresent()) {
                 skinData.putString("signature", this.fabrictailor_getSkinSignature().get());
             }
@@ -323,17 +324,20 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void readCustomDataFromNbt(ValueInput valueInput, CallbackInfo ci) {
         Optional<ValueInput> skinDataOP = valueInput.child("fabrictailor:skin_data");
-        if(skinDataOP.isEmpty()) return; // This causes an java.util.NoSuchElementException for new players I believe.
+        if (skinDataOP.isEmpty()) {
+            // New players don't have this data yet (or players who cleared their skin)
+            return;
+        }
         ValueInput skinData = skinDataOP.get();
         Optional<String> skinValueOP = skinData.getString("value");
         Optional<String> skinSignatureOP = skinData.getString("signature");
         // https://fabricmc.net/2025/03/24/1215.html#nbt
-        if (skinValueOP.isEmpty() || skinSignatureOP.isEmpty()) {
+        if (skinValueOP.isEmpty()) {
             return;
         }
 
         this.skinValue = skinValueOP.get();
-        this.skinSignature = skinSignatureOP.get();
+        this.skinSignature = skinSignatureOP.orElse("");
         this.fabrictailor_setSkin(this.skinValue, this.skinSignature, false);
     }
 }
