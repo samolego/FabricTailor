@@ -16,6 +16,8 @@ import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
 import org.samo_lego.fabrictailor.network.payload.FabricTailorHelloPayload;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
+import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
+
 /**
  * This doesn't work in server environment,
  * it's meant for singleplayer OR
@@ -40,7 +42,7 @@ public class ClientTailor implements ClientModInitializer {
                 "key.fabrictailor.toggle_skin_gui",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_K, // K for opening the window
-                KeyMapping.Category.register(ResourceLocation.parse("category.fabrictailor.skin_category"))
+                new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(MOD_ID, "skin_category"))
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
