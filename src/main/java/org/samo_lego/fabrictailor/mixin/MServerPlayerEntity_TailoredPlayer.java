@@ -50,7 +50,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.samo_lego.fabrictailor.FabricTailor.config;
-import static org.samo_lego.fabrictailor.mixin.accessors.APlayer.getPLAYER_MODEL_PARTS;
+import static org.samo_lego.fabrictailor.mixin.accessors.AAvatar.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayer.class)
 public abstract class MServerPlayerEntity_TailoredPlayer extends Player implements TailoredPlayer {
@@ -62,7 +62,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     @Unique
     private final GameProfile gameProfile = self.getGameProfile();
     @Unique
-    private final PropertyMap map = this.gameProfile.getProperties();
+    private final PropertyMap map = this.gameProfile.properties();
     @Shadow
     public ServerGamePacketListenerImpl connection;
 
@@ -93,15 +93,10 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
      */
     @Override
     public void fabrictailor_reloadSkin() {
-        if (self.getServer() == null) {
-            Logging.error("Tried to reload skin form client side! This should not happen!");
-            return;
-        }
-        
         Logging.debug("Reloading skin for player " + self.getName().getString());
 
         // Refreshing in tablist for each player
-        PlayerList playerManager = self.getServer().getPlayerList();
+        PlayerList playerManager = self.level().getServer().getPlayerList();
         playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(self.getUUID()))));
         playerManager.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(Collections.singleton(self)));
 
@@ -263,7 +258,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         String skin = this.skinValue;
         if (skin == null) {
             // Fallback to default skin
-            var textures = self.getGameProfile().getProperties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findAny();
+            var textures = self.getGameProfile().properties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findAny();
 
             if (textures.isPresent()) {
                 skin = textures.get().value();

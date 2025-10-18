@@ -40,7 +40,7 @@ public class NetworkHandler {
             if (value.isEmpty() || signature.isEmpty()) {
 
                 if (!config.defaultSkin.applyToAll) {
-                    skinData = fetchSkinByName(player.getGameProfile().getName());
+                    skinData = fetchSkinByName(player.getGameProfile().name());
                 }
 
                 if (skinData.isEmpty()) {

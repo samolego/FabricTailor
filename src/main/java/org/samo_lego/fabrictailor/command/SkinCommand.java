@@ -128,7 +128,7 @@ public class SkinCommand {
         String skinFilePath = getMessage(context, "skin file path").getString();
 
         // Warn about server path for uploads
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = player.level().getServer();
         if (server != null && server.isDedicatedServer() && config.logging.skinChangeFeedback) {
                 player.displayClientMessage(
                     TextTranslations.create("hint.fabrictailor.server_skin_path").withStyle(ChatFormatting.GOLD),

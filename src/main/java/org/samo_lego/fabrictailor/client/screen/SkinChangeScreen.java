@@ -151,7 +151,7 @@ public class SkinChangeScreen extends Screen {
                                         var profile = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile();
 
                                         // could return an empty collection, Iterator#next in this case produces NoSuchElementException
-                                        Optional<Property> optionalProperty = profile.getProperties()
+                                        Optional<Property> optionalProperty = profile.properties()
                                                 .get(TailoredPlayer.PROPERTY_TEXTURES)
                                                 .stream()
                                                 .findFirst();
@@ -171,7 +171,7 @@ public class SkinChangeScreen extends Screen {
         if (TAILORED_SERVER) {
             this.minecraft.player.connection.sendCommand("skin clear");
         } else {
-            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
+            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().properties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
             // Reload skin - todo
         }
     }
@@ -185,7 +185,7 @@ public class SkinChangeScreen extends Screen {
                     ClientPlayNetworking.send(packet);
                 } else {
                     // Change skin clientside only todo: reload skin
-                    PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
+                    PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().properties();
 
                     /*try {
                         map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);

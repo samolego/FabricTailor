@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworkin
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
 import org.samo_lego.fabrictailor.network.payload.FabricTailorHelloPayload;
@@ -39,7 +40,7 @@ public class ClientTailor implements ClientModInitializer {
                 "key.fabrictailor.toggle_skin_gui",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_K, // K for opening the window
-                "category.fabrictailor.skin_category"
+                KeyMapping.Category.register(ResourceLocation.parse("category.fabrictailor.skin_category"))
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
