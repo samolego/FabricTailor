@@ -15,7 +15,8 @@
         "accessors.AAvatar",
         "accessors.AChunkMap",
         "accessors.AEntitySelector",
-        "accessors.ATrackedEntity",
+        "accessors.APlayer",
+        "accessors.ATrackedEntity"
     ],
     "injectors": {
         "defaultRequire": 1
