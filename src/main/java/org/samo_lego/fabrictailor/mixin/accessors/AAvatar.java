@@ -8,5 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(Avatar.class)
 public interface AAvatar {
     @Accessor("DATA_PLAYER_MODE_CUSTOMISATION")
-    EntityDataAccessor<Byte> getPLAYER_MODEL_PARTS();
+    static EntityDataAccessor<Byte> getPLAYER_MODEL_PARTS() {
+        throw new AssertionError();
+    }
 }

@@ -34,7 +34,6 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
-import org.samo_lego.fabrictailor.mixin.accessors.AAvatar;
 import org.samo_lego.fabrictailor.mixin.accessors.AChunkMap;
 import org.samo_lego.fabrictailor.mixin.accessors.APlayer;
 import org.samo_lego.fabrictailor.mixin.accessors.ATrackedEntity;
@@ -46,12 +45,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Optional;
 
 import static org.samo_lego.fabrictailor.FabricTailor.config;
+import static org.samo_lego.fabrictailor.mixin.accessors.AAvatar.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayer.class)
-public abstract class MServerPlayerEntity_TailoredPlayer extends Player implements TailoredPlayer, AAvatar, APlayer {
+public abstract class MServerPlayerEntity_TailoredPlayer extends Player implements TailoredPlayer {
 
     @Unique
     private static final String STEVE = "MHF_STEVE";
@@ -176,7 +179,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
             Multimap<String, Property> properties = ArrayListMultimap.create(this.getGameProfile().properties());
             properties.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
 
-            this.setGameProfile(new GameProfile(
+            ((APlayer) this).setGameProfile(new GameProfile(
                     this.getGameProfile().id(),
                     this.getGameProfile().name(),
                     new PropertyMap(properties)
@@ -189,7 +192,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
             Multimap<String, Property> properties = ArrayListMultimap.create(this.getGameProfile().properties());
             properties.put(TailoredPlayer.PROPERTY_TEXTURES, skinData);
 
-            this.setGameProfile(new GameProfile(
+            ((APlayer) this).setGameProfile(new GameProfile(
                     this.getGameProfile().id(),
                     this.getGameProfile().name(),
                     new PropertyMap(properties)
@@ -255,7 +258,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
             Multimap<String, Property> properties = ArrayListMultimap.create(this.getGameProfile().properties());
             properties.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
 
-            this.setGameProfile(new GameProfile(
+            ((APlayer) this).setGameProfile(new GameProfile(
                     this.getGameProfile().id(),
                     this.getGameProfile().name(),
                     new PropertyMap(properties)
@@ -315,7 +318,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
 
             // Fake cape rule to be off
             playerModel = (byte) (playerModel & ~(1));
-            this.self.getEntityData().set(this.getPLAYER_MODEL_PARTS(), playerModel);
+            this.self.getEntityData().set(getPLAYER_MODEL_PARTS(), playerModel);
         }
     }
 
