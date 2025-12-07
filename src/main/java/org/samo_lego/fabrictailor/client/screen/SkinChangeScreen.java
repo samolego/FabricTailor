@@ -6,23 +6,26 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
@@ -31,6 +34,8 @@ import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.PlayerSkinTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.SkinTabType;
 import org.samo_lego.fabrictailor.client.screen.tabs.UrlSkinTab;
+import org.samo_lego.fabrictailor.mixin.accessors.AAdvancementsScreen;
+import org.samo_lego.fabrictailor.mixin.accessors.AInventoryScreen;
 import org.samo_lego.fabrictailor.mixin.client.AAbstractClientPlayer;
 import org.samo_lego.fabrictailor.network.payload.DefaultSkinPayload;
 import org.samo_lego.fabrictailor.util.Logging;
@@ -91,11 +96,17 @@ public class SkinChangeScreen extends Screen {
                 .size(BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
         this.addRenderableWidget(openExplorerButton);
+        if (this.font == null) {  // todo: figure out why this happens in 1.21.11
+            Minecraft.getInstance().setScreen(null);
+            Minecraft.getInstance().player.displayClientMessage(Component.nullToEmpty("WTH?? Screen#font is null, closing screen"), false);
+            return;
+        }
 
         // Checkbox for slim skin model
         this.skinModelCheckbox = Checkbox.builder(TextTranslations.create("button.fabrictailor.use_slim"), this.font)
                 .pos(width / 2,
                         height / 2 - 12)
+                .maxWidth(BUTTON_WIDTH)
                 .selected(false)
                 .build();
         this.addRenderableWidget(skinModelCheckbox);
@@ -229,7 +240,7 @@ public class SkinChangeScreen extends Screen {
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, AAdvancementsScreen.getWINDOW_LOCATION(), startX, startY, 0, 0, 252, 140, 256, 256);
 
 
         this.skinInput.render(guiGraphics, startX, startY, delta);
@@ -253,13 +264,9 @@ public class SkinChangeScreen extends Screen {
     public void renderEntityInInventoryFollowsMouseBackwards(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
         float mousex = -(((float) width / 2) - 75 - g);
         float mousey = ((float) height / 2) - h;
-        float n = (float) (i + k) / 2.0F;
-        float o = (float) (j + l) / 2.0F;
         float p = (float) Math.atan(mousex / 40.0f);
         float q = (float) Math.atan(mousey / 40.0f);
         guiGraphics.enableScissor(i, j, k, l);
-        //float p = (float) Math.atan((double) ((n - g) / 40.0F));
-        //float q = (float) Math.atan((double) ((o - h) / 40.0F));
         Quaternionf quaternionf = (new Quaternionf()).rotateZ((float) Math.PI);
         Quaternionf quaternionf2 = (new Quaternionf()).rotateX(q * 20.0F * (float) (Math.PI / 180.0));
         quaternionf.mul(quaternionf2);
@@ -274,9 +281,25 @@ public class SkinChangeScreen extends Screen {
         livingEntity.yHeadRot = livingEntity.getYRot();
         livingEntity.yHeadRotO = livingEntity.getYRot();
         float w = livingEntity.getScale();
-        Vector3f vector3f = new Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + f * w, 0.0F);
         float x = (float) m / w;
-        InventoryScreen.renderEntityInInventory(guiGraphics, i, j, k, l, x, vector3f, quaternionf, quaternionf2, livingEntity);
+
+        EntityRenderState entityRenderState = AInventoryScreen.invokeExtractRenderState(livingEntity);
+        if (entityRenderState instanceof LivingEntityRenderState livingEntityRenderState) {
+            livingEntityRenderState.bodyRot = 180.0F + p * 20.0F;
+            livingEntityRenderState.yRot = p * 20.0F;
+            if (livingEntityRenderState.pose != Pose.FALL_FLYING) {
+                livingEntityRenderState.xRot = -q * 20.0F;
+            } else {
+                livingEntityRenderState.xRot = 0.0F;
+            }
+
+            livingEntityRenderState.boundingBoxWidth /= livingEntityRenderState.scale;
+            livingEntityRenderState.boundingBoxHeight /= livingEntityRenderState.scale;
+            livingEntityRenderState.scale = 1.0F;
+        }
+
+        Vector3f vector3f = new Vector3f(0.0F, entityRenderState.boundingBoxHeight / 2.0F + f, 0.0F);
+        guiGraphics.submitEntityRenderState(entityRenderState, (float)m, vector3f, quaternionf, quaternionf2, i, j, k, l);
         livingEntity.yBodyRot = r;
         livingEntity.setYRot(s);
         livingEntity.setXRot(t);

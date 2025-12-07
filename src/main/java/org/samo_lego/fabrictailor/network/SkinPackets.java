@@ -1,12 +1,12 @@
 package org.samo_lego.fabrictailor.network;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static org.samo_lego.fabrictailor.FabricTailor.MOD_ID;
 
 public class SkinPackets {
-    public static final ResourceLocation FABRICTAILOR_VANILLA_CHANGE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "skin_change_vanilla");
-    public static final ResourceLocation FABRICTAILOR_HD_CHANGE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "skin_change_hd");
-    public static final ResourceLocation FABRICTAILOR_DEFAULT_SKIN = ResourceLocation.fromNamespaceAndPath(MOD_ID, "default_skin_request");
-    public static final ResourceLocation FT_HELLO = ResourceLocation.fromNamespaceAndPath(MOD_ID, "hello");
+    public static final Identifier FABRICTAILOR_VANILLA_CHANGE = Identifier.fromNamespaceAndPath(MOD_ID, "skin_change_vanilla");
+    public static final Identifier FABRICTAILOR_HD_CHANGE = Identifier.fromNamespaceAndPath(MOD_ID, "skin_change_hd");
+    public static final Identifier FABRICTAILOR_DEFAULT_SKIN = Identifier.fromNamespaceAndPath(MOD_ID, "default_skin_request");
+    public static final Identifier FT_HELLO = Identifier.fromNamespaceAndPath(MOD_ID, "hello");
 }

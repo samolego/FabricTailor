@@ -11,6 +11,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.Permission.HasCommandLevel;
+import net.minecraft.server.permissions.PermissionLevel;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.network.payload.DefaultSkinPayload;
 import org.samo_lego.fabrictailor.network.payload.FabricTailorHelloPayload;
@@ -65,7 +68,7 @@ public class NetworkHandler {
     }
 
     public static void defaultSkinPacket(DefaultSkinPayload payload, Context context) {
-        if (context.player().hasPermissions(2)) {
+        if (context.player().permissions().hasPermission(new HasCommandLevel(PermissionLevel.GAMEMASTERS))) {
 
             config.defaultSkin.value = payload.skinProperty().value();
             config.defaultSkin.signature = payload.skinProperty().signature();
