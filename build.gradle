@@ -39,7 +39,7 @@ dependencies {
     modImplementation(include("com.github.samolego:Config2Brigadier:${project.c2b_lib_version}"))
 
     // LuckPerms
-    modImplementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}"))
+    modImplementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}-patbox"))
 
     // Carpet
     modCompileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
