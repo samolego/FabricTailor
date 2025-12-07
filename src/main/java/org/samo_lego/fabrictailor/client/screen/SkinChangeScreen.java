@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -151,7 +152,7 @@ public class SkinChangeScreen extends Screen {
                                         var profile = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile();
 
                                         // could return an empty collection, Iterator#next in this case produces NoSuchElementException
-                                        Optional<Property> optionalProperty = profile.getProperties()
+                                        Optional<Property> optionalProperty = profile.properties()
                                                 .get(TailoredPlayer.PROPERTY_TEXTURES)
                                                 .stream()
                                                 .findFirst();
@@ -171,7 +172,7 @@ public class SkinChangeScreen extends Screen {
         if (TAILORED_SERVER) {
             this.minecraft.player.connection.sendCommand("skin clear");
         } else {
-            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
+            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().properties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
             // Reload skin - todo
         }
     }
@@ -185,7 +186,7 @@ public class SkinChangeScreen extends Screen {
                     ClientPlayNetworking.send(packet);
                 } else {
                     // Change skin clientside only todo: reload skin
-                    PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
+                    PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().properties();
 
                     /*try {
                         map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
@@ -359,18 +360,17 @@ public class SkinChangeScreen extends Screen {
      * Checks if one of the tabs was clicked
      * and selects it accordingly.
      *
-     * @param mouseX mouse x
-     * @param mouseY mouse y
-     * @param button button that was clicke
+     * @param mouseButtonEvent The mouse event
+     *
      * @return super.mouseClicked()
      */
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
+        if (mouseButtonEvent.button() == 0) {
             for (int i = 0; i < TABS.size(); ++i) {
                 SkinTabType tab = TABS.get(i);
 
-                final boolean mouseOver = tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY);
+                final boolean mouseOver = tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseButtonEvent.x(), mouseButtonEvent.y());
 
                 if (mouseOver) {
                     this.selectedTab = tab;
@@ -378,7 +378,7 @@ public class SkinChangeScreen extends Screen {
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseButtonEvent, bl);
     }
 
 

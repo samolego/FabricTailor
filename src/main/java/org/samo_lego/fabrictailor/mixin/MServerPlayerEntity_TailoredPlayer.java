@@ -1,5 +1,6 @@
 package org.samo_lego.fabrictailor.mixin;
 
+import com.google.common.collect.*;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -13,7 +14,6 @@ import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundSetCursorItemPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundSetExperiencePacket;
-import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket;
 import net.minecraft.network.protocol.game.CommonPlayerSpawnInfo;
@@ -35,6 +35,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.mixin.accessors.AChunkMap;
+import org.samo_lego.fabrictailor.mixin.accessors.APlayer;
 import org.samo_lego.fabrictailor.mixin.accessors.ATrackedEntity;
 import org.samo_lego.fabrictailor.util.Logging;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,7 +51,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.samo_lego.fabrictailor.FabricTailor.config;
-import static org.samo_lego.fabrictailor.mixin.accessors.APlayer.getPLAYER_MODEL_PARTS;
+import static org.samo_lego.fabrictailor.mixin.accessors.AAvatar.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayer.class)
 public abstract class MServerPlayerEntity_TailoredPlayer extends Player implements TailoredPlayer {
@@ -59,10 +60,6 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     private static final String STEVE = "MHF_STEVE";
     @Unique
     private final ServerPlayer self = (ServerPlayer) (Object) this;
-    @Unique
-    private final GameProfile gameProfile = self.getGameProfile();
-    @Unique
-    private final PropertyMap map = this.gameProfile.getProperties();
     @Shadow
     public ServerGamePacketListenerImpl connection;
 
@@ -93,15 +90,10 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
      */
     @Override
     public void fabrictailor_reloadSkin() {
-        if (self.getServer() == null) {
-            Logging.error("Tried to reload skin form client side! This should not happen!");
-            return;
-        }
-        
         Logging.debug("Reloading skin for player " + self.getName().getString());
 
         // Refreshing in tablist for each player
-        PlayerList playerManager = self.getServer().getPlayerList();
+        PlayerList playerManager = self.level().getServer().getPlayerList();
         playerManager.broadcastAll(new ClientboundPlayerInfoRemovePacket(new ArrayList<>(Collections.singleton(self.getUUID()))));
         playerManager.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(Collections.singleton(self)));
 
@@ -173,7 +165,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     }
 
     /**
-     * Sets the skin to the specified player and reloads it with {@link MServerPlayerEntity_TailoredPlayer#fabrictailor_reloadSkin()} ()} reloadSkin().
+     * Sets the skin to the specified player and reloads it with {@link MServerPlayerEntity_TailoredPlayer#fabrictailor_reloadSkin()}.
      *
      * @param skinData skin texture data
      * @param reload   whether to send packets around for skin reload
@@ -183,13 +175,28 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         Logging.debug("Setting skin for player " + self.getName().getString());
         try {
             Logging.debug("Clearing existing skin for player");
-            this.map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
+
+            Multimap<String, Property> properties = ArrayListMultimap.create(this.getGameProfile().properties());
+            properties.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
+
+            ((APlayer) this).setGameProfile(new GameProfile(
+                    this.getGameProfile().id(),
+                    this.getGameProfile().name(),
+                    new PropertyMap(properties)
+            ));
         } catch (Exception ignored) {
             // Player has no skin data, no worries
         }
 
         try {
-            this.map.put(TailoredPlayer.PROPERTY_TEXTURES, skinData);
+            Multimap<String, Property> properties = ArrayListMultimap.create(this.getGameProfile().properties());
+            properties.put(TailoredPlayer.PROPERTY_TEXTURES, skinData);
+
+            ((APlayer) this).setGameProfile(new GameProfile(
+                    this.getGameProfile().id(),
+                    this.getGameProfile().name(),
+                    new PropertyMap(properties)
+            ));
 
             // Saving skin data
             this.skinValue = skinData.value();
@@ -216,7 +223,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     public Optional<String> fabrictailor_getSkinValue() {
         if (this.skinValue == null) {
             try {
-                Property property = map.get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next();
+                Property property = this.getGameProfile().properties().get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next();
                 this.skinValue = property.value();
             } catch (Exception ignored) {
                 // Player has no skin data, no worries
@@ -230,7 +237,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     public Optional<String> fabrictailor_getSkinSignature() {
         if (this.skinSignature == null) {
             try {
-                Property property = map.get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next();
+                Property property = this.getGameProfile().properties().get(TailoredPlayer.PROPERTY_TEXTURES).iterator().next();
                 this.skinSignature = property.signature();
             } catch (Exception ignored) {
                 // Player has no skin data, no worries
@@ -248,7 +255,14 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
     @Override
     public void fabrictailor_clearSkin() {
         try {
-            this.map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
+            Multimap<String, Property> properties = ArrayListMultimap.create(this.getGameProfile().properties());
+            properties.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
+
+            ((APlayer) this).setGameProfile(new GameProfile(
+                    this.getGameProfile().id(),
+                    this.getGameProfile().name(),
+                    new PropertyMap(properties)
+            ));
             // Ensure that the skin is completely cleared to prevent the save bug.
             this.skinValue = null;
             this.skinSignature = null;
@@ -263,7 +277,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
         String skin = this.skinValue;
         if (skin == null) {
             // Fallback to default skin
-            var textures = self.getGameProfile().getProperties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findAny();
+            var textures = self.getGameProfile().properties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findAny();
 
             if (textures.isPresent()) {
                 skin = textures.get().value();

@@ -12,6 +12,7 @@
     ],
     "mixins": [
         "MServerPlayerEntity_TailoredPlayer",
+        "accessors.AAvatar",
         "accessors.AChunkMap",
         "accessors.AEntitySelector",
         "accessors.APlayer",

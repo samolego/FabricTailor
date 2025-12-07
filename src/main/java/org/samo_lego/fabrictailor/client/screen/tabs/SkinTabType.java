@@ -45,7 +45,7 @@ public interface SkinTabType {
     }
 
     default Property getExtendedProperty(LocalPlayer player, MinecraftProfileTexture.Type type, String textureUrl, JsonObject metadata) {
-        var current = ((AAbstractClientPlayer) player).ft_getPlayerInfo().getProfile().getProperties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findFirst();
+        var current = ((AAbstractClientPlayer) player).ft_getPlayerInfo().getProfile().properties().get(TailoredPlayer.PROPERTY_TEXTURES).stream().findFirst();
         String json = current.map(property -> new String(Base64.getDecoder().decode(property.value()), StandardCharsets.UTF_8))
                 .orElse("{\"" + TailoredPlayer.PROPERTY_TEXTURES + "\":{}}");
         JsonObject jsonPayload = JsonParser.parseString(json).getAsJsonObject();

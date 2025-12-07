@@ -16,6 +16,6 @@
   "tab.fabrictailor.title_player": "Fetch from player",
   "tab.fabrictailor.title_url": "Fetch from URL",
   "key.fabrictailor.toggle_skin_gui": "Open skin GUI",
-  "category.fabrictailor.skin_category": "FabricTailor",
+  "key.category.fabrictailor.skin_category": "FabricTailor",
   "error.fabrictailor.not_installed": "FabricTailor mod is sadly not installed on this server. Please contact admin for more info."
 }
