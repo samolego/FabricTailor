@@ -57,6 +57,10 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
 }
 
+tasks.test {
+    failOnNoDiscoveredTests = false
+}
+
 java {
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
     // if it is present.
@@ -66,7 +70,7 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_${project.archives_base_name}" }
     }
 }
 
