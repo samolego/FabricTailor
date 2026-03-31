@@ -16,6 +16,6 @@
   "tab.fabrictailor.title_player": "Lấy từ người chơi",
   "tab.fabrictailor.title_url": "Lấy từ URL",
   "key.fabrictailor.toggle_skin_gui": "Mở GUI skin",
-  "category.fabrictailor.skin_category": "FabricTailor",
+  "key.category.fabrictailor.skin": "FabricTailor",
   "error.fabrictailor.not_installed": "Rất tiếc, mod FabricTailor không được cài đặt trên máy chủ này. Vui lòng liên hệ quản trị viên để biết thêm thông tin."
 }

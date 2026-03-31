@@ -5,11 +5,12 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
 import org.samo_lego.fabrictailor.network.payload.FabricTailorHelloPayload;
@@ -35,11 +36,11 @@ public class ClientTailor implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        keyBinding = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        keyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.fabrictailor.toggle_skin_gui",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_K, // K for opening the window
-                "category.fabrictailor.skin_category"
+                KeyMapping.Category.register(Identifier.fromNamespaceAndPath("fabrictailor", "skin"))
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

@@ -17,6 +17,6 @@
 
 
   "key.fabrictailor.toggle_skin_gui": "스킨 GUI 열기",
-  "category.fabrictailor.skin_category": "FabricTailor",
+  "key.category.fabrictailor.skin": "FabricTailor",
   "error.fabrictailor.not_installed": "슬프게도 이 서버에는 FabricTailor 모드가 설치되어 있지 않네요. 자세한 사항은 어드민과 연락하시길 바랍니다."
 }

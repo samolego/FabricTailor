@@ -17,6 +17,6 @@
 
 
   "key.fabrictailor.toggle_skin_gui": "Meni za izgled",
-  "category.fabrictailor.skin_category": "FabricTailor",
+  "key.category.fabrictailor.skin": "FabricTailor",
   "error.fabrictailor.not_installed": "FabricTailor mod na tem strežniku žal ni nameščen. Prosim kontaktiraj skrbnika."
 }

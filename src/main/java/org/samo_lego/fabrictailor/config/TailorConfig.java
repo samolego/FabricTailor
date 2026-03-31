@@ -3,9 +3,9 @@ package org.samo_lego.fabrictailor.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
-import org.samo_lego.config2brigadier.IBrigadierConfigurator;
-import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
-import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
+//import org.samo_lego.config2brigadier.IBrigadierConfigurator;
+//import org.samo_lego.config2brigadier.annotation.BrigadierDescription;
+//import org.samo_lego.config2brigadier.annotation.BrigadierExcluded;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -14,13 +14,13 @@ import java.util.Set;
 
 import static org.samo_lego.fabrictailor.FabricTailor.*;
 
-public class TailorConfig implements IBrigadierConfigurator {
+public class TailorConfig /* implements IBrigadierConfigurator */ {
     private static final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
 
 
     @SerializedName("// Whether to allow players to have capes. WARNING! This will toggle ALL capes!")
     public final String _comment_allowCapes = "(default: true)";
-    @BrigadierDescription(defaultOption = "true")
+    // @BrigadierDescription(defaultOption = "true")
     @SerializedName("allow_capes")
     public boolean allowCapes = true;
 
@@ -31,7 +31,7 @@ public class TailorConfig implements IBrigadierConfigurator {
 
     @SerializedName("// How quickly can player change the skin, in seconds. -1 for no limit. If using this in server environment, -1 is not recommended.")
     public final String _comment_skinChangeTimer = "(default in singleplayer: -1, default for server: 60)";
-    @BrigadierDescription(defaultOption = "-1")
+    // @BrigadierDescription(defaultOption = "-1")
     @SerializedName("skin_change_timer")
     public long skinChangeTimer = -1;
 
@@ -41,7 +41,7 @@ public class TailorConfig implements IBrigadierConfigurator {
     public final String _comment_customSkinServer1 = "";
     @SerializedName("// Available parameters: {player}. Example: https://skins.samolego.org/{player}.png")
     public final String _comment_customSkinServer2 = "";
-    @BrigadierDescription(defaultOption = "")
+    // @BrigadierDescription(defaultOption = "")
     @SerializedName("custom_skin_server")
     public String customSkinServer = "";
 
@@ -63,7 +63,7 @@ public class TailorConfig implements IBrigadierConfigurator {
             "duckduckgo.com"
     ));
 
-    @Override
+//    @Override
     public void save() {
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(configFile), StandardCharsets.UTF_8)) {
             gson.toJson(this, writer);
@@ -76,12 +76,12 @@ public class TailorConfig implements IBrigadierConfigurator {
     public static class DefaultSkin {
         @SerializedName("// Whether to apply the default skin to ALL new players, not just those without skin.")
         public final String _comment_applyToAll = "(default: false)";
-        @BrigadierDescription(defaultOption = "false")
+//        @BrigadierDescription(defaultOption = "false")
         @SerializedName("apply_to_all")
         public boolean applyToAll = false;
-        @BrigadierExcluded
+//        @BrigadierExcluded
         public String value = "";
-        @BrigadierExcluded
+//        @BrigadierExcluded
         public String signature = "";
     }
 

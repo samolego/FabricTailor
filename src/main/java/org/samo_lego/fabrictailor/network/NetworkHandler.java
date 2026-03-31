@@ -42,7 +42,7 @@ public class NetworkHandler {
             if (value.isEmpty() || signature.isEmpty()) {
 
                 if (!config.defaultSkin.applyToAll)
-                    skinData = fetchSkinByName(player.getGameProfile().getName());
+                    skinData = fetchSkinByName(player.getGameProfile().name());
 
                 if (skinData == null) {
                     var defValue = config.defaultSkin.value;
@@ -79,7 +79,7 @@ public class NetworkHandler {
     }
 
     public static void defaultSkinPacket(DefaultSkinPayload payload, Context context) {
-        if (context.player().hasPermissions(2)) {
+        if (context.player().permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER)) {
 
             config.defaultSkin.value = payload.skinProperty().value();
             config.defaultSkin.signature = payload.skinProperty().signature();
@@ -92,7 +92,7 @@ public class NetworkHandler {
 
     public static void changeHDSkinPacket(HDSkinPayload payload, Context context) {
         NetworkHandler.onSkinChangePacket(context.player(), payload.skinProperty(), () ->
-                context.player().displayClientMessage(TextTranslations.create("hint.fabrictailor.client_only")
+                context.player().sendSystemMessage(TextTranslations.create("hint.fabrictailor.client_only")
                         .withStyle(ChatFormatting.DARK_PURPLE), false));
     }
 
@@ -108,7 +108,7 @@ public class NetworkHandler {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                     .withStyle(ChatFormatting.LIGHT_PURPLE);
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                             .withStyle(ChatFormatting.RED),
                     false

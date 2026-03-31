@@ -1,12 +1,12 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
     id 'maven-publish'
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.modrinth.minotaur" version "2.+"
 }
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
+base.archivesName = project.archives_base_name
+version = project.mod_version + "+" + project.minecraft_version
 group = project.maven_group
 
 repositories {
@@ -14,10 +14,12 @@ repositories {
     maven { url 'https://maven.nucleoid.xyz' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://masa.dy.fi/maven' }
+    maven { url 'https://repo.codemc.io/repository/relativitymc/' }
 }
 
 loom {
     accessWidenerPath = file("src/main/resources/fabrictailor.accesswidener")
+
 }
 
 def ENV = System.getenv()
@@ -25,26 +27,21 @@ def ENV = System.getenv()
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.layered {
-        it.officialMojangMappings {
-            setNameSyntheticMembers(false)
-        }
-    }
 
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // Config2Brigadier
-    modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
+//    // Config2Brigadier
+//    modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
 
     // LuckPerms
-    modImplementation(include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
+    implementation(include('me.lucko:fabric-permissions-api:0.7.0'))
 
     // Carpet
-    modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
-    modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
+//    modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
+//    modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
 }
 
 processResources {
@@ -56,19 +53,16 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
     withSourcesJar()
 }
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_${base.archivesName}" }
     }
 }
 
@@ -76,13 +70,7 @@ jar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
+            from components.java
         }
     }
 
@@ -108,12 +96,12 @@ curseforge {
         addGameVersion "${project.minecraft_version}"
         addGameVersion "Fabric"
 
-        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
+        mainArtifact(file("${project.buildDir}/libs/${base.archivesName}-${version}.jar")) {
             displayName = "[${project.minecraft_version}] FabricTailor ${version}"
         }
 
         afterEvaluate {
-            uploadTask.dependsOn("remapJar")
+            uploadTask.dependsOn("jar")
         }
     }
 
@@ -137,7 +125,7 @@ modrinth {
     versionName = "[${project.minecraft_version}] FabricTailor ${version}"
     versionType = "release"
 
-    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    uploadFile = file("${project.buildDir}/libs/${base.archivesName}-${version}.jar")
 
     gameVersions = [project.minecraft_version]
     loaders = ['fabric', 'quilt']

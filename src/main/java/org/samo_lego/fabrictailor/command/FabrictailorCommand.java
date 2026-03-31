@@ -36,7 +36,7 @@ public class FabrictailorCommand {
                 .build();
 
         // Generate command for in-game editing
-        config.generateCommand(editNode);
+//        config.generateCommand(editNode);
 
         configNode.addChild(editNode);
         root.addChild(configNode);

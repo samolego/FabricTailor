@@ -34,6 +34,6 @@
   "tab.fabrictailor.title_player": "Отримати від гравця",
   "tab.fabrictailor.title_url": "Отримати з URL",
   "key.fabrictailor.toggle_skin_gui": "Відкрити FabricTailor GUI",
-  "category.fabrictailor.skin_category": "FabricTailor",
+  "key.category.fabrictailor.skin": "FabricTailor",
   "error.fabrictailor.not_installed": "Мод FabricTailor не встановлено на цьому сервері. Будь ласка, зв'яжіться з адміністратором для отримання додаткової інформації."
 }

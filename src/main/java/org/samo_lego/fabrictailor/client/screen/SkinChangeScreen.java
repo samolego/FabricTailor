@@ -7,8 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
@@ -16,12 +15,19 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.LivingEntity;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.client.screen.tabs.CapeTab;
 import org.samo_lego.fabrictailor.client.screen.tabs.LocalSkinTab;
@@ -149,7 +155,7 @@ public class SkinChangeScreen extends Screen {
                                         var profile = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile();
 
                                         // could return an empty collection, Iterator#next in this case produces NoSuchElementException
-                                        Optional<Property> optionalProperty = profile.getProperties()
+                                        Optional<Property> optionalProperty = profile.properties()
                                                 .get(TailoredPlayer.PROPERTY_TEXTURES)
                                                 .stream()
                                                 .findFirst();
@@ -167,9 +173,9 @@ public class SkinChangeScreen extends Screen {
 
     private void clearSkin() {
         if (TAILORED_SERVER) {
-            this.minecraft.player.connection.sendUnsignedCommand("skin clear");
+            this.minecraft.player.connection.sendCommand("skin clear");
         } else {
-            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
+            ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().properties().removeAll(TailoredPlayer.PROPERTY_TEXTURES);
             // Reload skin - todo
         }
     }
@@ -182,7 +188,7 @@ public class SkinChangeScreen extends Screen {
                     ClientPlayNetworking.send(packet);
                 } else {
                     // Change skin clientside only todo: reload skin
-                    PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().getProperties();
+                    PropertyMap map = ((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile().properties();
 
                     /*try {
                         map.removeAll(TailoredPlayer.PROPERTY_TEXTURES);
@@ -196,13 +202,13 @@ public class SkinChangeScreen extends Screen {
 
                     // Reload skin
                     //HttpTexture.
-                    Minecraft.getInstance().getSkinManager().registerSkins(((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile(), (type, resourceLocation, minecraftProfileTexture) -> {
+                    Minecraft.getInstance().getSkinManager().registerSkins(((AAbstractClientPlayer) this.minecraft.player).ft_getPlayerInfo().getProfile(), (type, Identifier, minecraftProfileTexture) -> {
                     }, true);
                     //this.minecraft.getEntityRenderDispatcher().onResourceManagerReload(ResourceManager.Empty.INSTANCE);
 
                     //var skinInfo = this.minecraft.getSkinManager().getInsecureSkinInformation(this.minecraft.player.getGameProfile());
                     //MinecraftProfileTexture skinTexture = skinInfo.get(MinecraftProfileTexture.Type.SKIN);
-                    //ResourceLocation resourceLocation = this.minecraft.getSkinManager().registerTexture(skinTexture, MinecraftProfileTexture.Type.SKIN);
+                    //Identifier Identifier = this.minecraft.getSkinManager().registerTexture(skinTexture, MinecraftProfileTexture.Type.SKIN);
                     // todo*/
                 }
             });
@@ -214,25 +220,24 @@ public class SkinChangeScreen extends Screen {
      * Renders the skin changing screen.
      */
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
         // Darkens background
-        this.renderBackground(guiGraphics, 0, 0, 0.5f);
-        super.render(guiGraphics, mouseX, mouseY, delta);
+        this.extractBackground(guiGraphics, 0, 0, 0.5f);
+        super.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 
         // Screen title
-        guiGraphics.drawCenteredString(font, title, width / 2, 15, 0xffffff);
+        guiGraphics.centeredText(font, title, width / 2, 15, 0xffffff);
 
         // Starting position of the window texture
         this.startX = (this.width - 252) / 2;
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        RenderSystem.enableBlend();
-        guiGraphics.blit(AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0, 0, 252, 140);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, AdvancementsScreen.WINDOW_LOCATION, startX, startY, 0.0F, 0.0F, 252, 140, 256, 256);
 
 
         // Render input field
-        skinInput.render(guiGraphics, startX, startY, delta);
+        skinInput.extractWidgetRenderState(guiGraphics, startX, startY, delta);
 
         // Other renders
         this.drawTabs(guiGraphics, startX, startY);
@@ -240,59 +245,11 @@ public class SkinChangeScreen extends Screen {
         this.drawWidgetTooltips(guiGraphics, startX, startY, mouseX, mouseY);
 
 
-        if (this.selectedTab.showModelBackwards()) {
-            float mousex = -(((float) width / 2) - 75 - mouseX);
-            float mousey = ((float) height / 2) - mouseY;
-            var player = minecraft.player;
-            float f = (float) Math.atan(mousex / 40.0f);
-            float g = (float) Math.atan(mousey / 40.0f);
-
-            int x = this.startX + 24;
-            int y = this.startY - 76;
-            renderEntityInInventoryFollowsMouseBackwards(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
-
-        } else {
-            // Drawing Player
-            // Luckily vanilla code is available
-            int x = this.startX + 24;
-            int y = this.startY - 76;
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
-        }
-    }
-
-    public void renderEntityInInventoryFollowsMouseBackwards(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
-        float mousex = -(((float) width / 2) - 75 - g);
-        float mousey = ((float) height / 2) - h;
-        float n = (float) (i + k) / 2.0F;
-        float o = (float) (j + l) / 2.0F;
-        float p = (float) Math.atan(mousex / 40.0f);
-        float q = (float) Math.atan(mousey / 40.0f);
-        guiGraphics.enableScissor(i, j, k, l);
-        //float p = (float) Math.atan((double) ((n - g) / 40.0F));
-        //float q = (float) Math.atan((double) ((o - h) / 40.0F));
-        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
-        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(q * 20.0F * 0.017453292F);
-        quaternionf.mul(quaternionf2);
-        float r = livingEntity.yBodyRot;
-        float s = livingEntity.getYRot();
-        float t = livingEntity.getXRot();
-        float u = livingEntity.yHeadRotO;
-        float v = livingEntity.yHeadRot;
-        livingEntity.yBodyRot = p * 40.0F;
-        livingEntity.setYRot(p * 40.0F);
-        livingEntity.setXRot(-q * 40.0F);
-        livingEntity.yHeadRot = livingEntity.getYRot();
-        livingEntity.yHeadRotO = livingEntity.getYRot();
-        float w = livingEntity.getScale();
-        Vector3f vector3f = new Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + f * w, 0.0F);
-        float x = (float) m / w;
-        InventoryScreen.renderEntityInInventory(guiGraphics, n, o, x, vector3f, quaternionf, quaternionf2, livingEntity);
-        livingEntity.yBodyRot = r;
-        livingEntity.setYRot(s);
-        livingEntity.setXRot(t);
-        livingEntity.yHeadRotO = u;
-        livingEntity.yHeadRot = v;
-        guiGraphics.disableScissor();
+        // Drawing Player
+        // Luckily vanilla code is available
+        int x = this.startX + 24;
+        int y = this.startY - 76;
+        InventoryScreen.extractEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
     }
 
     /**
@@ -302,7 +259,7 @@ public class SkinChangeScreen extends Screen {
      * @param startX      x where skin window starts
      * @param startY      y where skin window starts
      */
-    private void drawTabs(GuiGraphics guiGraphics, int startX, int startY) {
+    private void drawTabs(GuiGraphicsExtractor guiGraphics, int startX, int startY) {
         if (this.selectedTab == null) {
             this.selectedTab = TABS.get(0);
         }
@@ -319,14 +276,14 @@ public class SkinChangeScreen extends Screen {
                 this.openExplorerButton.visible = tab.showExplorerButton();
             }
 
-            tab.getTabType().draw(guiGraphics, startX, startY, selected, tab.getTabType().getMax() - i - 1);
+            tab.getTabType().extractRenderState(guiGraphics, startX, startY, selected, tab.getTabType().getMax() - i - 1);
         }
 
         // Rendering title
-        guiGraphics.drawString(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFF);
+        guiGraphics.text(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFF);
 
         // Rendering description above input field
-        guiGraphics.drawString(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFF);
+        guiGraphics.text(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFF);
     }
 
 
@@ -336,11 +293,11 @@ public class SkinChangeScreen extends Screen {
      * @param startX x where skin window starts
      * @param startY y where skin window starts
      */
-    private void drawIcons(GuiGraphics guiGraphics, int startX, int startY) {
+    private void drawIcons(GuiGraphicsExtractor guiGraphics, int startX, int startY) {
         // Icons
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
-            tab.getTabType().drawIcon(guiGraphics, startX, startY, tab.getTabType().getMax() - i - 1, tab.getIcon());
+            tab.getTabType().extractIcon(guiGraphics, startX, startY, tab.getTabType().getMax() - i - 1, tab.getIcon());
         }
     }
 
@@ -354,33 +311,24 @@ public class SkinChangeScreen extends Screen {
      * @param mouseX      mouse x
      * @param mouseY      mouse y
      */
-    private void drawWidgetTooltips(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
+    private void drawWidgetTooltips(GuiGraphicsExtractor guiGraphics, int startX, int startY, int mouseX, int mouseY) {
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
 
             if (tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY)) {
-                guiGraphics.renderTooltip(this.font, tab.getTitle(), mouseX, mouseY);
+                guiGraphics.tooltip(this.font, List.of(ClientTooltipComponent.create(tab.getTitle().getVisualOrderText())), mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null);
                 break;
             }
         }
     }
 
-    /**
-     * Checks if one of the tabs was clicked
-     * and selects it accordingly.
-     *
-     * @param mouseX mouse x
-     * @param mouseY mouse y
-     * @param button button that was clicke
-     * @return super.mouseClicked()
-     */
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
             for (int i = 0; i < TABS.size(); ++i) {
                 SkinTabType tab = TABS.get(i);
 
-                final boolean mouseOver = tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY);
+                final boolean mouseOver = tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, event.x(), event.y());
 
                 if (mouseOver) {
                     this.selectedTab = tab;
@@ -388,9 +336,8 @@ public class SkinChangeScreen extends Screen {
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
-
 
     /**
      * Used for skin drag and drop.

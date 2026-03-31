@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import org.samo_lego.fabrictailor.compatibility.TaterzenSkins;
 import org.samo_lego.fabrictailor.mixin.accessors.AEntitySelector;
+import org.samo_lego.fabrictailor.mixin.accessors.AServerPlayer;
 import org.samo_lego.fabrictailor.util.SkinFetcher;
 import org.samo_lego.fabrictailor.util.TextTranslations;
 
@@ -154,16 +155,16 @@ public class SkinCommand {
         String skinFilePath = getMessage(context, "skin file path").getString();
 
         // Warn about server path for uploads
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = ((AServerPlayer) player).getServer();
         if(server != null && server.isDedicatedServer()) {
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     TextTranslations.create("hint.fabrictailor.server_skin_path").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
 
         setSkin(player, () -> setSkinFromFile(skinFilePath, useSlim));
-        player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
+        player.sendSystemMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
                 false
         );
         return 1;
@@ -190,24 +191,24 @@ public class SkinCommand {
         long now = System.currentTimeMillis();
 
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
-            player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
+            player.sendSystemMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
             THREADPOOL.submit(() -> {
                 Property skinData = skinProvider.get();
 
                 if (skinData == null) {
-                    player.displayClientMessage(SKIN_SET_ERROR, false);
+                    player.sendSystemMessage(SKIN_SET_ERROR, false);
                 } else {
                     if (!TATERZENS_LOADED || !TaterzenSkins.setTaterzenSkin(player, skinData)) {
                         ((TailoredPlayer) player).fabrictailor_setSkin(skinData, true);
                     }
-                    player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
+                    player.sendSystemMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
                 }
             });
         } else {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                     .withStyle(ChatFormatting.LIGHT_PURPLE);
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                             .withStyle(ChatFormatting.RED),
                     false
@@ -223,7 +224,7 @@ public class SkinCommand {
 
         if(now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             ((TailoredPlayer) player).fabrictailor_clearSkin();
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     TextTranslations.create("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
                     false
             );
@@ -233,7 +234,7 @@ public class SkinCommand {
         // Prevent skin change spamming
         MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                 .withStyle(ChatFormatting.LIGHT_PURPLE);
-        player.displayClientMessage(
+        player.sendSystemMessage(
                 TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                         .withStyle(ChatFormatting.RED),
                 false

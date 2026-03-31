@@ -16,6 +16,6 @@
   "tab.fabrictailor.title_player": "Buscar do jogador",
   "tab.fabrictailor.title_url": "Buscar na URL",
   "key.fabrictailor.toggle_skin_gui": "Abrir menu da skin",
-  "category.fabrictailor.skin_category": "FabricTailor",
+  "key.category.fabrictailor.skin": "FabricTailor",
   "error.fabrictailor.not_installed": "FabricTailor infelizmente não está instalado no servidor. Favor contactar o administrador para mais informações."
 }

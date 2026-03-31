@@ -16,6 +16,6 @@
   "tab.fabrictailor.title_player": "Получить с игрока",
   "tab.fabrictailor.title_url": "Получить с URL",
   "key.fabrictailor.toggle_skin_gui": "Открыть граф. интерфейс скина",
-  "category.fabrictailor.skin_category": "FabricTailor",
+  "key.category.fabrictailor.skin": "FabricTailor",
   "error.fabrictailor.not_installed": "К сожалению, FabricTailor не установлен на этом сервере. За подробной информацией свяжитесь с администратором."
 }
