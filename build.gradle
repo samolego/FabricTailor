@@ -1,7 +1,7 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
-    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.matthewprenger.cursegradle" version "1.4.0" apply false
     id "com.modrinth.minotaur" version "2.+"
 }
 
@@ -24,37 +24,46 @@ loom {
 }
 
 def ENV = System.getenv()
+def enableCurseforge = ENV.CURSEFORGE_API_KEY || gradle.startParameter.taskNames.any { it.toLowerCase().contains("curseforge") }
+
+if (enableCurseforge) {
+    apply plugin: "com.matthewprenger.cursegradle"
+}
 
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
 
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    // Config2Brigadier
-    modImplementation(include("com.github.samolego:Config2Brigadier:${project.c2b_lib_version}"))
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // LuckPerms
-    modImplementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}-patbox"))
+    implementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}"))
 
     // Carpet
-    modCompileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
+    compileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
 }   
 
 processResources {
     inputs.property "version", project.version
+    inputs.property "loader_version", project.loader_version
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "fabric_version", project.fabric_version
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand(
+                "version": project.version,
+                "loader_version": project.loader_version,
+                "minecraft_version": project.minecraft_version,
+                "fabric_version": project.fabric_version
+        )
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 tasks.test {
@@ -95,35 +104,37 @@ publishing {
     }
 }
 
-// from FAPI https://github.com/FabricMC/fabric/blob/1.16/build.gradle
-curseforge {
-    if (ENV.CURSEFORGE_API_KEY) {
-        apiKey = ENV.CURSEFORGE_API_KEY
-    }
-
-    project {
-        id = "390114"
-        changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
-        releaseType = "release"
-        if (project.minecraft_version.contains("-")) {
-            // yuck
-            addGameVersion "${project.minecraft_version.split("-")[0]}-Snapshot"
-        } else {
-            addGameVersion "${project.minecraft_version}"
-        }
-        addGameVersion "Fabric"
-
-        mainArtifact(remapJar.archiveFile) {
-            displayName = "[${project.minecraft_version}] FabricTailor ${version}"
+if (enableCurseforge) {
+    // from FAPI https://github.com/FabricMC/fabric/blob/1.16/build.gradle
+    curseforge {
+        if (ENV.CURSEFORGE_API_KEY) {
+            apiKey = ENV.CURSEFORGE_API_KEY
         }
 
-        afterEvaluate {
-            uploadTask.dependsOn("remapJar")
-        }
-    }
+        project {
+            id = "390114"
+            changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
+            releaseType = "release"
+            if (project.minecraft_version.contains("-")) {
+                // yuck
+                addGameVersion "${project.minecraft_version.split("-")[0]}-Snapshot"
+            } else {
+                addGameVersion "${project.minecraft_version}"
+            }
+            addGameVersion "Fabric"
 
-    options {
-        forgeGradleIntegration = false
+            mainArtifact(jar.archiveFile) {
+                displayName = "[${project.minecraft_version}] FabricTailor ${version}"
+            }
+
+            afterEvaluate {
+                uploadTask.dependsOn("jar")
+            }
+        }
+
+        options {
+            forgeGradleIntegration = false
+        }
     }
 }
 
@@ -142,7 +153,7 @@ modrinth {
     versionName = "[${project.minecraft_version}] FabricTailor ${version}"
     versionType = "release"
 
-    uploadFile = remapJar.archiveFile
+    uploadFile = jar.archiveFile
 
     gameVersions = [project.minecraft_version]
     loaders = ['fabric', 'quilt']

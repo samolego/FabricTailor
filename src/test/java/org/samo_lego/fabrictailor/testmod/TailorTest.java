@@ -4,8 +4,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -37,7 +37,7 @@ public class TailorTest implements ModInitializer, ClientModInitializer {
     }
 
     private void hdSkinCmd(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("hdskin").executes(this::hdSkinCmd));
+        dispatcher.register(ClientCommands.literal("hdskin").executes(this::hdSkinCmd));
     }
 
     private int hdSkinCmd(CommandContext<FabricClientCommandSource> context) {
@@ -47,7 +47,7 @@ public class TailorTest implements ModInitializer, ClientModInitializer {
     }
 
     private void capeCmd(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(ClientCommandManager.literal("cape").executes(this::capeCmd));
+        dispatcher.register(ClientCommands.literal("cape").executes(this::capeCmd));
     }
 
     private int capeCmd(CommandContext<FabricClientCommandSource> context) {

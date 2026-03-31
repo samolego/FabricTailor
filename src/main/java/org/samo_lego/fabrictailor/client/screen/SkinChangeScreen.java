@@ -7,15 +7,13 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -98,7 +96,7 @@ public class SkinChangeScreen extends Screen {
         this.addRenderableWidget(openExplorerButton);
         if (this.font == null) {  // todo: figure out why this happens in 1.21.11
             Minecraft.getInstance().setScreen(null);
-            Minecraft.getInstance().player.displayClientMessage(Component.nullToEmpty("WTH?? Screen#font is null, closing screen"), false);
+            Minecraft.getInstance().player.sendSystemMessage(Component.nullToEmpty("WTH?? Screen#font is null, closing screen"));
             return;
         }
 
@@ -121,7 +119,7 @@ public class SkinChangeScreen extends Screen {
         skinInput.setVisible(true);
         skinInput.setBordered(true);
         skinInput.setTextColor(0xFFFFFFFF);
-        this.addWidget(skinInput);
+        this.addRenderableWidget(skinInput);
 
         // "Set skin" button
         this.addRenderableWidget(
@@ -229,11 +227,11 @@ public class SkinChangeScreen extends Screen {
      * Renders the skin changing screen.
      */
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        super.render(guiGraphics, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 
         // Screen title
-        guiGraphics.drawCenteredString(this.font, title, width / 2, 15, -1);
+        guiGraphics.centeredText(this.font, title, width / 2, 15, -1);
 
         // Starting position of the window texture
         this.startX = (this.width - 252) / 2;
@@ -241,9 +239,6 @@ public class SkinChangeScreen extends Screen {
 
         // Window texture
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, AAdvancementsScreen.getWINDOW_LOCATION(), startX, startY, 0, 0, 252, 140, 256, 256);
-
-
-        this.skinInput.render(guiGraphics, startX, startY, delta);
 
         // Other renders
         this.drawTabs(guiGraphics, startX, startY);
@@ -257,11 +252,11 @@ public class SkinChangeScreen extends Screen {
         } else {
             // Drawing Player
             // Luckily vanilla code is available
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
+            InventoryScreen.extractEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
         }
     }
 
-    public void renderEntityInInventoryFollowsMouseBackwards(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
+    public void renderEntityInInventoryFollowsMouseBackwards(GuiGraphicsExtractor guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
         float mousex = -(((float) width / 2) - 75 - g);
         float mousey = ((float) height / 2) - h;
         float p = (float) Math.atan(mousex / 40.0f);
@@ -299,7 +294,7 @@ public class SkinChangeScreen extends Screen {
         }
 
         Vector3f vector3f = new Vector3f(0.0F, entityRenderState.boundingBoxHeight / 2.0F + f, 0.0F);
-        guiGraphics.submitEntityRenderState(entityRenderState, (float)m, vector3f, quaternionf, quaternionf2, i, j, k, l);
+        guiGraphics.entity(entityRenderState, (float) m, vector3f, quaternionf, quaternionf2, i, j, k, l);
         livingEntity.yBodyRot = r;
         livingEntity.setYRot(s);
         livingEntity.setXRot(t);
@@ -315,7 +310,7 @@ public class SkinChangeScreen extends Screen {
      * @param startX      x where skin window starts
      * @param startY      y where skin window starts
      */
-    private void drawTabs(GuiGraphics guiGraphics, int startX, int startY) {
+    private void drawTabs(GuiGraphicsExtractor guiGraphics, int startX, int startY) {
         if (this.selectedTab == null) {
             this.selectedTab = TABS.get(0);
         }
@@ -332,14 +327,14 @@ public class SkinChangeScreen extends Screen {
                 this.openExplorerButton.visible = tab.showExplorerButton();
             }
 
-            tab.getTabType().draw(guiGraphics, startX, startY, selected, tab.getTabType().getMax() - i - 1);
+            tab.getTabType().extractRenderState(guiGraphics, startX, startY, selected, tab.getTabType().getMax() - i - 1);
         }
 
         // Rendering title
-        guiGraphics.drawString(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFFFF);
+        guiGraphics.text(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFFFF);
 
         // Rendering description above input field
-        guiGraphics.drawString(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFFFF);
+        guiGraphics.text(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFFFF);
     }
 
 
@@ -349,11 +344,11 @@ public class SkinChangeScreen extends Screen {
      * @param startX x where skin window starts
      * @param startY y where skin window starts
      */
-    private void drawIcons(GuiGraphics guiGraphics, int startX, int startY) {
+    private void drawIcons(GuiGraphicsExtractor guiGraphics, int startX, int startY) {
         // Icons
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
-            tab.getTabType().drawIcon(guiGraphics, startX, startY, tab.getTabType().getMax() - i - 1, tab.getIcon());
+            tab.getTabType().extractIcon(guiGraphics, startX, startY, tab.getTabType().getMax() - i - 1, tab.getIcon());
         }
     }
 
@@ -367,13 +362,12 @@ public class SkinChangeScreen extends Screen {
      * @param mouseX      mouse x
      * @param mouseY      mouse y
      */
-    private void drawWidgetTooltips(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
+    private void drawWidgetTooltips(GuiGraphicsExtractor guiGraphics, int startX, int startY, int mouseX, int mouseY) {
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
 
-            ClientTooltipComponent clientTooltipComponent = ClientTooltipComponent.create(tab.getTitle().getVisualOrderText());
             if (tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY)) {
-                guiGraphics.renderTooltip(this.font, List.of(clientTooltipComponent), mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null);
+                guiGraphics.setTooltipForNextFrame(this.font, tab.getTitle(), mouseX, mouseY);
                 break;
             }
         }

@@ -8,10 +8,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.samo_lego.fabrictailor.command.FabrictailorCommand;
 import org.samo_lego.fabrictailor.command.SkinCommand;
 import org.samo_lego.fabrictailor.compatibility.CarpetFunctions;
@@ -42,7 +38,7 @@ public class FabricTailor implements ModInitializer {
 		});
 
 		configFile = new File(FabricLoader.getInstance().getConfigDir() + "/fabrictailor.json");
-		config = TailorConfig.loadConfigFile(configFile, FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER);
+		config = TailorConfig.loadConfigFile(configFile, isServerEnvironment());
 		config.save();
 
 		if (FabricLoader.getInstance().isModLoaded("carpet")) {
@@ -54,20 +50,24 @@ public class FabricTailor implements ModInitializer {
 		ServerConfigurationConnectionEvents.CONFIGURE.register(NetworkHandler::onConfigured);
 		
 		
-		PayloadTypeRegistry.configurationS2C().register(FabricTailorHelloPayload.TYPE, FabricTailorHelloPayload.CODEC);
+		PayloadTypeRegistry.clientboundConfiguration().register(FabricTailorHelloPayload.TYPE, FabricTailorHelloPayload.CODEC);
 
-		PayloadTypeRegistry.playC2S().register(VanillaSkinPayload.TYPE, VanillaSkinPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(VanillaSkinPayload.TYPE, VanillaSkinPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(VanillaSkinPayload.TYPE, NetworkHandler::changeVanillaSkinPacket);
 
-		PayloadTypeRegistry.playC2S().register(HDSkinPayload.TYPE, HDSkinPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(HDSkinPayload.TYPE, HDSkinPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(HDSkinPayload.TYPE, NetworkHandler::changeHDSkinPacket);
 
-		PayloadTypeRegistry.playC2S().register(DefaultSkinPayload.TYPE, DefaultSkinPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(DefaultSkinPayload.TYPE, DefaultSkinPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(DefaultSkinPayload.TYPE, NetworkHandler::defaultSkinPacket);
 	}
 
 	public static void reloadConfig() {
-		TailorConfig newConfig = TailorConfig.loadConfigFile(configFile, !Minecraft.getInstance().isLocalServer());
+		TailorConfig newConfig = TailorConfig.loadConfigFile(configFile, isServerEnvironment());
 		config.reload(newConfig);
+	}
+
+	private static boolean isServerEnvironment() {
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
 	}
 }

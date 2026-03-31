@@ -75,7 +75,7 @@ public class NetworkHandler {
             config.save();
 
             if (config.logging.skinChangeFeedback) {
-                context.player().displayClientMessage(TextTranslations.create("command.fabrictailor.config.defaultSkin")
+                context.player().sendSystemMessage(TextTranslations.create("command.fabrictailor.config.defaultSkin")
                         .withStyle(ChatFormatting.GREEN), false);
             }
         }
@@ -84,7 +84,7 @@ public class NetworkHandler {
     public static void changeHDSkinPacket(HDSkinPayload payload, Context context) {
         NetworkHandler.onSkinChangePacket(context.player(), payload.skinProperty(), () -> {
                 if (config.logging.skinChangeFeedback) {
-                    context.player().displayClientMessage(TextTranslations.create("hint.fabrictailor.client_only")
+                    context.player().sendSystemMessage(TextTranslations.create("hint.fabrictailor.client_only")
                             .withStyle(ChatFormatting.DARK_PURPLE), false);
                 }
             });
@@ -102,7 +102,7 @@ public class NetworkHandler {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                     .withStyle(ChatFormatting.LIGHT_PURPLE);
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                             .withStyle(ChatFormatting.RED),
                     false
