@@ -33,7 +33,7 @@ public abstract class MSkinCustomizationScreen_SkinButton extends OptionsSubScre
     private void onInit(CallbackInfo ci, List<AbstractWidget> widgets) {
         if (this.minecraft != null && this.minecraft.player != null) {
             var ftButton = Button.builder(Component.literal("FabricTailor"),
-                    button -> this.minecraft.setScreen(ClientTailor.SKIN_CHANGE_SCREEN)).build();
+                    button -> this.minecraft.setScreen(ClientTailor.getSkinChangeScreen())).build();
             widgets.add(ftButton);
         }
     }

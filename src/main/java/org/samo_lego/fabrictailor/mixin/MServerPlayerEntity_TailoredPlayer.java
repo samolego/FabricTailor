@@ -1,12 +1,11 @@
 package org.samo_lego.fabrictailor.mixin;
 
+import com.google.common.collect.HashMultimap;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -44,6 +43,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ import java.util.Optional;
 
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 import static org.samo_lego.fabrictailor.FabricTailor.errorLog;
-import static org.samo_lego.fabrictailor.mixin.accessors.APlayer.getPLAYER_MODEL_PARTS;
+import static org.samo_lego.fabrictailor.mixin.accessors.AAvatar.getPLAYER_MODEL_PARTS;
 
 @Mixin(ServerPlayer.class)
 public abstract class MServerPlayerEntity_TailoredPlayer extends Player implements TailoredPlayer {
