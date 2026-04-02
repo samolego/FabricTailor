@@ -168,7 +168,7 @@ public class SkinCommand {
         long now = System.currentTimeMillis();
 
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
-            player.sendSystemMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
+            if (config.logging.skinChangeFeedback) player.sendSystemMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
             THREADPOOL.submit(() -> {
                 var skinData = skinProvider.get();
 
