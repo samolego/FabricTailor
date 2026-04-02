@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id "com.modrinth.minotaur" version "2.+"
@@ -21,28 +21,29 @@ repositories {
 
 loom {
     accessWidenerPath = file("src/main/resources/fabrictailor.accesswidener")
+
 }
+
 
 def ENV = System.getenv()
 
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
 
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
     // Config2Brigadier
-    modImplementation(include("com.github.samolego:Config2Brigadier:${project.c2b_lib_version}"))
+    implementation(include("com.github.samolego:Config2Brigadier:${project.c2b_lib_version}"))
 
     // LuckPerms
-    modImplementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}-patbox"))
+    implementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}"))
 
     // Carpet
-    modCompileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
+    compileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
 }   
 
 processResources {
@@ -54,7 +55,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 tasks.test {
@@ -113,12 +114,12 @@ curseforge {
         }
         addGameVersion "Fabric"
 
-        mainArtifact(remapJar.archiveFile) {
+        mainArtifact(jar.archiveFile) {
             displayName = "[${project.minecraft_version}] FabricTailor ${version}"
         }
 
         afterEvaluate {
-            uploadTask.dependsOn("remapJar")
+            uploadTask.dependsOn("jar")
         }
     }
 
@@ -142,7 +143,7 @@ modrinth {
     versionName = "[${project.minecraft_version}] FabricTailor ${version}"
     versionType = "release"
 
-    uploadFile = remapJar.archiveFile
+    uploadFile = jar.archiveFile
 
     gameVersions = [project.minecraft_version]
     loaders = ['fabric', 'quilt']

@@ -54,15 +54,15 @@ public class FabricTailor implements ModInitializer {
 		ServerConfigurationConnectionEvents.CONFIGURE.register(NetworkHandler::onConfigured);
 		
 		
-		PayloadTypeRegistry.configurationS2C().register(FabricTailorHelloPayload.TYPE, FabricTailorHelloPayload.CODEC);
+		PayloadTypeRegistry.clientboundConfiguration().register(FabricTailorHelloPayload.TYPE, FabricTailorHelloPayload.CODEC);
 
-		PayloadTypeRegistry.playC2S().register(VanillaSkinPayload.TYPE, VanillaSkinPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(VanillaSkinPayload.TYPE, VanillaSkinPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(VanillaSkinPayload.TYPE, NetworkHandler::changeVanillaSkinPacket);
 
-		PayloadTypeRegistry.playC2S().register(HDSkinPayload.TYPE, HDSkinPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(HDSkinPayload.TYPE, HDSkinPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(HDSkinPayload.TYPE, NetworkHandler::changeHDSkinPacket);
 
-		PayloadTypeRegistry.playC2S().register(DefaultSkinPayload.TYPE, DefaultSkinPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(DefaultSkinPayload.TYPE, DefaultSkinPayload.CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(DefaultSkinPayload.TYPE, NetworkHandler::defaultSkinPacket);
 	}
 

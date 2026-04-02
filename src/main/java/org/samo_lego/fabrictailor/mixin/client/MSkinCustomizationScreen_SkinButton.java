@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
 import net.minecraft.network.chat.Component;
 import org.samo_lego.fabrictailor.client.ClientTailor;
+import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,7 +34,7 @@ public abstract class MSkinCustomizationScreen_SkinButton extends OptionsSubScre
     private void onInit(CallbackInfo ci, List<AbstractWidget> widgets) {
         if (this.minecraft != null && this.minecraft.player != null) {
             var ftButton = Button.builder(Component.literal("FabricTailor"),
-                    button -> this.minecraft.setScreen(ClientTailor.SKIN_CHANGE_SCREEN)).build();
+                    button -> this.minecraft.setScreen(new SkinChangeScreen())).build();
             widgets.add(ftButton);
         }
     }

@@ -32,14 +32,7 @@
 
   "depends": {
     "fabricloader": ">=0.8.8",
-    "fabric": "*"
-  },
-  "custom": {
-    "modmenu": {
-      "links": {
-        "modmenu.discord": "https://discord.gg/9PAesuHFnp"
-      }
-    }
+    "fabric-api": "*"
   },
   "accessWidener": "fabrictailor.accesswidener"
 }

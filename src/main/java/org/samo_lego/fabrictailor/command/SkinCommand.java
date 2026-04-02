@@ -130,7 +130,7 @@ public class SkinCommand {
         // Warn about server path for uploads
         MinecraftServer server = player.level().getServer();
         if (server != null && server.isDedicatedServer() && config.logging.skinChangeFeedback) {
-                player.displayClientMessage(
+                player.sendSystemMessage(
                     TextTranslations.create("hint.fabrictailor.server_skin_path").withStyle(ChatFormatting.GOLD),
                     false
             );
@@ -139,7 +139,7 @@ public class SkinCommand {
         setSkin(player, () -> setSkinFromFile(skinFilePath, useSlim));
         
         if (config.logging.skinChangeFeedback) {
-            player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
+            player.sendSystemMessage(TextTranslations.create("command.fabrictailor.skin.please_wait").withStyle(ChatFormatting.GOLD),
                     false
             );
         }
@@ -168,17 +168,17 @@ public class SkinCommand {
         long now = System.currentTimeMillis();
 
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
-            player.displayClientMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
+            player.sendSystemMessage(SET_SKIN_ATTEMPT.withStyle(ChatFormatting.AQUA), false);
             THREADPOOL.submit(() -> {
                 var skinData = skinProvider.get();
 
                 if (skinData.isEmpty()) {
-                    player.displayClientMessage(SKIN_SET_ERROR, false);
+                    player.sendSystemMessage(SKIN_SET_ERROR, false);
                 } else {
                     ((TailoredPlayer) player).fabrictailor_setSkin(skinData.get(), true);
                     
                     if (config.logging.skinChangeFeedback) {
-                        player.displayClientMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
+                        player.sendSystemMessage(TextTranslations.create("command.fabrictailor.skin.set.success").withStyle(ChatFormatting.GREEN), false);
                     }
                 }
             });
@@ -186,7 +186,7 @@ public class SkinCommand {
             // Prevent skin change spamming
             MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                     .withStyle(ChatFormatting.LIGHT_PURPLE);
-            player.displayClientMessage(
+            player.sendSystemMessage(
                     TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                             .withStyle(ChatFormatting.RED),
                     false
@@ -203,7 +203,7 @@ public class SkinCommand {
         if (now - lastChange > config.skinChangeTimer * 1000 || lastChange == 0) {
             ((TailoredPlayer) player).fabrictailor_clearSkin();
             if (config.logging.skinChangeFeedback) {
-                player.displayClientMessage(
+                player.sendSystemMessage(
                         TextTranslations.create("command.fabrictailor.skin.clear.success").withStyle(ChatFormatting.GREEN),
                         false
                 );
@@ -215,7 +215,7 @@ public class SkinCommand {
         // Prevent skin change spamming
         MutableComponent timeLeft = Component.literal(String.valueOf((config.skinChangeTimer * 1000 - now + lastChange) / 1000))
                 .withStyle(ChatFormatting.LIGHT_PURPLE);
-        player.displayClientMessage(
+        player.sendSystemMessage(
                 TextTranslations.create("command.fabrictailor.skin.timer.please_wait", timeLeft)
                         .withStyle(ChatFormatting.RED),
                 false

@@ -7,7 +7,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
@@ -18,6 +18,8 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.chat.CommonComponents;
@@ -96,12 +98,6 @@ public class SkinChangeScreen extends Screen {
                 .size(BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
         this.addRenderableWidget(openExplorerButton);
-        if (this.font == null) {  // todo: figure out why this happens in 1.21.11
-            Minecraft.getInstance().setScreen(null);
-            Minecraft.getInstance().player.displayClientMessage(Component.nullToEmpty("WTH?? Screen#font is null, closing screen"), false);
-            return;
-        }
-
         // Checkbox for slim skin model
         this.skinModelCheckbox = Checkbox.builder(TextTranslations.create("button.fabrictailor.use_slim"), this.font)
                 .pos(width / 2,
@@ -229,93 +225,81 @@ public class SkinChangeScreen extends Screen {
      * Renders the skin changing screen.
      */
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        super.render(guiGraphics, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphicsExtractor, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphicsExtractor, mouseX, mouseY, delta);
 
         // Screen title
-        guiGraphics.drawCenteredString(this.font, title, width / 2, 15, -1);
+        graphicsExtractor.centeredText(this.font, title, width / 2, 15, -1);
 
         // Starting position of the window texture
         this.startX = (this.width - 252) / 2;
         this.startY = (this.height - 140) / 2;
 
         // Window texture
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, AAdvancementsScreen.getWINDOW_LOCATION(), startX, startY, 0, 0, 252, 140, 256, 256);
+        graphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, AAdvancementsScreen.getWINDOW_LOCATION(), startX, startY, 0, 0, 252, 140, 256, 256);
 
 
-        this.skinInput.render(guiGraphics, startX, startY, delta);
+        this.skinInput.extractWidgetRenderState(graphicsExtractor, startX, startY, delta);
 
         // Other renders
-        this.drawTabs(guiGraphics, startX, startY);
-        this.drawIcons(guiGraphics, startX, startY);
-        this.drawWidgetTooltips(guiGraphics, startX, startY, mouseX, mouseY);
+        this.drawTabs(graphicsExtractor, startX, startY);
+        this.drawIcons(graphicsExtractor, startX, startY);
+        this.drawWidgetTooltips(graphicsExtractor, startX, startY, mouseX, mouseY);
 
         int x = this.startX + 24;
         int y = this.startY - 76;
         if (this.selectedTab.showModelBackwards()) {
-            renderEntityInInventoryFollowsMouseBackwards(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
+            extractEntityInInventoryFollowsMouseBackwards(graphicsExtractor, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
         } else {
             // Drawing Player
             // Luckily vanilla code is available
-            InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
+            InventoryScreen.extractEntityInInventoryFollowsMouse(graphicsExtractor, x, y, x + 75, y + 208, 48, 1.0f, mouseX + 2, mouseY - 16, this.minecraft.player);
         }
     }
 
-    public void renderEntityInInventoryFollowsMouseBackwards(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
-        float mousex = -(((float) width / 2) - 75 - g);
-        float mousey = ((float) height / 2) - h;
-        float p = (float) Math.atan(mousex / 40.0f);
-        float q = (float) Math.atan(mousey / 40.0f);
-        guiGraphics.enableScissor(i, j, k, l);
-        Quaternionf quaternionf = (new Quaternionf()).rotateZ((float) Math.PI);
-        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(q * 20.0F * (float) (Math.PI / 180.0));
-        quaternionf.mul(quaternionf2);
-        float r = livingEntity.yBodyRot;
-        float s = livingEntity.getYRot();
-        float t = livingEntity.getXRot();
-        float u = livingEntity.yHeadRotO;
-        float v = livingEntity.yHeadRot;
-        livingEntity.yBodyRot = p * 40.0F;
-        livingEntity.setYRot(p * 40.0F);
-        livingEntity.setXRot(-q * 40.0F);
-        livingEntity.yHeadRot = livingEntity.getYRot();
-        livingEntity.yHeadRotO = livingEntity.getYRot();
-        float w = livingEntity.getScale();
-        float x = (float) m / w;
+    public static void extractEntityInInventoryFollowsMouseBackwards(final GuiGraphicsExtractor graphicsExtractor, final int x0, final int y0, final int x1, final int y1, final int size, final float offsetY, final float mouseX, final float mouseY, final LivingEntity entity) {
+        float centerX = (float)(x0 + x1) / 2.0F;
+        float centerY = (float)(y0 + y1) / 2.0F;
+        float xAngle = (float)Math.atan((mouseX - centerX) / 40.0F);
+        float yAngle = (float)Math.atan((centerY - mouseY) / 40.0F);
+        Quaternionf rotation = (new Quaternionf()).rotateZ((float)Math.PI);
+        Quaternionf xRotation = (new Quaternionf()).rotateX(yAngle * 20.0F * ((float)Math.PI / 180F));
+        var backwardsBodyRot = new Quaternionf().rotateAxis((180.0F + xAngle * 20.0F) * ((float)Math.PI / 180F), 0.0F, 1.0F, 0.0F);
+        rotation.mul(xRotation);
+        rotation.mul(backwardsBodyRot);
 
-        EntityRenderState entityRenderState = AInventoryScreen.invokeExtractRenderState(livingEntity);
-        if (entityRenderState instanceof LivingEntityRenderState livingEntityRenderState) {
-            livingEntityRenderState.bodyRot = 180.0F + p * 20.0F;
-            livingEntityRenderState.yRot = p * 20.0F;
-            if (livingEntityRenderState.pose != Pose.FALL_FLYING) {
-                livingEntityRenderState.xRot = -q * 20.0F;
+        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        EntityRenderer<? super LivingEntity, ?> renderer = entityRenderDispatcher.getRenderer(entity);
+        EntityRenderState renderState = renderer.createRenderState(entity, 1.0F);
+        renderState.shadowPieces.clear();
+        renderState.outlineColor = 0;
+
+        if (renderState instanceof LivingEntityRenderState livingRenderState) {
+            livingRenderState.bodyRot = 180.0F + xAngle * 20.0F;
+            livingRenderState.yRot = xAngle * 20.0F;
+            if (livingRenderState.pose != Pose.FALL_FLYING) {
+                livingRenderState.xRot = -yAngle * 20.0F;
             } else {
-                livingEntityRenderState.xRot = 0.0F;
+                livingRenderState.xRot = 0.0F;
             }
 
-            livingEntityRenderState.boundingBoxWidth /= livingEntityRenderState.scale;
-            livingEntityRenderState.boundingBoxHeight /= livingEntityRenderState.scale;
-            livingEntityRenderState.scale = 1.0F;
+            livingRenderState.boundingBoxWidth /= livingRenderState.scale;
+            livingRenderState.boundingBoxHeight /= livingRenderState.scale;
+            livingRenderState.scale = 1.0F;
         }
 
-        Vector3f vector3f = new Vector3f(0.0F, entityRenderState.boundingBoxHeight / 2.0F + f, 0.0F);
-        guiGraphics.submitEntityRenderState(entityRenderState, (float)m, vector3f, quaternionf, quaternionf2, i, j, k, l);
-        livingEntity.yBodyRot = r;
-        livingEntity.setYRot(s);
-        livingEntity.setXRot(t);
-        livingEntity.yHeadRotO = u;
-        livingEntity.yHeadRot = v;
-        guiGraphics.disableScissor();
+        Vector3f translation = new Vector3f(0.0F, renderState.boundingBoxHeight / 2.0F + offsetY, 0.0F);
+        graphicsExtractor.entity(renderState, (float)size, translation, rotation, xRotation, x0, y0, x1, y1);
     }
 
     /**
      * Draws tabs.
      *
-     * @param guiGraphics
+     * @param graphicsExtractor
      * @param startX      x where skin window starts
      * @param startY      y where skin window starts
      */
-    private void drawTabs(GuiGraphics guiGraphics, int startX, int startY) {
+    private void drawTabs(GuiGraphicsExtractor graphicsExtractor, int startX, int startY) {
         if (this.selectedTab == null) {
             this.selectedTab = TABS.get(0);
         }
@@ -332,14 +316,18 @@ public class SkinChangeScreen extends Screen {
                 this.openExplorerButton.visible = tab.showExplorerButton();
             }
 
-            tab.getTabType().draw(guiGraphics, startX, startY, selected, tab.getTabType().getMax() - i - 1);
+            int index = tab.getTabType().getMax() - i - 1;
+            int tabX = startX + tab.getTabType().getX(index);
+            int tabY = startY + tab.getTabType().getY(index);
+
+            tab.getTabType().extractRenderState(graphicsExtractor, tabX, tabY, selected, index);
         }
 
         // Rendering title
-        guiGraphics.drawString(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFFFF);
+        graphicsExtractor.text(this.font, this.selectedTab.getTitle(), startX + 10, startY + 5, 0xFFFFFFFF);
 
         // Rendering description above input field
-        guiGraphics.drawString(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFFFF);
+        graphicsExtractor.text(this.font, this.selectedTab.getDescription(), width / 2, height / 2 - 40, 0xFFFFFFFF);
     }
 
 
@@ -349,11 +337,11 @@ public class SkinChangeScreen extends Screen {
      * @param startX x where skin window starts
      * @param startY y where skin window starts
      */
-    private void drawIcons(GuiGraphics guiGraphics, int startX, int startY) {
+    private void drawIcons(GuiGraphicsExtractor graphicsExtractor, int startX, int startY) {
         // Icons
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
-            tab.getTabType().drawIcon(guiGraphics, startX, startY, tab.getTabType().getMax() - i - 1, tab.getIcon());
+            tab.getTabType().extractIcon(graphicsExtractor, startX, startY, tab.getTabType().getMax() - i - 1, tab.getIcon());
         }
     }
 
@@ -361,19 +349,20 @@ public class SkinChangeScreen extends Screen {
     /**
      * Draws tooltips when hovering over tabs.
      *
-     * @param guiGraphics
+     * @param graphicsExtractor
      * @param startX      x where skin window starts
      * @param startY      y where skin window starts
      * @param mouseX      mouse x
      * @param mouseY      mouse y
      */
-    private void drawWidgetTooltips(GuiGraphics guiGraphics, int startX, int startY, int mouseX, int mouseY) {
+    private void drawWidgetTooltips(GuiGraphicsExtractor graphicsExtractor, int startX, int startY, int mouseX, int mouseY) {
         for (int i = 0; i < TABS.size(); ++i) {
             SkinTabType tab = TABS.get(i);
 
             ClientTooltipComponent clientTooltipComponent = ClientTooltipComponent.create(tab.getTitle().getVisualOrderText());
             if (tab.getTabType().isMouseOver(startX, startY, tab.getTabType().getMax() - i - 1, mouseX, mouseY)) {
-                guiGraphics.renderTooltip(this.font, List.of(clientTooltipComponent), mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null);
+                //graphicsExtractor.tooltip(this.font, List.of(clientTooltipComponent), mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null);
+                graphicsExtractor.setTooltipForNextFrame(this.font, tab.getTitle(), mouseX, mouseY);
                 break;
             }
         }
