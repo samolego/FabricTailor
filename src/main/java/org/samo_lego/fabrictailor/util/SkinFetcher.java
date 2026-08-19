@@ -162,10 +162,7 @@ public class SkinFetcher {
                 writer.flush();
 
                 writer.append("--").append(boundary).append(LINE);
-                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(image.getName()).append("\"");
-                if (variant != null)
-                    writer.append("; variant=\"").append(variant).append("\"");
-                writer.append(LINE);
+                writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(image.getName()).append("\"").append(LINE);
                 writer.append("Content-Type: image/png").append(LINE);
                 writer.append("Content-Transfer-Encoding: binary").append(LINE);
                 writer.append(LINE);
@@ -177,6 +174,16 @@ public class SkinFetcher {
                 outputStream.flush();
                 writer.append(LINE);
                 writer.flush();
+
+                if (variant != null) {
+                    writer.append("--").append(boundary).append(LINE);
+                    writer.append("Content-Disposition: form-data; name=\"variant\"").append(LINE);
+                    writer.append("Content-Type: text/plain; charset=UTF-8").append(LINE);
+                    writer.append(LINE);
+                    writer.append(variant);
+                    writer.append(LINE);
+                    writer.flush();
+                }
 
                 writer.append("--").append(boundary).append("--").append(LINE);
                 writer.close();
