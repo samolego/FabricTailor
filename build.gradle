@@ -42,7 +42,7 @@ dependencies {
     implementation(include("me.lucko:fabric-permissions-api:${project.permissions_api_version}"))
 
     // Carpet
-    compileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
+//    compileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
 }   
 
 tasks.withType(JavaCompile).configureEach {

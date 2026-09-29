@@ -378,7 +378,7 @@ public class SkinChangeScreen extends Screen {
      */
     @Override
     public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
-        if (mouseButtonEvent.button() == 0) {
+        if (mouseButtonEvent.button() == 1) {
             for (int i = 0; i < TABS.size(); ++i) {
                 SkinTabType tab = TABS.get(i);
 

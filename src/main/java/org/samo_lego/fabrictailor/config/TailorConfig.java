@@ -77,7 +77,8 @@ public class TailorConfig implements IBrigadierConfigurator {
             "googleusercontent.com",
             "nocookie.net",
             "discord.com",
-            "duckduckgo.com"
+            "duckduckgo.com",
+            "minecraft.wiki"
     ));
 
     @Override
