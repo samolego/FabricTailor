@@ -117,7 +117,7 @@ public abstract class MServerPlayerEntity_TailoredPlayer extends Player implemen
                                 level.dimension(),
                                 BiomeManager.obfuscateSeed(level.getSeed()),
                                 self.gameMode.getGameModeForPlayer(),
-                                self.gameMode.getPreviousGameModeForPlayer(),
+                                Optional.ofNullable(self.gameMode.getPreviousGameModeForPlayer()),
                                 level.isDebug(),
                                 level.isFlat(),
                                 self.getLastDeathLocation(),

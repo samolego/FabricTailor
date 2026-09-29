@@ -2,13 +2,13 @@ package org.samo_lego.fabrictailor.mixin.client;
 
 import com.mojang.authlib.SignatureState;
 import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
+import com.mojang.authlib.services.MinecraftServicesSessionService;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = YggdrasilMinecraftSessionService.class, remap = false)
+@Mixin(value = MinecraftServicesSessionService.class, remap = false)
 public class MYggDrasilMinecraftSessionService_AllSkinsAcceptor {
 
     /**

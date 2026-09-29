@@ -2,7 +2,7 @@ package org.samo_lego.fabrictailor.mixin.client;
 
 import com.google.common.net.InternetDomainName;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.authlib.yggdrasil.TextureUrlChecker;
+import com.mojang.authlib.services.MinecraftServicesDiscoveryService;
 import java.net.URI;
 import static org.samo_lego.fabrictailor.FabricTailor.config;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(value = TextureUrlChecker.class, remap = false)
+@Mixin(value = MinecraftServicesDiscoveryService.class, remap = false)
 public final class MTextureUrlChecker_AllDomains {
 
     @Unique
@@ -22,9 +22,10 @@ public final class MTextureUrlChecker_AllDomains {
     }
 
     @Inject(method = "isAllowedTextureDomain",
-            at = @At(value = "INVOKE", target = "Ljava/net/URI;getScheme()Ljava/lang/String;"),
+            at = @At("TAIL"),
             cancellable = true)
-    private static void ft_allowAllTextureDomains(String url, CallbackInfoReturnable<Boolean> cir, @Local URI uri) {
+    private static void ft_allowAllTextureDomains(String url, CallbackInfoReturnable<Boolean> cir) {
+        var uri = URI.create(url);
         if (FILE_SCHEME_CONST.equals(uri.getScheme())) {
             cir.setReturnValue(false);  // todo, allow files
             return;

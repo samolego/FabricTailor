@@ -1,6 +1,7 @@
 package org.samo_lego.fabrictailor.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.InputConstants.Type;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,7 +12,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
 import org.samo_lego.fabrictailor.client.screen.SkinChangeScreen;
 import org.samo_lego.fabrictailor.network.payload.FabricTailorHelloPayload;
 import org.samo_lego.fabrictailor.util.TextTranslations;
@@ -37,10 +37,11 @@ public class ClientTailor implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // K for opening the window
         keyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.fabrictailor.toggle_skin_gui",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_K, // K for opening the window
+                Type.KEYBOARD,
+                InputConstants.KEY_K,
                 new KeyMapping.Category(Identifier.fromNamespaceAndPath(MOD_ID, "skin_category"))
         ));
 

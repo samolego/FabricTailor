@@ -2,6 +2,7 @@ package org.samo_lego.fabrictailor.client.screen;
 
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.blaze3d.Blaze3D;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -25,7 +26,6 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import org.joml.Quaternionf;
@@ -91,7 +91,7 @@ public class SkinChangeScreen extends Screen {
 
         // Button for opening file manager
         this.openExplorerButton = Button.builder(TextTranslations.create("button.fabrictailor.open_explorer"),
-                        (buttonWidget) -> Util.getPlatform().openFile(new File("")))
+                        (buttonWidget) -> Blaze3D.openPath(new File("").toPath()))
                 .tooltip(Tooltip.create(TextTranslations.create("hint.fabrictailor.dragAndDrop")))
                 .pos(this.width / 2, this.height / 2 + 10)
                 .tooltip(Tooltip.create(TextTranslations.create("hint.fabrictailor.dragAndDrop")))

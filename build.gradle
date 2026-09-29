@@ -1,8 +1,7 @@
 plugins {
     id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
-    id "com.matthewprenger.cursegradle" version "1.4.0"
-    id "com.modrinth.minotaur" version "2.+"
+    id "me.modmuss50.mod-publish-plugin" version "2.0.1"
 }
 
 version = project.mod_version
@@ -46,14 +45,6 @@ dependencies {
     compileOnly("carpet:fabric-carpet:${project.carpet_core_version}")
 }   
 
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
-    }
-}
-
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 25
 }
@@ -77,7 +68,6 @@ jar {
     }
 }
 
-
 // configure the maven publication
 publishing {
     publications {
@@ -96,59 +86,26 @@ publishing {
     }
 }
 
-// from FAPI https://github.com/FabricMC/fabric/blob/1.16/build.gradle
-curseforge {
-    if (ENV.CURSEFORGE_API_KEY) {
-        apiKey = ENV.CURSEFORGE_API_KEY
-    }
-
-    project {
-        id = "390114"
-        changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
-        releaseType = "release"
-        if (project.minecraft_version.contains("-")) {
-            // yuck
-            addGameVersion "${project.minecraft_version.split("-")[0]}-Snapshot"
-        } else {
-            addGameVersion "${project.minecraft_version}"
-        }
-        addGameVersion "Fabric"
-
-        mainArtifact(jar.archiveFile) {
-            displayName = "[${project.minecraft_version}] FabricTailor ${version}"
-        }
-
-        afterEvaluate {
-            uploadTask.dependsOn("jar")
-        }
-    }
-
-    options {
-        forgeGradleIntegration = false
-    }
-}
-
-
-tasks.modrinth {
-    onlyIf {
-        ENV.MODRINTH_TOKEN
-    }
-}
-
-modrinth {
-    token = ENV.MODRINTH_TOKEN
-    projectId = "g8w1NapE"
+// Publishing to CurseForge / Modrinth, modeled after Fabric API's build:
+publishMods {
+    file = jar.archiveFile
     changelog = ENV.CHANGELOG ?: "A changelog can be found at https://github.com/samolego/FabricTailor/releases/tag/${version}"
-    versionNumber = version
-    versionName = "[${project.minecraft_version}] FabricTailor ${version}"
-    versionType = "release"
+    type = STABLE
+    displayName = "[${project.minecraft_version}] FabricTailor ${version}"
+    modLoaders.addAll("fabric", "quilt")
+    dryRun = providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull() == null
 
-    uploadFile = jar.archiveFile
-
-    gameVersions = [project.minecraft_version]
-    loaders = ['fabric', 'quilt']
-    dependencies {
-        required.project "fabric-api"
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = "390114"
+        minecraftVersions.add(project.minecraft_version)
+        client = true
+        server = true
     }
 
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = "g8w1NapE"
+        minecraftVersions.add(project.minecraft_version)
+    }
 }
